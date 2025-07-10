@@ -1,0 +1,79 @@
+name: deploy
+
+# dispara em pushes e pull requests na branch main (ou mude para a sua)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: 📦 Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Pega o código
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Configura Node e cacheia dependências
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3. Instala deps
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. (Opcional) Lint
+      - name: Run lint
+        run: npm run lint
+        continue-on-error: true
+
+      # 5. (Opcional) Testes
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+
+      # 6. Build produção
+      - name: Build project
+        run: npm run build
+
+      # 7. Salva artefato (dist/) para deploy
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: dist
+
+  deploy:
+    name: 🚀 Deploy to GitHub Pages
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write       # para GitHub Pages
+      id-token: write    # se precisar de OIDC no futuro
+    steps:
+      # 1. Checa o código de novo
+      - uses: actions/checkout@v3
+
+      # 2. Setup Node (para rebuild)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3. Instala deps e rebuild
+      - run: npm ci
+      - run: npm run build
+
+      # 4. Deploy usando peaceiris/actions-gh-pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
