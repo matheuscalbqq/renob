@@ -1,53 +1,59 @@
-name: CI/CD
+name: CI / CD
 
-# Dispara em push e PR na main e permite execução manual
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
-  build-and-test:
-    name: 📦 Build & Test
+  build:
+    name: 📦 Build
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout do repositório (precisa do histórico completo para o deploy depois)
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      # 2. Instala e cacheia o Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: npm
 
-      # 3. Instala dependências
       - name: Install dependencies
         run: npm ci
 
-      # 4. Executa o build
-      - name: Build
+      - name: Build project
         run: npm run build
 
-      # 5. Deploy para GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
         with:
-          # token padrão do Actions
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # branch onde o site vai ficar
-          publish_branch: gh-pages
-          # URL remota para o push (força autenticação correta)
-          remote_url: https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          # pasta gerada pelo build
-          publish_dir: ./dist
-          # cria o branch na primeira vez, mesmo vazio
-          allow_empty_commit: true
-          # opcional: quem aparece como autor do commit
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          name: build-output
+          path: dist
+
+  deploy:
+    name: 🌐 Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-output
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./dist
+
+      - name: Deploy to Pages
+        uses: actions/deploy-pages@v1
