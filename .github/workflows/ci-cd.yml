@@ -1,4 +1,4 @@
-name: deploy
+name: CI/CD
 
 # dispara em pushes e pull requests na branch main (ou mude para a sua)
 on:

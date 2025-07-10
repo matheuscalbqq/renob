@@ -31,7 +31,7 @@ const Missao = () => {
             </CardContent>
           </Card>
         </section>
-
+        {/* Impact Phrase */}
         <div className="text-center mb-16">
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto italic">
             Explore nossos mapas e gráficos para obter uma compreensão aprofundada do estado nutricional no Brasil e ajude-nos a construir um futuro mais saudável para todos.
