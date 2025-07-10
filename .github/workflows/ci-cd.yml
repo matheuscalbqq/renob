@@ -1,29 +1,30 @@
 name: CI/CD
 
-# dispara em pushes e pull requests na branch main (ou mude para a sua)
+# Dispara em push e PR na main e permite execução manual
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
     name: 📦 Build & Test
     runs-on: ubuntu-latest
     steps:
-      # 1. Pega o código
+      # 1. Puxa o código
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Configura Node e cacheia dependências
+      # 2. Configura Node.js e cacheia node_modules
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
 
-      # 3. Instala deps
+      # 3. Instala dependências
       - name: Install dependencies
         run: npm ci
 
@@ -37,30 +38,23 @@ jobs:
         run: npm test
         continue-on-error: true
 
-      # 6. Build produção
+      # 6. Build de produção
       - name: Build project
         run: npm run build
-
-      # 7. Salva artefato (dist/) para deploy
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: dist
 
   deploy:
     name: 🚀 Deploy to GitHub Pages
     needs: build-and-test
-    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     permissions:
-      pages: write       # para GitHub Pages
-      id-token: write    # se precisar de OIDC no futuro
+      pages: write
+      id-token: write
     steps:
-      # 1. Checa o código de novo
+      # 1. Checkout de novo
       - uses: actions/checkout@v3
 
-      # 2. Setup Node (para rebuild)
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -71,7 +65,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # 4. Deploy usando peaceiris/actions-gh-pages
+      # 4. Deploy para gh-pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
