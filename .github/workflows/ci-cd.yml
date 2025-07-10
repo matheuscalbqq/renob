@@ -38,10 +38,16 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
+          # token padrão do Actions
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # branch onde o site vai ficar
+          publish_branch: gh-pages
+          # URL remota para o push (força autenticação correta)
+          remote_url: https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          # pasta gerada pelo build
           publish_dir: ./dist
-          # para o primeiro deploy, permite criar um commit vazio
+          # cria o branch na primeira vez, mesmo vazio
           allow_empty_commit: true
-          # configurações de usuário para o commit
+          # opcional: quem aparece como autor do commit
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
