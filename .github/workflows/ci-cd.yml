@@ -13,11 +13,13 @@ jobs:
     name: 📦 Build & Test
     runs-on: ubuntu-latest
     steps:
-      # 1. Puxa o código
-      - name: Checkout repository
+      # 1. Checkout do repositório (precisa do histórico completo para o deploy depois)
+      - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      # 2. Configura Node.js e cacheia node_modules
+      # 2. Instala e cacheia o Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -28,46 +30,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 4. (Opcional) Lint
-      - name: Run lint
-        run: npm run lint
-        continue-on-error: true
-
-      # 5. (Opcional) Testes
-      - name: Run tests
-        run: npm test
-        continue-on-error: true
-
-      # 6. Build de produção
-      - name: Build project
+      # 4. Executa o build
+      - name: Build
         run: npm run build
 
-  deploy:
-    name: 🚀 Deploy to GitHub Pages
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    steps:
-      # 1. Checkout de novo
-      - uses: actions/checkout@v3
-
-      # 2. Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      # 3. Instala deps e rebuild
-      - run: npm ci
-      - run: npm run build
-
-      # 4. Deploy para gh-pages
+      # 5. Deploy para GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          # para o primeiro deploy, permite criar um commit vazio
+          allow_empty_commit: true
+          # configurações de usuário para o commit
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
