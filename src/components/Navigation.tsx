@@ -19,7 +19,7 @@ export const Navigation = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-2">
-          <div className="h-16 w-16 translate-y-2"><img src="src/assets/logo-renob-vet.png"></img></div>
+          <div className="h-16 w-16 translate-y-2"><img src="@/assets/logo-renob-vet.png"></img></div>
           <span className="text-xl font-bold text-primary">
             RENOB-MG
           </span>
