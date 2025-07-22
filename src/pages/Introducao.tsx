@@ -45,8 +45,8 @@ const Introducao = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="text-center shadow-soft hover:shadow-medium transition-all duration-300">
               <CardContent className="p-6">
-                <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-nutrition-green/10 flex items-center justify-center">
-                  <BarChart3 className="h-6 w-6 text-nutrition-green" />
+                <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-nutrition-blue/10 flex items-center justify-center">
+                  <BarChart3 className="h-6 w-6 text-nutrition-blue" />
                 </div>
                 <h3 className="text-2xl font-bold text-primary mb-2">Adultos</h3>
                 <p className="text-muted-foreground">Entre 20 e 59 anos</p>
@@ -55,8 +55,8 @@ const Introducao = () => {
 
             <Card className="text-center shadow-soft hover:shadow-medium transition-all duration-300">
               <CardContent className="p-6">
-                <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-nutrition-orange/10 flex items-center justify-center">
-                  <Globe className="h-6 w-6 text-nutrition-orange" />
+                <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-nutrition-green/10 flex items-center justify-center">
+                  <Globe className="h-6 w-6 text-nutrition-green" />
                 </div>
                 <h3 className="text-xl font-bold text-primary mb-2"> Unidades Geográficas</h3>
                 <p className="text-muted-foreground">Municípios, Unidades Federativas e Regiões de Saúde</p>
@@ -65,8 +65,8 @@ const Introducao = () => {
 
             <Card className="text-center shadow-soft hover:shadow-medium transition-all duration-300">
               <CardContent className="p-6">
-                <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-nutrition-blue/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-nutrition-blue" />
+                <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-nutrition-orange/10 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-nutrition-orange" />
                 </div>
                 <h3 className="text-2xl font-bold text-primary mb-2">Gêneros</h3>
                 <p className="text-muted-foreground">Feminino e Masculino</p>

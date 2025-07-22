@@ -6,8 +6,9 @@
 All colors MUST be HSL.
 */
 
-@layer base {
-  :root {
+/*
+======================================
+Originais
     --background: 120 20% 99%;
     --foreground: 160 15% 15%;
 
@@ -35,6 +36,57 @@ All colors MUST be HSL.
     --border: 120 20% 90%;
     --input: 120 20% 92%;
     --ring: 142 70% 45%;
+=======================================
+cores renob
+
+azul: 205 100% 20% / 240 20% 99%
+vermelho: 358 84% 56%
+pessego: 10 80% 70%
+*/
+
+@layer base {
+  :root { 
+     /* ——— Paleta Principal ——— */
+    --primary: 205 100% 20%;            /* azul escuro */
+    --primary-foreground: 0 0% 98%;     /* branco para texto sobre o azul */
+    --primary-hover: 205 100% 25%;      /* leve clareamento para hover */
+    --primary-active: 205 100% 10%;     /* leve escurecimento para active */
+    --primary-muted: 205 100% 90%;
+    --primary-muted-fg: 205 30% 50%;
+
+    --secondary: 358 84% 56%;           /* vermelho médio */
+    --secondary-foreground: 0 0% 98%;   /* branco para texto sobre o vermelho */
+    --secondary-hover: 358 84% 64%;
+    --secondary-active: 358 84% 48%;
+    --secondary-muted: 358 100% 90%;
+    --secondary-muted-fg: 205 30% 50%;
+
+    --accent: 10 80% 70%;               /* laranja claro */
+    --accent-foreground: 0 0% 10%;      /* quase preto para contraste */
+    --accent-hover: 10 80% 60%;
+    --accent-active: 10 80% 80%;
+
+    /* ——— Tonalidades Globais (mantidas) ——— */
+    --background: var(--primary-foreground);
+    --foreground: var(--primary);
+
+    --card: 120 20% 98%;
+    --card-foreground: 160 15% 15%;
+
+    --popover: 120 20% 99%;
+    --popover-foreground: 160 15% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --muted: var(--primary-muted);
+    --muted-foreground: var(--primary-muted-fg);
+
+    --border: 120 20% 90%;
+    --input: 120 20% 92%;
+    --ring: var(--primary);
+
+    --radius: 0.5rem;
 
     /* Custom nutrition theme colors */
     --nutrition-green: 142 70% 45%;
@@ -47,16 +99,14 @@ All colors MUST be HSL.
     --nutrition-pink-light: 306 90% 80%;
 
     /* Gradients for data visualization */
-    --gradient-primary: linear-gradient(135deg, hsl(142 70% 45%), hsl(142 60% 55%));
-    --gradient-secondary: linear-gradient(135deg, hsl(25 95% 53%), hsl(25 85% 63%));
-    --gradient-accent: linear-gradient(135deg, hsl(207 90% 54%), hsl(207 80% 64%));
+    --gradient-primary: linear-gradient(135deg,hsl(var(--secondary)), hsl(var(--primary)));
+    --gradient-secondary: linear-gradient(135deg,hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent)));
 
     /* Shadows for depth */
     --shadow-soft: 0 4px 20px hsl(120 20% 50% / 0.1);
     --shadow-medium: 0 8px 30px hsl(120 20% 50% / 0.15);
     --shadow-strong: 0 12px 40px hsl(120 20% 50% / 0.2);
-
-    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -130,4 +180,70 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+  
+}
+
+@layer components{
+  /* container geral do tooltip */
+  .tooltip-regional {
+    @apply fixed z-50 pointer-events-none
+           transition-opacity duration-200
+           bg-white text-sm text-gray-800
+           px-3 py-2 rounded-lg
+           shadow-lg border border-gray-300;
+  }
+
+  /* layout interno, espaçamento entre linhas */
+  .tooltip-content  { @apply space-y-1;  }
+
+  /* título em negrito */
+  .tooltip-title    { @apply font-bold text-gray-800;  }
+
+  /* subtítulo em itálico */
+  .tooltip-subtitle { @apply italic text-gray-600;     }
+
+  /* porcentagem feminina */
+  .tooltip-fem      { @apply text-red-500 font-medium; }
+
+  /* porcentagem masculina */
+  .tooltip-masc     { @apply text-blue-500 font-medium;}
+
+  /* cores */
+  .cor-masc { @apply text-masc; }
+  .cor-fem  { @apply text-fem;  }
+  .cor-all  { @apply text-all;  }
+  /* linhas do gráfico */
+  .line-masc  { @apply stroke-masc; }
+  .line-fem   { @apply stroke-fem;  }
+  .line-all   { @apply stroke-all;  }
+
+  /* círculos */
+  .circle-masc    { @apply fill-masc; }
+  .circle-fem     { @apply fill-fem;  }
+  .circle-all     { @apply fill-all;  }
+
+  .notbold {  @apply font-normal; }
+
+  .site-header      { @apply bg-white shadow-md p-4 flex items-center fixed top-0 w-full z-50; }
+  .nav-link         { @apply text-gray-700 hover:text-blue-600;                                }
+  .section          { @apply min-h-screen flex flex-col items-center justify-center;           }
+  .section-content  { @apply max-w-6xl w-full px-4 mx-auto;                                    }
+
+  .card                         { @apply bg-white p-4 rounded-md shadow-md;                    }
+  .stat-table                   { @apply place-self-center text-center border border-gray-600; }
+  .stat-table th,.stat-table td { @apply border border-gray-600 px-4;                          }
+
+  /* Alertas de clique em regional.js */
+  .alerta-mapa-base { @apply text-center mt-2 text-sm text-red-600; }
+
+
+  .checkbox-disabled { @apply line-through text-gray-400 opacity-50 cursor-not-allowed; }
+  .grid-line { @apply stroke-gray-200 stroke-[1px]; }
+  .y-axis-label { @apply text-lg font-medium; }
+
+  .map-path { @apply stroke-1;  }
+  .map-path-country { @apply stroke-purple-600; }
+  .map-path-state   { @apply stroke-blue-500; }
+  .map-path-muni    { @apply stroke-gray-400; }
+
 }
