@@ -21,7 +21,7 @@ export const Navigation = () => {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="h-16 w-16 translate-y-2">
-            <img src={logo} alt="Logo"/>
+            <img src={logo} alt="Logo RENOB"/>
           </div>
           <span className="text-xl font-bold text-primary">
             RENOB-MG
