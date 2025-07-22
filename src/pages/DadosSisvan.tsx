@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, TrendingUp, Globe } from "lucide-react";
+import { BarChart3, TrendingUp, Globe } from "lucide-react";
 import { initMapeamento, populateSelectsMapeamento }   from "@/lib/d3/mapeamento";
 import { initRegional }     from "@/lib/d3/regional";
 import { initTemporal }     from "@/lib/d3/analise_temporal";
@@ -256,8 +256,8 @@ export default function DadosSisvan() {
         <Tabs defaultValue="mapeamento" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="mapeamento" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Mapeamento Estadual
+              <BarChart3 className="h-4 w-4" />
+              Mapeamento Nutricional
             </TabsTrigger>
             <TabsTrigger value="regional" className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
