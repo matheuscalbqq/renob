@@ -386,15 +386,17 @@ export function initRegional(
          .attr("class", "country-boundary")
          .attr("d", (d: any) => pathGen(d)!)  // pathGen sabe lidar com FeatureCollection
          .attr("fill", colorScaleCountry(nutrPct))  // pinta todo o país pela % nacional
-         .attr("stroke", "#fff")        // ou remova o stroke interno: .attr("stroke", "none")
+         .attr("stroke", G.getStrokeColor[filtroSexo])    // ou remova o stroke interno: .attr("stroke", "none")
          .attr("stroke-width", 1)
          .on("mouseover", (event, d) => {
             // mesmo tooltip que você já tinha para "estados"
             showTooltipBrasil(event, d);
+            d3.select(event.currentTarget as Element).attr("stroke-width", 2);
          })
          .on("mousemove", G.moveTooltip)
          .on("mouseout", () => {
             G.hideTooltip();
+            d3.select(event.currentTarget as Element).attr("stroke-width", 1);
          })
          .on("click", () => {
             initEstadosMap();            
@@ -559,7 +561,7 @@ export function initRegional(
          .data(features)
          .join("path")
             .classed("map-path state", true)
-            .attr("stroke", G.getStrokeColor(filtroSexo))
+            .attr("stroke", G.getStrokeColor[filtroSexo])
             .attr("d", d => pathGen(d)!)
             .attr("fill", d => {
             const val = valoresMapa.get(d.id as string);
@@ -721,8 +723,7 @@ export function initRegional(
       const minVal = d3.min(vals) ?? 0;
       const maxVal = d3.max(vals) ?? 0;
       const colorScale = G.getColorScale(selectedSexo, minVal, maxVal);
-      const borderColor = { Todos: "#b982a1", Fem: "#4682B4", Masc: "#DB7093" }[selectedSexo] || "#ccc";
-
+      
       // injeta o valor no geo
       geo.features.forEach((f: any) => {
          const code = f.properties.id || f.properties.CODMUN || f.properties.cod_mun;
@@ -747,7 +748,7 @@ export function initRegional(
          .data(geo.features as any[])
          .join("path")
          .classed("map-path municipio", true)
-         .attr("stroke", borderColor)
+         .attr("stroke", G.getStrokeColor[selectedSexo])
          .attr("d", pathGen as any)
          .attr("fill", d => {
             const code = d.properties.id || d.properties.CODMUN || d.properties.cod_mun;
@@ -975,7 +976,7 @@ export function initRegional(
              ? "#ccc"
              : colorScale(d.properties.value);
            })
-           .attr("stroke", G.getStrokeColor(selectedSexo))
+           .attr("stroke", G.getStrokeColor[selectedSexo])
            .attr("stroke-width", 1)
            .on("mouseover", function(event, d) {
                // 1) pega a agregação por região

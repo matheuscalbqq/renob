@@ -184,6 +184,7 @@ pessego: 10 80% 70%
 }
 
 @layer components{
+
   /* container geral do tooltip */
   .tooltip-regional {
     @apply fixed z-50 pointer-events-none

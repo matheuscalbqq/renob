@@ -444,7 +444,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
     chartArea.append("text")
       .attr("transform", "rotate(-90)")
       .attr("x", -internalHeight/2)
-      .attr("y", -margin.left)
+      .attr("y", -margin.left -3)
       .attr("dy", "1em")
       .attr("text-anchor", "middle")
       .classed("y-axis-label", true)
@@ -468,12 +468,21 @@ const promiseDados = d3.csv<TemporalDataRow>(
     (["Fem","Masc","Todos"] as const).forEach(sexo => {
       const key = sexo === "Todos" ? "all" : sexo.toLowerCase();
       const serie = dadosRecord[sexo];
+      const pathString = lineGen(serie);
+      console.log(sexo, "->", pathString);
+
+      /* purgecss start ignore */
+      /* fill-primary fill-secondary fill-accent
+        stroke-primary stroke-secondary stroke-accent */
+      /* purgecss end ignore */
+        
+      const cores = {all: 'primary', fem: 'secondary', masc: 'accent'};
 
       // LINHA
       linesGroup.append("path")
         .datum(serie)
         .attr("fill", "none")
-        .attr("class", `line-${key}`)
+        .classed(`stroke-${cores[key]}`,true)
         .attr("stroke-width", 2)
         .attr("d", lineGen);
 
@@ -486,6 +495,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
           .attr("cx", d => x(d.ano)!)
           .attr("cy", d => y(d.valor))
           .attr("r", 4)
+          .classed(`fill-${cores[key]}`,true)
           .on("mouseover", (event, d) => {
             d3.select(event.currentTarget)
               .transition().duration(100).attr("r", 6);
@@ -502,6 +512,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
               .classed("visible", false);
             G.hideTooltip();
           });
+     
 
       // LABELS
       const labelGroups = labelsGroup

@@ -99,13 +99,13 @@ export function populateSelectsMapeamento (
 
       // ---Sexo---
       selectSexoEl.innerHTML = "";
-      ["Todos", "masc", "fem"].forEach(s => {
+      ["", "masc", "fem"].forEach(s => {
         const opt = document.createElement("option");
         opt.value = s;
         if (!s) {
           opt.text = "Todos";
         } else {
-          opt.text = s === "Todos"? "Todos": s === "masc" ? "Masculino" : "Feminino";
+          opt.text = s === "masc" ? "Masculino" : "Feminino";
         }
         selectSexoEl.appendChild(opt);
       });
@@ -226,7 +226,6 @@ export function initMapeamento(
   adultoCols.forEach(chk => {
     chk.addEventListener("change", handleAdultoCheckboxChange);
   });
-  atualizarGrafico();
 
   // --- Funções originais --- //
   function handleAdultoCheckboxChange(e) {
@@ -341,8 +340,10 @@ export function initMapeamento(
   const ufSelecionada       = selectUFEl.value;
   const municipioSelecionado= selectMunicipioEl.value;
   const anoSelecionado      = selectAnoEl.value;
-  const faseSelecionada     = selectFaseEl.value;   // “adolescente” | “adulto”
-  const sexoSelecionado     = selectSexoEl.value;   // “Masc” | “Fem” | “Todos”
+  const selectFaseInicial   = selectFaseEl.value;
+  const faseSelecionada     = selectFaseInicial === "" ? "adulto" : selectFaseInicial;   // “adolescente” | “adulto”
+  const selectSexoInicial   = selectSexoEl.value;
+  const sexoSelecionado     = selectSexoInicial === "" ? "Todos" : selectSexoInicial;   // “Masc” | “Fem” | “Todos”
 
   // 2) exibe ou oculta botão/menu de adulto (HTMLButtonElement e HTMLElement)
   if (faseSelecionada === "adulto") {
@@ -513,7 +514,7 @@ export function initMapeamento(
   // 6) Qual filtro de sexo está ativo?
   const selectedSexo = selectSexoEl.value;
 
-  if (selectedSexo === "Todos") {
+  if (selectedSexo === "") {
     // Criar sub-escala para total vs stacked
     const groups = ["total", "stacked"];
     const x1 = d3.scaleBand()
@@ -535,7 +536,7 @@ export function initMapeamento(
       .attr("y", d => y(d.Todos))
       .attr("width", x1.bandwidth() * 0.7)
       .attr("height", d => height - y(d.Todos))
-      .classed("fill-nutrition-green", true)
+      .classed("fill-primary", true)
       .on("mouseover", (event, d) => {
         G.showTooltip(`
           <strong>${G.nomeAmigavel[d.indicador]}</strong><br/>
@@ -560,7 +561,7 @@ export function initMapeamento(
         .data(series)
         .enter()
         .append("rect")
-          .attr("class", s => `stacked ${s.key==="Masc"?"fill-nutrition-blue":"fill-nutrition-orange"}`)
+          .attr("class", s => `stacked ${s.key==="Masc"?"fill-accent":"fill-secondary"}`)
           .attr("x", x1("stacked") + x1.bandwidth() * 0.05)
           .attr("y", s => y(s[0][1]))
           .attr("height", s => y(s[0][0]) - y(s[0][1]))
@@ -579,7 +580,10 @@ export function initMapeamento(
 
   } else {
     // Apenas Masc ou Fem
-    const key = selectedSexo; // "Masc" ou "Fem"
+    const raw = selectSexoEl.value.toLowerCase();
+    const key = raw === "masc"    ? "Masc"
+              : raw === "fem"     ? "Fem"
+              : /*  === "todos"*/   "Todos";
     svg.selectAll("g.indicador-group")
       .data(dados)
       .enter()
@@ -588,9 +592,9 @@ export function initMapeamento(
         .attr("transform", d => `translate(${x0(d.indicador)},0)`)
       .append("rect")
         .attr("x", x0.bandwidth()*0.25)
-        .attr("y", d => y(d[key]))
-        .attr("width", x0.bandwidth()*0.5)
+        .attr("y",      d => y(d[key]))
         .attr("height", d => height - y(d[key]))
+        .attr("width", x0.bandwidth()*0.5)
         .classed(`fill-${key.toLowerCase()}`, true)
         .on("mouseover", (event, d) => {
           G.showTooltip(`

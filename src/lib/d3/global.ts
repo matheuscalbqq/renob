@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import type { FeatureCollection } from "geojson";
 import { json } from "d3-fetch";
+import {hsl, hcl} from "d3-color";
 
 // Tamanhos do SVG
 export const width  = 800;
@@ -10,12 +11,51 @@ export const height = 450;
 export const csvDataUrl    = "data/db_final.csv";
 export const csvRegionUrl  = "data/db_region.csv";
 
-// Gradientes de cores por sexo\
-export const gradientes: Record<string, [string, string]> = {
-  "Fem":   ["#FFF0F5", "#DC143C"],
-  "Masc":  ["#E0FFFF", "#4169E1"],
-  "Todos": ["#e6fae6", "#33a460"],
-};
+
+export function resolveCssColor(prop: string): string {
+  // 1) cria um elemento
+  const el = document.createElement("div");
+  // 2) injeta no DOM (pode ser invisível)
+  document.body.append(el);
+  // 3) aplica a var numa propriedade que o browser calcula (color, background-color, etc.)
+  el.style.color = `hsl(var(${prop}))`;
+  // 4) lê o valor computado (ex: "rgb(220, 20, 60)")
+  const resolved = getComputedStyle(el).color;
+  // 5) limpa
+  document.body.removeChild(el);
+  return resolved;
+}
+
+// 1) lê a cor-base em RGB/HSL e converte pra HCL
+
+const mapping: Record<string,string> = {
+    'Fem':   '--secondary',
+    'Masc':  '--accent',
+    'Todos': '--primary'
+  };
+
+export function getColorScale(sexo: string, min: number, max: number) {
+   
+  const base  = hsl(resolveCssColor(mapping[sexo]));
+  const hue   = base.h;
+
+  const start = hsl(hue,0.3,0.8).toString();
+  const end   = hsl(hue,0.8,0.2).toString();
+
+
+  // 3) monte a escala HCL com três pontos: mínimo, base e máximo
+  return d3.scaleLinear<string>()
+    .domain([min, max])
+    .range([start, end])
+    .interpolate(d3.interpolateHsl);
+}
+
+export const getStrokeColor: Record<string,string> = {
+  'Fem':   '#fff',
+  'Masc':  '#fff',
+  'Todos': '#fff'
+  
+}
 
 // Labels de estados nutricionais
 export const estadoLabel: Record<string, string> = {
@@ -176,15 +216,6 @@ export const filtroNutricionalFase: Record<string, Array<string>> = {
   ]
 }
 
-// Cores de stroke para linhas e áreas
-export const strokeByColor: Record<string, string> = {
-  Todos: "#b982a1",
-  Fem:   "#4682B4",
-  Masc:  "#DB7093"
-};
-
-// Tooltip global
-
 
 /**
  * Exibe o tooltip no posicionamento do cursor
@@ -220,20 +251,6 @@ export function hideTooltip(): void {
     .classed("opacity-0", true)
     .classed("hidden", true);
 }
-
-export function getColorScale(sexo: string, min: number, max: number) {
-  const [start, end] = gradientes[sexo];
-  return d3.scaleLinear<string>()
-    .domain([min, max])
-    .range([start, end]);
-}
-
-
-export function getStrokeColor(sexo: string): string {
-  return strokeByColor[sexo] || "#ccc";
-}
-
-
 
 const cidadesFriendly: Record< string, Record< string, string > > = {};
 

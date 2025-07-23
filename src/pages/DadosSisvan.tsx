@@ -314,7 +314,7 @@ export default function DadosSisvan() {
 
                       <label htmlFor="selectSexo" className="block font-semibold mt-2 text-base">Gênero</label>
                       <select ref={selectSexo} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Selecione o sexo</option>
+                        <option value="">Selecione o gênero</option>
                         {sexos.map(s => (
                           <option key={s} value={s}>{s}</option>
                         ))}
@@ -334,17 +334,17 @@ export default function DadosSisvan() {
                       <h4 className="font-semibold mb-3 text-foreground">Entrevistados</h4>
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-start space-x-2 ">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-green mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-primary mt-1"></div>
                           <span>Todos:</span>
                           <span ref={valorTodosEl}>0</span>
                         </li>
                         <li className="flex items-start space-x-2 text-muted-foreground">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-orange mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-secondary mt-1"></div>
                           <span>Feminino:</span>
                           <span ref={valorMulheresEl}>0</span>
                         </li>
                         <li className="flex items-start space-x-2 text-muted-foreground">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-blue mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-accent mt-1"></div>
                           <span>Masculino:</span>
                           <span ref={valorHomensEl}>0</span>
                         </li>
@@ -353,14 +353,14 @@ export default function DadosSisvan() {
                                        
                   </div>
                   {/* coluna direita = gráfico + botão */}
-                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md relative">
+                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md relative h-[34.5rem]">
 
                     {/*espaço para o gráfico*/}
                     <div id='graficoMapeamento' ref={mapeamentoContainer} className="w-full h-full" />
 
                     {/*botão de adulto + checkboxes*/}
                     <button ref={btnMenuAdultoToggle} 
-                    className="absolute top-2 right-2 bg-nutrition-green text-white px-2 py-1 rounded">	&#10695;</button>
+                    className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded">	&#10695;</button>
                     
                     <div ref={menuAdultoContainer}  id="menuAdultoContainer" 
                     className="absolute top-12 right-2 bg-white p-2 shadow-md rounded-md hidden">
@@ -368,38 +368,38 @@ export default function DadosSisvan() {
 
                       <div ref={adultoColsRef} className="space-y-1 flex flex-col">
                         <label>
-                          <input type="checkbox" name="adultoCols" value="baixo_peso" checked />
+                          <input type="checkbox" name="adultoCols" value="baixo_peso" defaultChecked={true} />
                           Baixo Peso
                         </label>
                         <label>
-                          <input type="checkbox" name="adultoCols" value="eutrofico" checked />
+                          <input type="checkbox" name="adultoCols" value="eutrofico" defaultChecked={true} />
                           Eutrófico
                         </label>
                         <label>
-                          <input type="checkbox" name="adultoCols" value="sobrepeso" checked />
+                          <input type="checkbox" name="adultoCols" value="sobrepeso" defaultChecked={true} />
                           Sobrepeso
                         </label>
                         <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_G_1" checked />
+                          <input type="checkbox" name="adultoCols" value="obesidade_G_1" defaultChecked={true} />
                           Obesidade I
                         </label>
                         <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_G_2" checked />
+                          <input type="checkbox" name="adultoCols" value="obesidade_G_2" defaultChecked={true} />
                           Obesidade II
                         </label>
                         <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_G_3" checked />
+                          <input type="checkbox" name="adultoCols" value="obesidade_G_3" defaultChecked={true} />
                           Obesidade III
                         </label>
 
                         <label>
-                          <input type="checkbox" name="adultoCols" value="excesso_peso" />
+                          <input type="checkbox" name="adultoCols" value="excesso_peso" defaultChecked={false} />
                           Excesso de Peso
                         </label>
                         
                         {/*<!-- Obesidade (soma de obesidade_G_1 + obesidade_G_2 + obesidade_G_3) -->*/}
                         <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_calc" />
+                          <input type="checkbox" name="adultoCols" value="obesidade_calc" defaultChecked={false} />
                           Obesidade
                         </label>
                       </div>
@@ -409,20 +409,20 @@ export default function DadosSisvan() {
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-nutrition-green/10 p-4 rounded-lg">
+                  <div className="bg-primary/10 p-4 rounded-lg">
                     <h4 className="font-semibold text-nutrition-green mb-2">Baixo Peso</h4>
                     <p className="text-sm text-muted-foreground">
                       Estados com maior prevalência de baixo peso
                     </p>
                   </div>
-                  <div className="bg-nutrition-orange/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-nutrition-orange mb-2">Sobrepeso</h4>
+                  <div className="bg-secondary/10 p-4 rounded-lg">
+                    <h4 className="font-semibold text-secondary mb-2">Sobrepeso</h4>
                     <p className="text-sm text-muted-foreground">
                       Distribuição do sobrepeso por estado
                     </p>
                   </div>
-                  <div className="bg-nutrition-blue/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-nutrition-blue mb-2">Obesidade</h4>
+                  <div className="bg-accent/10 p-4 rounded-lg">
+                    <h4 className="font-semibold text-accent mb-2">Obesidade</h4>
                     <p className="text-sm text-muted-foreground">
                       Índices de obesidade por região
                     </p>
@@ -503,17 +503,17 @@ export default function DadosSisvan() {
                       <h4 className="font-semibold mb-3 text-foreground">Entrevistados</h4>
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-start space-x-2 ">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-green mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-primary mt-1"></div>
                           <span>Todos:</span>
                           <span ref={valorTodosElReg}>0</span>
                         </li>
                         <li className="flex items-start space-x-2 text-muted-foreground">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-orange mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-secondary mt-1"></div>
                           <span>Feminino:</span>
                           <span ref={valorMulheresElReg}>0</span>
                         </li>
                         <li className="flex items-start space-x-2 text-muted-foreground">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-blue mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-accent mt-1"></div>
                           <span>Masculino:</span>
                           <span ref={valorHomensElReg}>0</span>
                         </li>
@@ -635,17 +635,17 @@ export default function DadosSisvan() {
                       <h4 className="font-semibold mb-3 text-foreground">Entrevistados</h4>
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-start space-x-2 ">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-green mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-primary mt-1"></div>
                           <span>Todos:</span>
                           <span ref={valorTodosElTemp}>0</span>
                         </li>
                         <li className="flex items-start space-x-2 text-muted-foreground">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-orange mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-secondary mt-1"></div>
                           <span>Feminino:</span>
                           <span ref={valorMulheresElTemp}>0</span>
                         </li>
                         <li className="flex items-start space-x-2 text-muted-foreground">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-blue mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-accent mt-1"></div>
                           <span>Masculino:</span>
                           <span ref={valorHomensElTemp}>0</span>
                         </li>
@@ -654,7 +654,7 @@ export default function DadosSisvan() {
                   </div>
 
                   <div className="w-4/5 bg-white p-4 rounded-md shadow-md flex items-center">
-                    <div ref={temporalContainer} className="mx-auto flex-1" />
+                    <div id="temporalContainer" ref={temporalContainer} className="mx-auto flex-1" />
                   </div>
                 
                 </div>
@@ -666,15 +666,15 @@ export default function DadosSisvan() {
                       <h4 className="font-semibold mb-3 text-foreground">Número de Entrevistados</h4>
                       <ul className="space-y-2 text-sm">
                         <li className="flex items-start space-x-2">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-green mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-primary mt-1"></div>
                           <span className="text-muted-foreground">Todos:</span>
                         </li>
                         <li className="flex items-start space-x-2">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-orange mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-secondary mt-1"></div>
                           <span className="text-muted-foreground">Feminino:</span>
                         </li>
                         <li className="flex items-start space-x-2">
-                          <div className="h-3 w-3 rounded-[30%] bg-nutrition-blue mt-1"></div>
+                          <div className="h-3 w-3 rounded-[30%] bg-accent mt-1"></div>
                           <span className="text-muted-foreground">Masculino:</span>
                         </li>
                       </ul>
@@ -686,15 +686,15 @@ export default function DadosSisvan() {
                       <h4 className="font-semibold mb-3 text-foreground">Tendências Identificadas</h4>
                       <ul className="space-y-2 text-sm">
                         <li className="flex items-start space-x-2">
-                          <div className="h-2 w-2 rounded-full bg-nutrition-green mt-1.5"></div>
+                          <div className="h-2 w-2 rounded-full bg-primary mt-1.5"></div>
                           <span className="text-muted-foreground">Redução da desnutrição infantil</span>
                         </li>
                         <li className="flex items-start space-x-2">
-                          <div className="h-2 w-2 rounded-full bg-nutrition-orange mt-1.5"></div>
+                          <div className="h-2 w-2 rounded-full bg-secondary mt-1.5"></div>
                           <span className="text-muted-foreground">Aumento do sobrepeso em adultos</span>
                         </li>
                         <li className="flex items-start space-x-2">
-                          <div className="h-2 w-2 rounded-full bg-nutrition-blue mt-1.5"></div>
+                          <div className="h-2 w-2 rounded-full bg-accent mt-1.5"></div>
                           <span className="text-muted-foreground">Estabilização da obesidade infantil</span>
                         </li>
                       </ul>
