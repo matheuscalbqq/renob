@@ -193,6 +193,18 @@ pessego: 10 80% 70%
            px-3 py-2 rounded-lg
            shadow-lg border border-gray-300;
   }
+  #regional-tooltip.tooltip-temporalAll {
+    background-color: hsl(var(--primary));
+    color: #fff;
+  }
+  #regional-tooltip.tooltip-temporalMasc {
+    background-color: hsl(var(--accent));
+    color: #fff;
+  }
+  #regional-tooltip.tooltip-temporalFem {
+    background-color: hsl(var(--secondary));
+    color: #fff;
+  }
 
   /* layout interno, espaçamento entre linhas */
   .tooltip-content  { @apply space-y-1;  }

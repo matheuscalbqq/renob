@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, TrendingUp, Globe } from "lucide-react";
+import { GiBrazil } from "react-icons/gi";
 import { initMapeamento, populateSelectsMapeamento }   from "@/lib/d3/mapeamento";
 import { initRegional }     from "@/lib/d3/regional";
 import { initTemporal }     from "@/lib/d3/analise_temporal";
@@ -213,7 +214,10 @@ export default function DadosSisvan() {
       selectModoTemp.current &&
       labelMunicipioTemp.current &&
       labelSubdivTemp.current &&
-      titleTemp.current
+      titleTemp.current &&
+      valorHomensElTemp.current &&
+      valorMulheresElTemp.current &&
+      valorTodosElTemp.current
     ) {
       initTemporal(
         temporalContainer.current,
@@ -225,7 +229,10 @@ export default function DadosSisvan() {
         selectModoTemp.current,
         labelMunicipioTemp.current,
         labelSubdivTemp.current,
-        titleTemp.current
+        titleTemp.current,
+        valorHomensElTemp.current,
+        valorMulheresElTemp.current,
+        valorTodosElTemp.current
       );
     }
     // Cleanup: remove o listener quando desmontar
@@ -237,6 +244,9 @@ export default function DadosSisvan() {
   return (
         
     <div className="min-h-screen py-16">
+      
+      <div id="regional-tooltip" className="tooltip-regional hidden"></div>
+
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -256,15 +266,15 @@ export default function DadosSisvan() {
         <Tabs defaultValue="mapeamento" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="mapeamento" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
+              <BarChart3 className="h-5 w-5" />
               Mapeamento Nutricional
             </TabsTrigger>
             <TabsTrigger value="regional" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
+              <GiBrazil className="h-5 w-5" />
               Mapeamento Regional
             </TabsTrigger>
             <TabsTrigger value="temporal" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
+              <TrendingUp className="h-5 w-5" />
               Análises Temporais
             </TabsTrigger>
           </TabsList>
@@ -525,7 +535,6 @@ export default function DadosSisvan() {
                     <div id="mapaRegional" ref={regionalContainer} className="flex-1 mx-auto" />
                     <div id="legendRegional" className="legendRegional" />
                   </div>
-                  <div id="regional-tooltip" className="tooltip-regional hidden"></div>
 
                 </div>
 
@@ -656,6 +665,7 @@ export default function DadosSisvan() {
                   <div className="w-4/5 bg-white p-4 rounded-md shadow-md flex items-center">
                     <div id="temporalContainer" ref={temporalContainer} className="mx-auto flex-1" />
                   </div>
+                  
                 
                 </div>
 

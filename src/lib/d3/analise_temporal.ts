@@ -14,6 +14,7 @@ interface TemporalDataRow {
   // indicadores  
   baixo_peso:         number;
   eutrofico:          number;
+  sobrepeso:          number;
   obesidade_G_1:      number;
   obesidade_G_2:      number;
   obesidade_G_3:      number;
@@ -62,7 +63,10 @@ export function initTemporal(
   selectModo: HTMLSelectElement,
   labelMunicipio: HTMLLabelElement,
   labelModo: HTMLLabelElement,
-  titleEl: HTMLElement
+  titleEl: HTMLElement,
+  valorHomensEl: HTMLElement,
+  valorMulheresEl: HTMLElement,
+  valorTodosEl: HTMLElement
 ) {
   // Mapa para resolver qual região de saúde pertence a cada município (código)
   const regionMap: Map<string, string> = new Map();
@@ -92,10 +96,10 @@ const promiseDados = d3.csv<TemporalDataRow>(
     ANO:                row.ANO,
     SEXO:               row.SEXO,
     fase_vida:          row.fase_vida,
-    valor:             +row.valor,
     total:              row.total,
     baixo_peso:        +row.baixo_peso,
-    eutrofico:         +row.eutrofico, 
+    eutrofico:         +row.eutrofico,
+    sobrepeso:         +row.sobrepeso, 
     obesidade_G_1:     +row.obesidade_G_1, 
     obesidade_G_2:     +row.obesidade_G_2, 
     obesidade_G_3:     +row.obesidade_G_3, 
@@ -112,7 +116,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
     regionDataTemporal = regioes;
     regionMap.clear();
     regioes.forEach(r =>
-      regionMap.set(r.regional_id, r.municipio_id_sdv)
+      regionMap.set(r.municipio_id_sdv, r.regional_id)
     );
 
     allDataTemporal = dados;
@@ -124,19 +128,23 @@ const promiseDados = d3.csv<TemporalDataRow>(
 
     // Listeners para refazer gráfico ao mudar filtros
     selectModo.addEventListener("change", () => {
-      atualizarGrafico();
-      atualizarTitulo();
       FiltroChangerMunReg();
       labelMunicipio.textContent = selectModo.value === 'federativa' 
         ? 'Municípios'
         : 'Regiões de Saúde';
+      atualizarGrafico();
+      atualizarTitulo();
     });
-    [selectUF, selectMunicipio, selectSexo, selectFase, selectIndicador]
+    [selectUF, selectSexo, selectFase, selectIndicador]
       .forEach(sel => sel.addEventListener("change", () => {
         FiltroChangerMunReg();
         atualizarGrafico();
         atualizarTitulo();
       }));
+    selectMunicipio.addEventListener("change", () =>{
+      atualizarGrafico();
+      atualizarTitulo();
+    });
     console.log("📥 Ambos os CSVs carregaram", regioes.length, "regiões e", dados.length, "registros temporais");
     console.table(regioes.slice(0,5));
     console.table(dados.slice(0,5));
@@ -203,8 +211,6 @@ const promiseDados = d3.csv<TemporalDataRow>(
   }
 
   function FiltroChangerMunReg() : void {
-    console.log("UF selecionada:", selectUF.value,
-            "→ vai filtrar em regionDataTemporal.filter(d => d.uf === …)");
 
     [labelMunicipio,selectMunicipio,labelModo,selectModo].forEach(muni => { 
       muni.classList.toggle("hidden", selectUF.value === "" );
@@ -262,15 +268,12 @@ const promiseDados = d3.csv<TemporalDataRow>(
     const mapMun = municipiosPorUF[ufSelecionada];
     const prev = selectMunicipio.value;
     selectMunicipio.innerHTML = "<option value=''>Todos</option>";
-    console.log("→ Construindo mapa para UF", ufSelecionada, ":",
-            Array.from(mapMun?.entries()||[]));
-
     Array.from(mapMun!.entries())
       .sort((a,b) => a[1].localeCompare(b[1]))
       .forEach(([code,name]) => {
         const o = document.createElement("option");
         o.value = code;
-        o.text  = name;
+        o.text  = G.cidadesFriendly[ufSelecionada][code] || name;
         selectMunicipio.appendChild(o);
       });
     if (manterSelecionado && Array.from(selectMunicipio.options).some(opt => opt.value === prev)) {
@@ -298,12 +301,12 @@ const promiseDados = d3.csv<TemporalDataRow>(
    */
   function atualizarGrafico(): void {
     // Captura filtros
-    const uf       = selectUF.value;
-    const modo     = selectModo.value;       // “federativa” | “saude”
-    const sexo     = selectSexo.value;
-    const fase     = selectFase.value;
-    const muni     = selectMunicipio.value; // cidade ou região de saúde | depende do modo
-    const indicador= selectIndicador.value;
+    const uf        = selectUF.value;
+    const modo      = selectModo.value;       // “federativa” | “saude”
+    const sexo      = selectSexo.value;
+    const fase      = selectFase.value;
+    const muni      = selectMunicipio.value; // cidade ou região de saúde | depende do modo
+    const indicador = selectIndicador.value;
 
     
     // Filtra o dataset
@@ -315,8 +318,10 @@ const promiseDados = d3.csv<TemporalDataRow>(
         if (modo === "federativa") {
           if(String(d.codigo_municipio) !== muni) return false;
         } else {
-          const membros = regionMap[d.codigo_municipio] || [];
-          if (!membros.includes(String(d.codigo_municipio))) return false;
+
+          const regiaoDoMunicipio = regionMap.get(d.codigo_municipio);
+          if (regiaoDoMunicipio !== muni) return false;
+
         }
       }
       return true;
@@ -346,52 +351,80 @@ const promiseDados = d3.csv<TemporalDataRow>(
     const anos = Array.from(new Set(dadosFiltrados.map(d => d.ANO))).sort();
     let dadosGrafico: DadosGrafico = {};
     let maxPct = 0;
+    dadosGrafico = {Masc: [], Fem: [], Todos: []};
 
     if(selectSexo.value === "Todos"){
-      dadosGrafico = {Masc: [], Fem: [], Todos: []};
-
-    anos.forEach(ano => {
-      let masc = dadosFiltrados.filter(d=> d.ANO === ano && d.SEXO === "Masc");
-      let fem = dadosFiltrados.filter(d=> d.ANO === ano && d.SEXO === "Fem");
-
-      let totalEntrevistadosAno = totalEntrevistadosPorAno.get(ano) || 0;
-
-      if (totalEntrevistadosAno > 0) {
-            let valorMasc = masc.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
-            let valorFem = fem.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
-
-            // 🔹 Normalizar os valores como porcentagem do total de entrevistados NO ANO
-            let percMasc = (valorMasc / totalEntrevistadosAno) * 100;
-            let percFem = (valorFem / totalEntrevistadosAno) * 100;
-            let percTodos = ((valorMasc + valorFem) / totalEntrevistadosAno) * 100;
-
-            maxPct = Math.max(maxPct, percMasc, percFem, percTodos);
-
-            dadosGrafico.Masc.push({ ano, valor: percMasc });
-            dadosGrafico.Fem.push({ ano, valor: percFem });
-            dadosGrafico.Todos.push({ ano, valor: percTodos });
         
-    }  });
-  } else{
-    dadosGrafico[sexo] = [];
 
-    anos.forEach(ano => {
-          let dadosPorSexo = dadosFiltrados.filter(d => d.ANO === ano && d.SEXO === sexo);
-          let totalEntrevistadosAno = totalEntrevistadosPorAno.get(ano) || 0;
-          if (totalEntrevistadosAno > 0) {
-              let valor = dadosPorSexo.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
-              let perc = (valor / totalEntrevistadosAno) * 100;
-              maxPct = Math.max(maxPct, perc);
-              dadosGrafico[sexo].push({ ano, valor: perc });
-          }
+      anos.forEach(ano => {
+        let masc = dadosFiltrados.filter(d=> d.ANO === ano && d.SEXO === "Masc");
+        let fem = dadosFiltrados.filter(d=> d.ANO === ano && d.SEXO === "Fem");
+
+        let totalEntrevistadosAno = totalEntrevistadosPorAno.get(ano) || 0;
+
+        if (totalEntrevistadosAno > 0) {
+          let valorMasc = masc.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
+          let valorFem = fem.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
+
+          // 🔹 Normalizar os valores como porcentagem do total de entrevistados NO ANO
+          let percMasc = (valorMasc / totalEntrevistadosAno) * 100;
+          let percFem = (valorFem / totalEntrevistadosAno) * 100;
+          let percTodos = ((valorMasc + valorFem) / totalEntrevistadosAno) * 100;
+
+          maxPct = Math.max(maxPct, percMasc, percFem, percTodos);
+
+          dadosGrafico.Masc.push({ ano, valor: percMasc });
+          dadosGrafico.Fem.push({ ano, valor: percFem });
+          dadosGrafico.Todos.push({ ano, valor: percTodos });
+        
+        }  
+      });
+    } else{
+      anos.forEach(ano => {
+        let dadosPorSexo = dadosFiltrados.filter(d => d.ANO === ano && d.SEXO === sexo);
+        let totalEntrevistadosAno = totalEntrevistadosPorAno.get(ano) || 0;
+        if (totalEntrevistadosAno > 0) {
+            let valor = dadosPorSexo.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
+            let perc = (valor / totalEntrevistadosAno) * 100;
+            maxPct = Math.max(maxPct, perc);
+            dadosGrafico[sexo].push({ ano, valor: perc });
+        }
       });
 
-  }
-
+    }
+    
     // 5) Chama o render tipado
     desenharGraficoTemporal(dadosGrafico, anos, maxPct);
+    atualizarQuadroEntrevistados(dadosFiltrados);
   }
 
+  // 🔹 Função para atualizar os dados do Quadro de Entrevistados
+  function atualizarQuadroEntrevistados(dadosFiltrados: TemporalDataRow[]) {
+      // Agrupar por sexo
+      const dadosPorSexo = d3.group(dadosFiltrados, d => d.SEXO);
+
+      console.log("este é o dadosPorSexo:", dadosPorSexo);
+
+      let totalFemEntrevistados = 0;
+      let totalMascEntrevistados = 0;
+
+      if (dadosPorSexo.has("Fem")) {
+          const arrFem = dadosPorSexo.get("Fem");
+          totalFemEntrevistados = d3.sum(arrFem, d => +d.total);
+      }
+      if (dadosPorSexo.has("Masc")) {
+          const arrMasc = dadosPorSexo.get("Masc");
+          totalMascEntrevistados = d3.sum(arrMasc, d => +d.total);
+      }
+
+      const totalTodos = totalFemEntrevistados + totalMascEntrevistados;
+      // Atualizar HTML
+      valorHomensEl.textContent   = totalMascEntrevistados.toLocaleString("pt-BR");
+      valorMulheresEl.textContent = totalFemEntrevistados.toLocaleString("pt-BR");
+      valorTodosEl.textContent    = totalTodos.toLocaleString("pt-BR");
+
+      return totalTodos; // Retorna o total para ser usado na normalização do gráfico
+  }
 
 
   // 6) Função de render tipada e usando containerDivisao
@@ -502,7 +535,19 @@ const promiseDados = d3.csv<TemporalDataRow>(
             labelsGroup.selectAll<SVGGElement, TemporalPoint>(`.label-${key}`)
               .filter(ld => ld.ano === d.ano)
               .classed("visible", true);
-            G.showTooltip(`<strong>${d.ano}</strong><br/>${d.valor.toFixed(1)}%`, event);
+
+            
+            if (sexo === "Todos"){
+              d3.select("#regional-tooltip").classed("tooltip-temporalAll", true);
+            } else if (sexo === "Masc"){
+              d3.select("#regional-tooltip").classed("tooltip-temporalMasc", true);
+            } else{
+              d3.select("#regional-tooltip").classed("tooltip-temporalFem", true);
+            };
+
+            const htmlContent = `${d.ano}: ${d.valor.toFixed(1)}%`;
+
+            G.showTooltip(htmlContent, event);
           })
           .on("mouseout", (event, d) => {
             d3.select(event.currentTarget)
@@ -511,6 +556,13 @@ const promiseDados = d3.csv<TemporalDataRow>(
               .filter(ld => ld.ano === d.ano)
               .classed("visible", false);
             G.hideTooltip();
+            if (sexo === "Todos"){
+              d3.select("#regional-tooltip").classed("tooltip-temporalAll", false);
+            } else if (sexo === "Masc"){
+              d3.select("#regional-tooltip").classed("tooltip-temporalMasc", false);
+            } else{
+              d3.select("#regional-tooltip").classed("tooltip-temporalFem", false);
+            };
           });
      
 

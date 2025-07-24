@@ -381,6 +381,7 @@ export function initMapeamento(
 
   // 5) agrupa por SEXO e soma entrevistados
   const dadosPorSexo = d3.group(dadosFiltrados, d => d.SEXO);
+  
   const totalFem = dadosPorSexo.get("Fem")
     ? d3.sum(dadosPorSexo.get("Fem")!, d => +d.total)
     : 0;
@@ -535,7 +536,7 @@ export function initMapeamento(
       .attr("x", d => x1("total") + x1.bandwidth() * 0.25)
       .attr("y", d => y(d.Todos))
       .attr("width", x1.bandwidth() * 0.7)
-      .attr("height", d => height - y(d.Todos))
+      .attr("height", d => Math.max( 0, height - y(d.Todos)))
       .classed("fill-primary", true)
       .on("mouseover", (event, d) => {
         G.showTooltip(`
@@ -564,7 +565,7 @@ export function initMapeamento(
           .attr("class", s => `stacked ${s.key==="Masc"?"fill-accent":"fill-secondary"}`)
           .attr("x", x1("stacked") + x1.bandwidth() * 0.05)
           .attr("y", s => y(s[0][1]))
-          .attr("height", s => y(s[0][0]) - y(s[0][1]))
+          .attr("height", s => Math.abs(y(s[0][0]) - y(s[0][1])))
           .attr("width", x1.bandwidth()*0.3)
         .on("mouseover", (event, s) => {
           const value = s[0][1] - s[0][0];
@@ -593,7 +594,7 @@ export function initMapeamento(
       .append("rect")
         .attr("x", x0.bandwidth()*0.25)
         .attr("y",      d => y(d[key]))
-        .attr("height", d => height - y(d[key]))
+        .attr("height", d => Math.max( 0, height - y(d[key])))
         .attr("width", x0.bandwidth()*0.5)
         .classed(`fill-${key.toLowerCase()}`, true)
         .on("mouseover", (event, d) => {
