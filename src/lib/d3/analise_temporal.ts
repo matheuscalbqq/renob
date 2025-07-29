@@ -2,44 +2,9 @@ import * as d3 from "d3";
 import * as G from "./global";
 import { totalmem } from "os";
 
-// Tipagem para as linhas do CSV principal
-interface TemporalDataRow {
-  UF:                 string;
-  codigo_municipio:   string;
-  municipio:          string;
-  ANO:                string;
-  SEXO:               string;
-  fase_vida:          string;
-  total:              string;
-  // indicadores  
-  baixo_peso:         number;
-  eutrofico:          number;
-  sobrepeso:          number;
-  obesidade_G_1:      number;
-  obesidade_G_2:      number;
-  obesidade_G_3:      number;
-
-  magreza_acentuada:  number;
-  magreza:            number;
-  obesidade:          number;
-  obesidade_grave:    number;
-
-  
-  [key: string]: string | number;
-}
-
 interface TemporalPoint {
   ano:   string;
   valor: number;
-}
-
-
-// Tipagem para as linhas do CSV de regiões
-interface RegionDataRow {
-  municipio_id_sdv: string;
-  regional_id: string;
-  uf: string;
-  nome_regiao: string;
 }
 
 /**
@@ -71,13 +36,13 @@ export function initTemporal(
   // Mapa para resolver qual região de saúde pertence a cada município (código)
   const regionMap: Map<string, string> = new Map();
 
-  let allDataTemporal: TemporalDataRow[] = [];
+  let allDataTemporal: G.DataRow[] = [];
   const municipiosPorUF: Record<string, Map<string,string>> = {};
-  let regionDataTemporal: RegionDataRow[] = [];
+  let regionDataTemporal: G.RegionDataRow[] = [];
   const regionPorUF: Record<string, Map<string, string>> = {};
 
   // 1) Cria as duas Promises de carregamento
-const promiseRegioes = d3.csv<RegionDataRow>(
+const promiseRegioes = d3.csv<G.RegionDataRow>(
   G.csvRegionUrl,
   row => ({
     municipio_id_sdv: row.municipio_id_sdv,
@@ -87,7 +52,7 @@ const promiseRegioes = d3.csv<RegionDataRow>(
   })
 );
 
-const promiseDados = d3.csv<TemporalDataRow>(
+const promiseDados = d3.csv<G.DataRow>(
   G.csvDataUrl,
   row => ({
     UF:                 row.UF,
@@ -128,7 +93,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
 
     // Listeners para refazer gráfico ao mudar filtros
     selectModo.addEventListener("change", () => {
-      FiltroChangerMunReg();
+      G.FiltroChangerMunReg(selectModo,labelModo,selectUF,selectMunicipio,labelMunicipio,allDataTemporal,regionDataTemporal);
       labelMunicipio.textContent = selectModo.value === 'federativa' 
         ? 'Municípios'
         : 'Regiões de Saúde';
@@ -137,7 +102,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
     });
     [selectUF, selectSexo, selectFase, selectIndicador]
       .forEach(sel => sel.addEventListener("change", () => {
-        FiltroChangerMunReg();
+        G.FiltroChangerMunReg(selectModo,labelModo,selectUF,selectMunicipio,labelMunicipio,allDataTemporal,regionDataTemporal);
         atualizarGrafico();
         atualizarTitulo();
       }));
@@ -145,9 +110,6 @@ const promiseDados = d3.csv<TemporalDataRow>(
       atualizarGrafico();
       atualizarTitulo();
     });
-    console.log("📥 Ambos os CSVs carregaram", regioes.length, "regiões e", dados.length, "registros temporais");
-    console.table(regioes.slice(0,5));
-    console.table(dados.slice(0,5));
   });
 
   // Popula selects de UF, Mun, Sexo, Fase e Indicador
@@ -163,7 +125,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
     });
 
     // --- Carrega cidades ou regiões a depender do modo ---
-    FiltroChangerMunReg();
+    G.FiltroChangerMunReg(selectModo,labelModo,selectUF,selectMunicipio,labelMunicipio,allDataTemporal,regionDataTemporal);
 
     // --- Sexo ---
     selectSexo.innerHTML = "";
@@ -208,77 +170,6 @@ const promiseDados = d3.csv<TemporalDataRow>(
       o.text  = val === "federativa" ? "Divisão Federativa" : "Regiões de Saúde";
       selectModo.appendChild(o);
     });
-  }
-
-  function FiltroChangerMunReg() : void {
-
-    [labelMunicipio,selectMunicipio,labelModo,selectModo].forEach(muni => { 
-      muni.classList.toggle("hidden", selectUF.value === "" );
-    });
-    const modo = selectModo.value;
-    const filtroAtualizar = modo === "federativa" ? atualizarMunicipios : atualizarRegioes;
-
-    return filtroAtualizar(selectUF.value);
-  };
-
-  //Atualiza lista de Regiões conforme UF
-  function atualizarRegioes(ufSelecionada: string, manterSelecionado = false): void{
-    
-    
-    if (!regionPorUF[ufSelecionada]){
-      regionPorUF[ufSelecionada] = new Map();
-      regionDataTemporal
-        .filter(d => d.uf === ufSelecionada)
-        .forEach(d => {
-          regionPorUF[ufSelecionada]!.set(d.regional_id,d.nome_regiao);
-        })
-    }
-    const RegMap = regionPorUF[ufSelecionada];
-    const prev = selectMunicipio.value;
-    selectMunicipio.innerHTML = "";
-    console.log("→ Construindo mapa para UF", ufSelecionada, ":",
-            Array.from(RegMap?.entries()||[]));
-    Array.from(RegMap!.entries())
-      .sort((a,b) => a[1].localeCompare(b[1]))
-      .forEach(([code,name]) => {
-        const o = document.createElement("option");
-        o.value = code;
-        o.text = name;
-        selectMunicipio.appendChild(o);
-      });
-
-    if (manterSelecionado && Array.from(selectMunicipio.options).some(opt => opt.value === prev)) {
-      selectMunicipio.value = prev;
-    }
-
-  }
-
-  // Atualiza lista de municípios conforme UF
-  function atualizarMunicipios(ufSelecionada: string, manterSelecionado = false): void {
-    
-    // Agrupa por UF
-    if (!municipiosPorUF[ufSelecionada]) {
-      municipiosPorUF[ufSelecionada] = new Map();
-      allDataTemporal
-        .filter(d => d.UF === ufSelecionada)
-        .forEach(d => {
-          municipiosPorUF[ufSelecionada]!.set(d.codigo_municipio, d.municipio);
-        });
-    }
-    const mapMun = municipiosPorUF[ufSelecionada];
-    const prev = selectMunicipio.value;
-    selectMunicipio.innerHTML = "<option value=''>Todos</option>";
-    Array.from(mapMun!.entries())
-      .sort((a,b) => a[1].localeCompare(b[1]))
-      .forEach(([code,name]) => {
-        const o = document.createElement("option");
-        o.value = code;
-        o.text  = G.cidadesFriendly[ufSelecionada][code] || name;
-        selectMunicipio.appendChild(o);
-      });
-    if (manterSelecionado && Array.from(selectMunicipio.options).some(opt => opt.value === prev)) {
-      selectMunicipio.value = prev;
-    }
   }
 
   // Atualiza o título de acordo com filtros
@@ -339,7 +230,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
     }
 
 
-    let colunasIndicadores: (keyof TemporalDataRow)[];
+    let colunasIndicadores: (keyof G.DataRow)[];
     if (selectFase.value === "adolescente") {
       colunasIndicadores = G.filtroNutricionalFase["adolescente"];
     } else {
@@ -399,7 +290,7 @@ const promiseDados = d3.csv<TemporalDataRow>(
   }
 
   // 🔹 Função para atualizar os dados do Quadro de Entrevistados
-  function atualizarQuadroEntrevistados(dadosFiltrados: TemporalDataRow[]) {
+  function atualizarQuadroEntrevistados(dadosFiltrados: G.DataRow[]) {
       // Agrupar por sexo
       const dadosPorSexo = d3.group(dadosFiltrados, d => d.SEXO);
 

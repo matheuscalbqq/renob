@@ -323,5 +323,125 @@ export function legendasMapa(
          .attr("font-size", "18px")
          .text("Prevalência (%)");
   }
+//============== Filtros Cidade/Região de Saúde ===========================
+// 1) Declare o tipo de cada linha de dados que chega do CSV
+export interface DataRow {
+  // campos fixos que você usa:
+  UF: string
+  codigo_municipio: string
+  municipio: string
+  ANO: string
+  fase_vida: string
+  SEXO: string
+  total: string
+
+  // colunas numéricas que você soma
+  baixo_peso: number
+  eutrofico: number
+  sobrepeso: number
+  obesidade_G_1: number
+  obesidade_G_2: number
+  obesidade_G_3: number
+
+  magreza_acentuada: number
+  magreza: number
+  obesidade: number
+  obesidade_grave: number
+
+  // permite acessar qualquer coluna pelo nome dinâmico
+  [key: string]: string | number
+}
+// Tipagem para as linhas do CSV de regiões
+export interface RegionDataRow {
+  municipio_id_sdv: string;
+  regional_id: string;
+  uf: string;
+  nome_regiao: string;
+}
+
+export function FiltroChangerMunReg(
+  selectModo:HTMLSelectElement,
+  labelModo: HTMLLabelElement,
+  selectUF:HTMLSelectElement,
+  selectMunicipio: HTMLSelectElement,
+  labelMunicipio: HTMLLabelElement,
+  data: DataRow[],
+  dataRegion: RegionDataRow[],
+) : void {
+  const regionPorUF: Record<string, Map<string, string>> = {};
+
+  [labelMunicipio,selectMunicipio,labelModo,selectModo].forEach(muni => { 
+      muni.classList.toggle("hidden", selectUF.value === "" );
+    });
+
+  //Atualiza lista de Regiões conforme UF
+  function atualizarRegioes(
+      ufSelecionada: string, 
+      selectMunicipioEl: HTMLSelectElement,
+      dataRegion: RegionDataRow[]): void{
+    
+    
+    if (!regionPorUF[ufSelecionada]){
+      regionPorUF[ufSelecionada] = new Map();
+      dataRegion
+        .filter(d => d.uf === ufSelecionada)
+        .forEach(d => {
+          regionPorUF[ufSelecionada]!.set(d.regional_id, d.nome_regiao);
+        })
+    }
+    const RegMap = regionPorUF[ufSelecionada];
+    selectMunicipio.innerHTML = "";
+    console.log("→ Construindo mapa para UF", ufSelecionada, ":",
+            Array.from(RegMap?.entries()||[]));
+    Array.from(RegMap!.entries())
+      .sort((a,b) => a[1].localeCompare(b[1]))
+      .forEach(([code,name]) => {
+        const o = document.createElement("option");
+        o.value = code;
+        o.text =  name;
+        selectMunicipioEl.appendChild(o);
+      });
+
+  }
+  function atualizarMunicipios(
+          ufSelecionada: string,
+          selectMunicipioEl: HTMLSelectElement,
+          data: DataRow[]
+        ): void {
+          // se nenhuma UF selecionada, mostra apenas “Todos”
+          if (!ufSelecionada) {
+            selectMunicipioEl.innerHTML = "<option value=''>Todos</option>";
+            return;
+          }
+  
+          // filtra os municípios daquela UF
+          const linhaUF = data.filter(d => d.UF === ufSelecionada);
+          const mapMunicipios = new Map<string, string>();
+          linhaUF.forEach(d=>{
+            mapMunicipios.set(d.codigo_municipio,d.municipio);
+          });
+          const municipios: Array<{code:string;name:string}> = Array.from(mapMunicipios.entries()).map(([code,name])=>({ code, name}));
+          municipios.sort((a,b)=>a.name.localeCompare(b.name));
+  
+          // esvazia e preenche
+          selectMunicipioEl.innerHTML = "<option value=''>Todos</option>";
+          municipios.forEach((m) => {
+            const label = cidadesFriendly[ufSelecionada][m.code] || m.name;
+            const opt = document.createElement("option");
+            opt.value = m.name;
+            opt.text = label;
+            selectMunicipioEl.appendChild(opt);
+          });
+          
+        }
+
+  if (selectModo.value === "federativa"){
+    return atualizarMunicipios(selectUF.value, selectMunicipio, data);
+  } else {
+    return atualizarRegioes(selectUF.value, selectMunicipio, dataRegion);
+  }
+};
+
+
 
 export { cidadesFriendly };

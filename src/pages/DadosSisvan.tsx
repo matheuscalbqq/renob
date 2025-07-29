@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, TrendingUp, Globe } from "lucide-react";
+import { BarChart3, TrendingUp} from "lucide-react";
 import { GiBrazil } from "react-icons/gi";
-import { initMapeamento, populateSelectsMapeamento }   from "@/lib/d3/mapeamento";
+import { initMapeamento, resizeMapeamento, promiseDados, promiseRegioes }   from "@/lib/d3/mapeamento";
 import { initRegional }     from "@/lib/d3/regional";
 import { initTemporal }     from "@/lib/d3/analise_temporal";
-import React, { useRef, useEffect, useState } from "react";
-import { select, selectAll } from "d3-selection";
-import { preloadCidadesFriendly, cidadesFriendly } from "@/lib/d3/global";
+import { useRef, useEffect, useState } from "react";
+import { select } from "d3-selection";
+import { preloadCidadesFriendly } from "@/lib/d3/global";
+import * as G from "@/lib/d3/global";
 
 
 export default function DadosSisvan() {
@@ -21,6 +22,9 @@ export default function DadosSisvan() {
   // Refs para o gráfico de Mapeamento
   const selectUF             = useRef<HTMLSelectElement>(null);
   const selectMunicipio      = useRef<HTMLSelectElement>(null);
+  const selectDivisao        = useRef<HTMLSelectElement>(null);
+  const labelMunReg          = useRef<HTMLLabelElement>(null);
+  const labelDiv             = useRef<HTMLLabelElement>(null);
   const selectAno            = useRef<HTMLSelectElement>(null);
   const selectSexo           = useRef<HTMLSelectElement>(null);
   const selectFase           = useRef<HTMLSelectElement>(null);
@@ -52,7 +56,6 @@ export default function DadosSisvan() {
   const selectFaseTemp       = useRef<HTMLSelectElement>(null);
   const selectIndicadorTemp  = useRef<HTMLSelectElement>(null);
   const selectModoTemp       = useRef<HTMLSelectElement>(null);
-  const selectSubdivTemp     = useRef<HTMLSelectElement>(null);
   const labelMunicipioTemp   = useRef<HTMLLabelElement>(null);
   const labelSubdivTemp      = useRef<HTMLLabelElement>(null);
   const titleTemp            = useRef<HTMLHeadingElement>(null);
@@ -62,71 +65,30 @@ export default function DadosSisvan() {
 
   // —–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   // Estados para os filtros de Mapeamento
-  const [ufs, setUfs]               = useState<string[]>([]);
-  const [municipios, setMunicipios] = useState<string[]>([]);
-  const [anos, setAnos]             = useState<number[]>([]);
-  const [sexos]                     = useState<string[]>([]);
-  const [fases, setFases]           = useState<string[]>([]);
+  const [data, setData]             = useState<G.DataRow[]>([]);
+  const [regions, setRegions]       = useState<G.RegionDataRow[]>([]);
 
-  // —–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-  // Estados para os filtros de Regional
-  const [anosReg, setAnosReg]               = useState<number[]>([]);
-  const [sexosReg]                          = useState<string[]>([]);
-  const [fasesReg, setFasesReg]             = useState<string[]>([]);
-  const [nutricionais, setNutricionais]     = useState<string[]>([]);
-  const [modosReg, setModosReg]             = useState<string[]>([]);
-
-  // —–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-  // Estados para os filtros de Temporal
-  const [ufsTemp, setUfsTemp]               = useState<string[]>([]);
-  const [municipiosTemp, setMunicipiosTemp] = useState<string[]>([]);
-  const [sexosTemp]                         = useState<string[]>([]);
-  const [fasesTemp, setFasesTemp]           = useState<string[]>([]);
-  const [indicadores, setIndicadores]       = useState<string[]>([]);
-  const [modosTemp, setModosTemp]           = useState<string[]>([]);
-  const [subdivsTemp, setSubdivsTemp]       = useState<string[]>([]);
-  const [muniLabel, setMuniLabel]           = useState("Municípios");
-
-  const handleModoTempChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const modo = e.target.value;
-    setMuniLabel(modo === 'federativa' ? 'Municípios' : 'Regiões de Saúde');
-  }
 
   useEffect(()=>{
-    async function setupFiltros(){
+    async function preload(){
       await preloadCidadesFriendly();
-
-      if (
-      selectUF.current &&
-      selectMunicipio.current &&
-      selectAno.current &&
-      selectSexo.current &&
-      selectFase.current
-    ) {
-      populateSelectsMapeamento(
-        selectUF.current,
-        selectMunicipio.current,
-        selectAno.current,
-        selectSexo.current,
-        selectFase.current
-      );
-      }  
+      const [regs, dados] = await Promise.all([promiseRegioes,promiseDados]);
+      setRegions(regs);
+      setData(dados);
     }
+    preload();
+  }, []);
 
-    setupFiltros();
-  }, []); 
-  
-
-    
 
   useEffect(() => {
     const adultoCols = adultoColsRef.current   ?.querySelectorAll<HTMLInputElement>("input") ?? null;
     const containerDivSelection = containerDivisaoReg.current  ? select<HTMLElement, unknown>(containerDivisaoReg.current): null;
+    
     // ←── AQUI: configura o resize só para o Mapeamento ──→
     const handleResize = () => {
       // Re-executa o initMapeamento com os mesmos refs
-      initMapeamento(
-        mapeamentoContainer.current!,
+      resizeMapeamento(
+        data,
         selectUF.current!,
         selectMunicipio.current!,
         selectAno.current!,
@@ -137,14 +99,15 @@ export default function DadosSisvan() {
         valorHomensEl.current!,
         valorMulheresEl.current!,
         valorTodosEl.current!,
-        adultoCols
-      );
+      )
     }; 
     // Inicializa o gráfico de Mapeamento
     if (
       mapeamentoContainer.current &&
       selectUF.current &&
       selectMunicipio.current &&
+      selectDivisao.current &&
+      labelMunReg.current &&
       selectAno.current &&
       selectSexo.current &&
       selectFase.current &&
@@ -159,6 +122,9 @@ export default function DadosSisvan() {
         mapeamentoContainer.current,
         selectUF.current,
         selectMunicipio.current,
+        labelMunReg.current,
+        selectDivisao.current,
+        labelDiv.current,
         selectAno.current,
         selectSexo.current,
         selectFase.current,
@@ -297,45 +263,36 @@ export default function DadosSisvan() {
                 {/* Placeholder for D3 Chart */}
                 <div className="bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/30 p-2 w-full flex gap-6">
                   <div className="w-1/5 flex  flex-col gap-6">
-                    <div className="bg-white p-4 rounded-md shadow-md h-[24rem] text-sm">
+                    <div className="bg-white p-4 rounded-md shadow-md h-[28rem] text-sm">
                       <label htmlFor="selectUF" className="block font-semibold mt-2 text-base">Unidade Federativa</label>
                       <select id="selectUF" ref={selectUF} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione a UF</option>
-                        {ufs.map(uf => (
-                          <option key={uf} value={uf}>{uf}</option>
-                        ))}
                       </select>
 
-                      <label htmlFor="selectMunicipio" className="block font-semibold mt-2 text-base">Municípios</label>
-                      <select id="selectMunicipio" ref={selectMunicipio} className="mt-1 border border-gray-300 rounded p-1 w-full">
+                      <label htmlFor="selectMunicipio" ref={labelMunReg} className="block font-semibold mt-2 text-base hidden">Municípios</label>
+                      <select id="selectMunicipio" ref={selectMunicipio} className="mt-1 border border-gray-300 rounded p-1 w-full hidden">
                         <option value="">Municípios</option>
-                        {municipios.map(m => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
+                      </select>
+
+                      
+                      <label htmlFor="selectDivisao" ref={labelDiv} className="block font-semibold mt-2 text-base hidden">Divisão</label>
+                      <select id="selectDivisao" ref={selectDivisao} className="mt-1 border border-gray-300 rounded p-1 w-full hidden">
+                        <option value="">Divisão</option>                        
                       </select>
 
                       <label htmlFor="selectAno" className="block font-semibold mt-2 text-base">Ano</label>
                       <select id="selectAno" ref={selectAno} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione o ano</option>
-                        {anos.map(a => (
-                          <option key={a} value={a}>{a}</option>
-                        ))}
                       </select>
 
                       <label htmlFor="selectSexo" className="block font-semibold mt-2 text-base">Gênero</label>
                       <select ref={selectSexo} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione o gênero</option>
-                        {sexos.map(s => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
                       </select>
 
                       <label htmlFor="selectFase" className="block font-semibold mt-2 text-base">Fase da Vida</label>
                       <select id="selectFase" ref={selectFase} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione a fase de vida</option>
-                        {fases.map(f => (
-                          <option key={f} value={f}>{f}</option>
-                        ))}
                       </select>
                     </div>
 
@@ -363,7 +320,7 @@ export default function DadosSisvan() {
                                        
                   </div>
                   {/* coluna direita = gráfico + botão */}
-                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md relative h-[34.5rem]">
+                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md relative h-[38.5rem]">
 
                     {/*espaço para o gráfico*/}
                     <div id='graficoMapeamento' ref={mapeamentoContainer} className="w-full h-full" />
@@ -460,50 +417,32 @@ export default function DadosSisvan() {
                 {/* Placeholder for D3 Chart */}
                 <div className="bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/30 p-2 w-full flex gap-6">
                   <div className="w-1/5 flex  flex-col gap-6">
-                    <div className="bg-white p-4 rounded-md shadow-md h-[24rem] text-sm">
+                    <div className="bg-white p-4 rounded-md shadow-md h-[28rem] text-sm">
                   {/* Filtros Regionais */}
                       <label htmlFor="filtro-ano" className="block font-semibold mt-2 text-base">Ano</label>
                       <select id="filtro-ano" ref={selectAnoReg} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Ano</option>
-                        {anosReg.map(a => (
-                          <option key={a} value={a}>{a}</option>
-                        ))}
                       </select>
 
                       <label htmlFor="filtro-sexo" className="block font-semibold mt-2 text-base">Gênero</label>
                       <select id="filtro-sexo" ref={selectSexoReg} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Gênero</option>
-                        {sexosReg.map(s => (
-                          <option key={s} value={s}>
-                            {s === "masc" ? "Masculino" : "Feminino"}
-                          </option>
-                        ))}
                       </select>
 
                       <label htmlFor="filtro-fasevida" className="block font-semibold mt-2 text-base">Fase da vida</label>
                       <select id="filtro-fasevida" ref={selectFaseReg} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Fase de vida</option>
-                        {fasesReg.map(f => (
-                          <option key={f} value={f}>{f}</option>
-                        ))}
                       </select>
                       
                       <label htmlFor="filtroNutricional" className="block font-semibold mt-2 text-base">Estado Nutricional</label>
                       <select id="filtroNutricional" ref={selectNutricional} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Estado nutricional</option>
-                        {nutricionais.map(n => (
-                          <option key={n} value={n}>{n}</option>
-                        ))}
                       </select>
 
                       <div className="containerDiv hidden" ref={containerDivisaoReg}>
                         <label htmlFor="filtro-divisao" className="block font-semibold mt-2 text-base">Divisão</label>
                         <select id="filtro-divisao" ref={selectModoReg} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Divisão</option>
-                        {modosReg.map(m => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
-                          
+                        <option value="">Divisão</option>                          
                         </select>
                       </div>
                     </div>            
@@ -588,54 +527,32 @@ export default function DadosSisvan() {
                       <label htmlFor="filtroUFTemp" className="block font-semibold mt-2 text-base">Unidade Federativa</label>
                       <select id="filtroUFTemp" ref={selectUFTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione a UF</option>
-                        {ufsTemp.map(uf => (
-                          <option key={uf} value={uf}>{uf}</option>
-                        ))}
                       </select>
 
                       
                       <label htmlFor="filtro-muni" ref={labelMunicipioTemp} className="block font-semibold mt-2 text-base">Município</label>
                       <select id="filtro-muni" ref={selectMunicipioTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
                       <option value="">Selecione o Município</option>
-                      {modosReg.map(m => (
-                        <option key={m} value={m}>{m}</option>
-                      ))}
-                        
                       </select>
 
                       <label htmlFor="filtro-modoTemp" ref={labelSubdivTemp} className="block font-semibold mt-2 text-base">Divisão</label>
                       <select id="filtro-modoTemp"ref={selectModoTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
                       <option value="">Selecione a Divisão</option>
-                      {modosReg.map(m => (
-                        <option key={m} value={m}>{m}</option>
-                      ))}
-                        
                       </select>
 
                       <label htmlFor="filtroSexoTemp" className="block font-semibold mt-2 text-base">Gênero</label>
                       <select id="filtroSexoTemp" ref={selectSexoTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione o Gênero</option>
-                        {sexosTemp.map(s => (
-                          <option key={s} value={s}>
-                            {s === "M" ? "Masculino" : "Feminino"}
-                          </option>
-                        ))}
                       </select>
 
                       <label htmlFor="filtroFaseTemp" className="block font-semibold mt-2 text-base">Fase da Vida</label>
                       <select id="filtroFaseTemp" ref={selectFaseTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione a Fase da Vida</option>
-                        {fasesTemp.map(f => (
-                          <option key={f} value={f}>{f}</option>
-                        ))}
                       </select>
 
                       <label htmlFor="filtroNutriTemp" className="block font-semibold mt-2 text-base">Estado Nutricional</label>
                       <select id="filtroNutriTemp" ref={selectIndicadorTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione o Estado Nutricional</option>
-                        {indicadores.map(i => (
-                          <option key={i} value={i}>{i}</option>
-                        ))}
                       </select>
                     </div>
 
