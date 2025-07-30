@@ -20,7 +20,8 @@ interface IndicadorDatum{
     Fem: number;
     Todos: number;
     
-  }
+}
+
 export const promiseRegioes = d3.csv<G.RegionDataRow>(
   G.csvRegionUrl,
   row => ({
@@ -56,8 +57,10 @@ export const promiseDados = d3.csv<G.DataRow>(
 
 function atualizarGrafico(
   dados: G.DataRow[],
+  regionData: G.RegionDataRow[],
   selectUF: HTMLSelectElement,
   selectMunicipio: HTMLSelectElement,
+  selectDivisao: HTMLSelectElement,
   selectAno: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
   selectFase: HTMLSelectElement,
@@ -70,11 +73,15 @@ function atualizarGrafico(
   // 1) captura valores dos selects (todos são HTMLSelectElement)
   const ufSelecionada       = selectUF.value;
   const municipioSelecionado= selectMunicipio.value;
+  const divSelecionada      = selectDivisao.value;
   const anoSelecionado      = selectAno.value;
-  const selectFaseInicial   = selectFase.value;
-  const faseSelecionada     = selectFaseInicial === "" ? "adulto" : selectFaseInicial;   // “adolescente” | “adulto”
-  const selectSexoInicial   = selectSexo.value;
-  const sexoSelecionado     = selectSexoInicial === "" ? "Todos" : selectSexoInicial;   // “Masc” | “Fem” | “Todos”
+  const faseSelecionada     = selectFase.value;   // “adolescente” | “adulto”
+  const sexoSelecionado     = selectSexo.value === "Todos" ? "Todos" : selectSexo.value;   // “Masc” | “Fem” | “Todos”
+  const regionMap           : Map<string, string> = new Map();
+
+  regionData.forEach(r =>
+      regionMap.set(r.municipio_id_sdv, r.regional_id)
+    )
 
   // 2) exibe ou oculta botão/menu de adulto (HTMLButtonElement e HTMLElement)
   if (faseSelecionada === "adulto") {
@@ -87,17 +94,26 @@ function atualizarGrafico(
 
   // 3) filtra o allData (DataRow[]) conforme seleções
   const dadosFiltrados = dados.filter(d => {
-    if (faseSelecionada === "adolescente") {
-      if (d.RACA_COR !== "todos" || d.INDICE !== "IMCxIdade") return false;
+
+    if (faseSelecionada             && d.fase_vida                !== faseSelecionada     ) return false;
+    if (ufSelecionada               && d.UF                       !== ufSelecionada       ) return false;
+    if (anoSelecionado              && d.ANO                      !== anoSelecionado      ) return false;
+    if (sexoSelecionado !== "Todos" && d.SEXO                     !== sexoSelecionado     ) return false;
+    
+    if (municipioSelecionado){
+      if (divSelecionada === "federativa") {
+          if(String(d.codigo_municipio) !== municipioSelecionado) return false;
+        } else {
+
+          const regiaoDoMunicipio = regionMap.get(d.codigo_municipio);
+          if (regiaoDoMunicipio !== municipioSelecionado) return false;
+
+        }
     }
-    if (d.fase_vida !== faseSelecionada) return false;
-    if (ufSelecionada       && d.UF !== ufSelecionada) return false;
-    if (municipioSelecionado&& String(d.codigo_municipio) !== municipioSelecionado) return false;
-    if (anoSelecionado      && d.ANO !== anoSelecionado) return false;
-    if (sexoSelecionado !== "Todos" && d.SEXO !== sexoSelecionado)     return false;
+    
     return true;
   });
-
+  
   // 4) decide quais colunas usar
   let colunasIndicadores: (keyof G.DataRow)[];
   if (faseSelecionada === "adolescente") {
@@ -194,174 +210,167 @@ function atualizarGrafico(
   }
 
   function desenharGrafico(dados: IndicadorDatum[]) {
-  // 1) Limpa tudo que já existe no container
-  const container = d3.select("#graficoMapeamento");
-  container.selectAll("*").remove();
+    // 1) Limpa tudo que já existe no container
+    const container = d3.select("#graficoMapeamento");
+    container.selectAll("*").remove();
 
-  // 2) Define margens e dimensões
-  const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+    // 2) Define margens e dimensões
+    const margin = { top: 30, right: 30, bottom: 50, left: 60 };
 
-  // 2.1) Pega o tamanho real do container em Pixels
-  const bbox = (container.node() as HTMLElement).getBoundingClientRect();
-  const totalWidth  = bbox.width;
-  const totalHeight = bbox.height;    // se quiser altura fixa, use um valor interno aqui
-  const width       = totalWidth  - margin.left - margin.right;
-  const height      = totalHeight - margin.top  - margin.bottom;
+    // 2.1) Pega o tamanho real do container em Pixels
+    const bbox = (container.node() as HTMLElement).getBoundingClientRect();
+    const totalWidth  = bbox.width;
+    const totalHeight = bbox.height;    // se quiser altura fixa, use um valor interno aqui
+    const width       = totalWidth  - margin.left - margin.right;
+    const height      = totalHeight - margin.top  - margin.bottom;
 
-  // 3) Cria o SVG com viewBox e preserveAspectRatio
-  const svg = container
-    .append("svg")
-      .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
-      .attr("preserveAspectRatio", "xMinYMin meet")
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  const selectedSexo = selectSexo.value;
-
-  const maxValue = d3.max(dados, d => {
-    if (selectedSexo ===''){
-      return d.Todos;
-    } else if (selectedSexo ==='Masc'){
-      return d.Masc;
-    } else {d.Fem;}
-  }) ?? 0;
-  const fator = 1.1;
-  const yMax = maxValue*fator;
-
-  // 4) Escalas
-  const x0 = d3.scaleBand()
-    .domain(dados.map(d => d.indicador))
-    .range([0, width])
-    .paddingInner(0.1);
-
-  const y = d3.scaleLinear()
-    .domain([0, yMax])
-    .nice()
-    .range([height, 0]);
-
-  // 5) Eixos
-  const xAxis = svg.append("g")
-    .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x0).tickFormat(d => G.nomeAmigavel[d] || d));
-  xAxis.selectAll("text").classed("text-[14px]", true);
-
-  const yAxis = svg.append("g")
-    .call(d3.axisLeft(y).ticks(10).tickFormat(d => d + "%"));
-  yAxis.selectAll("text").classed("text-[14px]", true);
-
-  // 6) Qual filtro de sexo está ativo?
-  
-
-  if (selectedSexo === "") {
-    // Criar sub-escala para total vs stacked
-    const groups = ["total", "stacked"];
-    const x1 = d3.scaleBand()
-      .domain(groups)
-      .range([0, x0.bandwidth()])
-      .padding(0.1);
-
-    // G container por indicador
-    const gIndicador = svg.selectAll("g.indicador-group")
-      .data(dados)
-      .enter()
+    // 3) Cria o SVG com viewBox e preserveAspectRatio
+    const svg = container
+      .append("svg")
+        .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
+        .attr("preserveAspectRatio", "xMinYMin meet")
       .append("g")
-        .attr("class", "indicador-group")
-        .attr("transform", d => `translate(${x0(d.indicador)},0)`);
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Barra “Total”
-    gIndicador.append("rect")
-      .attr("x", d => x1("total") + x1.bandwidth() * 0.25)
-      .attr("y", d => y(d.Todos))
-      .attr("width", x1.bandwidth() * 0.7)
-      .attr("height", d => Math.max( 0, height - y(d.Todos)))
-      .classed("fill-primary", true)
-      .on("mouseover", (event, d) => {
-        G.showTooltip(`
-          <strong>${G.nomeAmigavel[d.indicador]}</strong><br/>
-          Valor Total: ${d.Todos.toFixed(2)}%
-        `, event);
-      })
-      .on("mousemove", G.moveTooltip)
-      .on("mouseout", G.hideTooltip);
+    const selectedSexo = selectSexo.value;
 
-    
+    const maxValue = d3.max(dados, d => {
+      if (selectedSexo ==='Todos'){
+        return d.Todos;
+      } else if (selectedSexo ==='Masc'){
+        return d.Masc;
+      } else {return d.Fem;}
+    }) ?? 0;
+    const fator = 1.1;
+    const yMax = maxValue*fator;
 
-    // Barra empilhada (Masc + Fem)
-    const stackGen = d3.stack().keys(["Masc","Fem"]);
-    gIndicador.each(function(d) {
-      const thisGroup = d3.select(this);
-      const numericOnly = {  
-        Masc: d.Masc,
-        Fem:  d.Fem
-      };
-      const series = stackGen([numericOnly]);
-      thisGroup.selectAll("rect.stacked")
-        .data(series)
+    // 4) Escalas
+    const x0 = d3.scaleBand()
+      .domain(dados.map(d => d.indicador))
+      .range([0, width])
+      .paddingInner(0.1);
+
+    const y = d3.scaleLinear()
+      .domain([0, yMax])
+      .nice()
+      .range([height, 0]);
+
+    // 5) Eixos
+    const xAxis = svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x0).tickFormat(d => G.nomeAmigavel[d] || d));
+    xAxis.selectAll("text").classed("text-[14px]", true);
+
+    const yAxis = svg.append("g")
+      .call(d3.axisLeft(y).ticks(10).tickFormat(d => d + "%"));
+    yAxis.selectAll("text").classed("text-[14px]", true);
+
+    // 6) Qual filtro de sexo está ativo?    
+    if (selectedSexo === "Todos") {
+      // Criar sub-escala para total vs stacked
+      const groups = ["total", "stacked"];
+      const x1 = d3.scaleBand()
+        .domain(groups)
+        .range([0, x0.bandwidth()])
+        .padding(0.1);
+
+      // G container por indicador
+      const gIndicador = svg.selectAll("g.indicador-group")
+        .data(dados)
         .enter()
-        .append("rect")
-          .attr("class", s => `stacked ${s.key==="Masc"?"fill-accent":"fill-secondary"}`)
-          .attr("x", x1("stacked") + x1.bandwidth() * 0.05)
-          .attr("y", s => y(s[0][1]))
-          .attr("height", s => Math.abs(y(s[0][0]) - y(s[0][1])))
-          .attr("width", x1.bandwidth()*0.3)
-        .on("mouseover", (event, s) => {
-          const value = s[0][1] - s[0][0];
-          G.showTooltip(`
-            <strong>${G.nomeAmigavel[d.indicador]}</strong><br/>
-            Sexo: ${G.sexoLabel[s.key]}<br/>
-            Valor: ${value.toFixed(2)}%
-          `, event);
-        })
-        .on("mousemove", G.moveTooltip)
-        .on("mouseout", G.hideTooltip);
-    });
+        .append("g")
+          .attr("class", "indicador-group")
+          .attr("transform", d => `translate(${x0(d.indicador)},0)`);
 
-  } else {
-    // Apenas Masc ou Fem
-    const raw = selectSexo.value.toLowerCase();
-    const key = raw === "masc"    ? "Masc"
-              : raw === "fem"     ? "Fem"
-              : /*  === "todos"*/   "Todos";
-    svg.selectAll("g.indicador-group")
-      .data(dados)
-      .enter()
-      .append("g")
-        .attr("class","indicador-group")
-        .attr("transform", d => `translate(${x0(d.indicador)},0)`)
-      .append("rect")
-        .attr("x", x0.bandwidth()*0.25)
-        .attr("y",      d => y(d[key]))
-        .attr("height", d => Math.max( 0, height - y(d[key])))
-        .attr("width", x0.bandwidth()*0.5)
-        .classed(`fill-${key.toLowerCase()}`, true)
+      // Barra “Total”
+      gIndicador.append("rect")
+        .attr("x", d => x1("total") + x1.bandwidth() * 0.25)
+        .attr("y", d => y(d.Todos))
+        .attr("width", x1.bandwidth() * 0.7)
+        .attr("height", d => Math.max( 0, height - y(d.Todos)))
+        .classed("fill-primary", true)
         .on("mouseover", (event, d) => {
           G.showTooltip(`
             <strong>${G.nomeAmigavel[d.indicador]}</strong><br/>
-            Valor: ${d[key].toFixed(2)}%
+            Valor Total: ${d.Todos.toFixed(2)}%
           `, event);
         })
         .on("mousemove", G.moveTooltip)
         .on("mouseout", G.hideTooltip);
-  }
 
-  // 7) Rótulo do eixo Y
-  // desenha o rótulo do eixo Y, rotacionado e centralizado
-  svg.append("text")
-    .attr("transform", "rotate(-90)")
-    // ajusta o X para ficar centrado verticalmente, considerando margin.top
-    .attr("x", -(height/(1.5) - margin.top))
-    .attr("y", -45)
-    .classed("text-[18px] font-semibold", true)
-    .text("Prevalência");  
+      
+
+      // Barra empilhada (Masc + Fem)
+      const stackGen = d3.stack().keys(["Masc","Fem"]);
+      gIndicador.each(function(d) {
+        const thisGroup = d3.select(this);
+        const numericOnly = {  
+          Masc: d.Masc,
+          Fem:  d.Fem
+        };
+        const series = stackGen([numericOnly]);
+        thisGroup.selectAll("rect.stacked")
+          .data(series)
+          .enter()
+          .append("rect")
+            .attr("class", s => `stacked ${s.key==="Masc"?"fill-accent":"fill-secondary"}`)
+            .attr("x", x1("stacked") + x1.bandwidth() * 0.05)
+            .attr("y", s => y(s[0][1]))
+            .attr("height", s => Math.abs(y(s[0][0]) - y(s[0][1])))
+            .attr("width", x1.bandwidth()*0.3)
+          .on("mouseover", (event, s) => {
+            const value = s[0][1] - s[0][0];
+            G.showTooltip(`
+              <strong>${G.nomeAmigavel[d.indicador]}</strong><br/>
+              Sexo: ${G.sexoLabel[s.key]}<br/>
+              Valor: ${value.toFixed(2)}%
+            `, event);
+          })
+          .on("mousemove", G.moveTooltip)
+          .on("mouseout", G.hideTooltip);
+      });
+
+    } else {
+      // Apenas Masc ou Fem
+      const key = selectSexo.value;
+      svg.selectAll("g.indicador-group")
+        .data(dados)
+        .enter()
+        .append("g")
+          .attr("class","indicador-group")
+          .attr("transform", d => `translate(${x0(d.indicador)},0)`)
+        .append("rect")
+          .attr("x", x0.bandwidth()*0.25)
+          .attr("y",      d => y(d[key]))
+          .attr("height", d => Math.max( 0, height - y(d[key])))
+          .attr("width", x0.bandwidth()*0.5)
+          .classed(key ==="Masc"? "fill-accent" : "fill-secondary", true)
+          .on("mouseover", (event, d) => {
+            G.showTooltip(`
+              <strong>${G.nomeAmigavel[d.indicador]}</strong><br/>
+              Valor: ${d[key].toFixed(2)}%
+            `, event);
+          })
+          .on("mousemove", G.moveTooltip)
+          .on("mouseout", G.hideTooltip);
+    }
+
+    // 7) Rótulo do eixo Y
+    // desenha o rótulo do eixo Y, rotacionado e centralizado
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      // ajusta o X para ficar centrado verticalmente, considerando margin.top
+      .attr("x", -(height/(1.5) - margin.top))
+      .attr("y", -45)
+      .classed("text-[18px] font-semibold", true)
+      .text("Prevalência");  
 
   };
   
   
 }
-
-
   
-
   function atualizarTitulo(
   dados: G.DataRow[],
   selectUF: HTMLSelectElement,
@@ -402,8 +411,7 @@ function atualizarGrafico(
       }
     });
     
-  }
-
+}
 
 export function populateSelectsMapeamento (
     selectUFEl: HTMLSelectElement,
@@ -454,14 +462,10 @@ export function populateSelectsMapeamento (
 
       // ---Sexo---
       selectSexoEl.innerHTML = "";
-      ["", "masc", "fem"].forEach(s => {
+      ["Todos", "Masc", "Fem"].forEach(s => {
         const opt = document.createElement("option");
         opt.value = s;
-        if (!s) {
-          opt.text = "Todos";
-        } else {
-          opt.text = s === "masc" ? "Masculino" : "Feminino";
-        }
+        opt.text = G.sexoLabel[s];
         selectSexoEl.appendChild(opt);
       });
 
@@ -483,9 +487,7 @@ export function populateSelectsMapeamento (
       G.FiltroChangerMunReg(selectDivisaoEl,labelDivisaoEl,selectUFEl,selectMunicipioEl,labelMunRegEl,data,regionData);
      
 
-    }
-
-
+}
 
 /**
  * Soma colunas especiais (“excesso_peso” e “obesidade_calc”) ou qualquer outra coluna numérica.
@@ -539,13 +541,13 @@ export async function initMapeamento(
   );
   //desenha o título e o gráfico iniciais
   atualizarTitulo(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-  atualizarGrafico(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
 
-  // ao mudar UF, atualiza municípios
+  // Listeners
   selectUFEl.addEventListener("change", () => {        
     G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
     atualizarTitulo(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-    atualizarGrafico(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl); 
+    atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl); 
   });
   selectDivisaoEl.addEventListener("change",()=>{
         G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
@@ -553,21 +555,19 @@ export async function initMapeamento(
         ? 'Municípios' 
         : 'Regiões de Saúde';
         atualizarTitulo(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-        atualizarGrafico(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
       });
-  [selectAnoEl,selectFaseEl,selectMunicipioEl,selectSexoEl].forEach(s =>{
+  selectMunicipioEl.addEventListener("change", () =>{
+        atualizarTitulo(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
+        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+      });
+  [selectAnoEl,selectFaseEl,selectSexoEl].forEach(s =>{
     s.addEventListener("change", () =>{
       G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
       atualizarTitulo(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-      atualizarGrafico(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+      atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
     })
   });
-
-  const regionMap: Map<string, string> = new Map();
-
-  regionData.forEach(r =>
-      regionMap.set(r.municipio_id_sdv, r.regional_id)
-    )
     
   // Alterna o menu adulto
   btnMenuAdultoToggleEl.addEventListener("click", () => {
@@ -650,7 +650,7 @@ export async function initMapeamento(
         }
       });
     }
-  atualizarGrafico(allData,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
   }
    
 
@@ -658,8 +658,10 @@ export async function initMapeamento(
 
 export function resizeMapeamento(
   dados: G.DataRow[],
+  regionData: G.RegionDataRow[],
   selectUF: HTMLSelectElement,
   selectMunicipio: HTMLSelectElement,
+  selectDivisao: HTMLSelectElement,
   selectAno: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
   selectFase: HTMLSelectElement,
@@ -670,5 +672,5 @@ export function resizeMapeamento(
   valorTodosEl: HTMLElement,
 ){
   atualizarTitulo(dados,selectUF,selectMunicipio,selectAno,selectSexo,selectFase);
-  atualizarGrafico(dados,selectUF,selectMunicipio,selectAno,selectSexo,selectFase,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+  atualizarGrafico(dados,regionData,selectUF,selectMunicipio,selectDivisao,selectAno,selectSexo,selectFase,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
 }

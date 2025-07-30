@@ -89,8 +89,10 @@ export default function DadosSisvan() {
       // Re-executa o initMapeamento com os mesmos refs
       resizeMapeamento(
         data,
+        regions,
         selectUF.current!,
         selectMunicipio.current!,
+        selectDivisao.current!,
         selectAno.current!,
         selectSexo.current!,
         selectFase.current!,

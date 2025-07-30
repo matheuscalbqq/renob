@@ -428,7 +428,7 @@ export function FiltroChangerMunReg(
           municipios.forEach((m) => {
             const label = cidadesFriendly[ufSelecionada][m.code] || m.name;
             const opt = document.createElement("option");
-            opt.value = m.name;
+            opt.value = m.code;
             opt.text = label;
             selectMunicipioEl.appendChild(opt);
           });
