@@ -56,6 +56,7 @@ export function initRegional(
   const regionMap = new Map<string,string>();
   let allData: RegionalDataRow[] = [];
   const tooltip = d3.select<HTMLDivElement, unknown>(".tooltip-regional");
+  const { width: chartW, height: chartH } = G.getChartSize(mapContainer);
 
    // Quadro de Entrevistados (atualiza os counters de Mulheres, Homens e Total)
   function atualizarQuadroRegional(): void {
@@ -284,6 +285,8 @@ export function initRegional(
 
    currentMode = "brasil";
    currentUF  = null;
+   
+   
 
    // carrega o geojson do Brasil
    d3.json<any>("data/geojson/brazil.json").then(geoData => {
@@ -300,8 +303,8 @@ export function initRegional(
       if (svg.empty()) {
          svg = d3.select(mapContainer)
          .append("svg")
-         .attr("width", G.width)
-         .attr("height", G.height);
+         .attr("width", chartW)
+         .attr("height", chartH);
       }
 
       // desenha o mapa
@@ -396,7 +399,7 @@ export function initRegional(
       const colorScaleCountry = G.getColorScale(filtroSexo, minVal, maxVal);
 
       // 5) Projeção e gerador de path
-      const projection = d3.geoMercator().fitSize([G.width, G.height], geoData);
+      const projection = d3.geoMercator().fitSize([chartW, chartH], geoData);
       const pathGen    = d3.geoPath().projection(projection);
 
       // 6) Tooltip local para Brasil
@@ -463,8 +466,8 @@ export function initRegional(
          if (svg.empty()) {
          svg = d3.select(mapContainer)
             .append("svg")
-            .attr("width", G.width)
-            .attr("height", G.height);
+            .attr("width", chartW)
+            .attr("height", chartH);
          }
 
          // primeiro quadro e mapa
@@ -577,7 +580,7 @@ export function initRegional(
 
       // projeção personalizada para o estado
       const projection = d3.geoMercator()
-         .fitSize([G.width, G.height], geoData);
+         .fitSize([chartW, chartH], geoData);
       const pathGen = d3.geoPath().projection(projection);
 
       // cria/limpa svg
@@ -585,8 +588,8 @@ export function initRegional(
       if (svgBrasil.empty()) {
          svgBrasil = d3.select(mapContainer)
          .append("svg")
-         .attr("width", G.width)
-         .attr("height", G.height);
+         .attr("width", chartW)
+         .attr("height", chartH);
       }
 
       svgBrasil
@@ -768,12 +771,12 @@ export function initRegional(
       if (svgEstado.empty()) {
          svgEstado = d3.select(mapContainer)
          .append("svg")
-         .attr("width", G.width)
-         .attr("height", G.height);
+         .attr("width", chartW)
+         .attr("height", chartH);
       }
 
       // projeção e path
-      const projection = d3.geoMercator().fitSize([G.width, G.height], geo);
+      const projection = d3.geoMercator().fitSize([chartW, chartH], geo);
       const pathGen    = d3.geoPath().projection(projection);
 
       // desenha municípios/regiões
@@ -1009,8 +1012,8 @@ export function initRegional(
       if (svg.empty()) {
         svg = d3.select("#mapaRegional")
                 .append("svg")
-                  .attr("width", G.width)
-                  .attr("height", G.height);
+                  .attr("width", chartW)
+                  .attr("height", chartH);
       }
   
       svg.selectAll("path")
@@ -1018,7 +1021,7 @@ export function initRegional(
          .join("path")
            .attr("class", "regiao-saude")
            .attr("d", d3.geoPath().projection(
-              d3.geoMercator().fitSize([G.width,G.height], geo)
+              d3.geoMercator().fitSize([chartW,chartH], geo)
            ))
            .attr("fill", d => {
              return d.properties.value === 0
@@ -1090,6 +1093,9 @@ export function initRegional(
         }
      });
    }
+   (mapContainer as any).__resizeRegional = () => {
+      reloadMap();
+   }
    // Clique direito global do mapa
    /* d3.select(mapContainer)
    .on("contextmenu", (event: MouseEvent) => {
@@ -1104,6 +1110,6 @@ export function initRegional(
          d3.select(".legendRegional").selectAll("*").remove();
       }
    }); */
-   }
+}
       
 

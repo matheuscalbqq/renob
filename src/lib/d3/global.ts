@@ -5,7 +5,30 @@ import {hsl, hcl} from "d3-color";
 
 // Tamanhos do SVG
 export const width  = 800;
-export const height = 450;
+export const height = 520;
+
+export function getChartSize(
+  container: HTMLElement,
+  opts: { minWidth?: number;minHeight?: number } = {}
+): { width: number; height: number }{  
+
+  const { minWidth = 600, minHeight = 350} = opts;
+
+  const rect      = (container as HTMLElement).getBoundingClientRect();
+  const style = getComputedStyle(container as HTMLElement);
+  const padTop = parseFloat(style.paddingTop) || 0;
+  const padBottom = parseFloat(style.paddingBottom) || 0;
+  const padLeft = parseFloat(style.paddingLeft) || 0;
+  const padRight = parseFloat(style.paddingRight) || 0;
+
+  const availableWidth  = rect.width - padLeft - padRight || width  ;
+  const availableHeight = rect.height - padTop - padBottom || height ;
+
+  return {
+    width:  Math.max( Math.min( availableWidth,  minWidth  ), availableWidth ),
+    height: Math.max( Math.min( availableHeight, minHeight ), availableHeight)
+  };
+}
 
 // URLs das fontes de dados
 export const csvDataUrl    = "data/db_final.csv";
@@ -279,8 +302,23 @@ export function legendasMapa(
         maxVal: number      ) : void 
   {
 
-      const legendSel = d3.select(mapContainer.parentElement!).select<HTMLElement>('.legendRegional');
-      d3.select('.legendRegional').selectAll("*").remove();
+      // acha o wrapper que contém tanto o mapa quanto a legenda; sobe um nível se necessário
+      let legendParent: HTMLElement | null = mapContainer.parentElement;
+      if (legendParent && !legendParent.querySelector('.legendRegional') && legendParent.parentElement) {
+        legendParent = legendParent.parentElement;
+      }
+      if (!legendParent) return; // segurança
+
+      const legendSel = d3.select(legendParent).select<HTMLElement>('.legendRegional');
+      if (legendSel.empty()) {
+        // se ainda não achou, tenta buscar de forma global como fallback (para compatibilidade)
+        console.warn("Não encontrou .legendRegional localmente; usando fallback global.");
+        d3.select('.legendRegional').selectAll("*").remove();
+      } else {
+        // limpar apenas o escopo correto
+        legendSel.selectAll("*").remove();
+      }
+
       const legendWidth    = 20;
       const legendHeight   = 200;
       const legendSvg = legendSel.append("svg")

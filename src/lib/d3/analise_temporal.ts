@@ -19,7 +19,7 @@ interface TemporalPoint {
  * @param labelMunicipio - label do selectMunicipio para mostrar/ocultar
  */
 export function initTemporal(
-  containerDivisao: HTMLElement,
+  container: HTMLElement,
   selectUF: HTMLSelectElement,
   selectMunicipio: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
@@ -341,22 +341,35 @@ const promiseDados = d3.csv<G.DataRow>(
     maxY: number
   ): void {
     // Limpa tudo
-    d3.select(containerDivisao).selectAll("*").remove();
+    d3.select(container).selectAll("*").remove();
 
     const margin = { top: 30, right: 30, bottom: 50, left: 50 };
-    const internalWidth  = 700;
-    const internalHeight = 355;
+    const minInternWidth  = 600;
+    const minInternHeight = 350;
 
+    const { width: outerWidth, height: outerHeight } = G.getChartSize(container, {
+      minWidth: minInternWidth + margin.left + margin.right,
+      minHeight: minInternHeight + margin.top + margin.bottom,
+    });
+
+    const internalWidth = Math.max (outerWidth - margin.left - margin.right, minInternWidth);
+    const internalHeight = Math.max (outerHeight - margin.top - margin.bottom, minInternHeight);
+    
     // SVG responsivo
-    const svg = d3.select(containerDivisao)
-      .append("svg")
+    const svg = d3.select(container)
+    .selectAll("svg")
+      .data([null])
+      .join("svg")
         .attr("viewBox", `0 0 ${internalWidth + margin.left + margin.right} ${internalHeight + margin.top + margin.bottom}`)
         .attr("preserveAspectRatio", "xMidYMid meet")
-        .classed("w-full", true)
-        .classed("h-auto", true);
+        .attr("width", internalWidth + margin.left + margin.right)
+        .attr("height", internalHeight + margin.top + margin.bottom);
 
-    const chartArea = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    const chartArea = svg.selectAll<SVGGElement, unknown>("g.chart-root")
+      .data([null])
+      .join("g")
+        .attr("class", "chart-root")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Escalas
     const x = d3.scalePoint<string>()
@@ -496,4 +509,7 @@ const promiseDados = d3.csv<G.DataRow>(
 
       });
     }
+    (container as any).__resizeTemporal = () => {
+      atualizarGrafico();
+    };
   }

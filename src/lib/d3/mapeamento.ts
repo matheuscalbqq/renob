@@ -216,11 +216,17 @@ function atualizarGrafico(
 
     // 2) Define margens e dimensões
     const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+    const minInternWidth  = 600;
+    const minInternHeight = 500;
 
     // 2.1) Pega o tamanho real do container em Pixels
     const bbox = (container.node() as HTMLElement).getBoundingClientRect();
-    const totalWidth  = bbox.width;
-    const totalHeight = bbox.height;    // se quiser altura fixa, use um valor interno aqui
+    const minTotalWidth   = minInternWidth  + margin.left + margin.right  ;
+    const minTotalHeight  = minInternHeight + margin.top  + margin.bottom ;
+    const totalWidthRaw   = Math.max( bbox.width,  minTotalWidth    );
+    const totalHeightRaw  = Math.max( bbox.height, minTotalHeight  );
+    const totalWidth  = totalWidthRaw;
+    const totalHeight = totalHeightRaw;    // se quiser altura fixa, use um valor interno aqui
     const width       = totalWidth  - margin.left - margin.right;
     const height      = totalHeight - margin.top  - margin.bottom;
 

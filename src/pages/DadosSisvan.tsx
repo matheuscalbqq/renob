@@ -104,7 +104,19 @@ export default function DadosSisvan() {
         valorMulheresEl.current!,
         valorTodosEl.current!,
       )
-    }; 
+    };
+    const handleResizeRegional = () => {
+      if (regionalContainer.current) {
+        const resizeFn = (regionalContainer.current as any).resizeRegional;
+        if (typeof resizeFn === "function") resizeFn();
+      }
+    };
+    const handleResizeTemporal = () => {
+      if (temporalContainer.current) {
+        const resizeFn = (temporalContainer.current as any).__resizeTemporal;
+        if (typeof resizeFn === "function") resizeFn();
+      }
+    };
     // Inicializa o gráfico de Mapeamento
     if (
       mapeamentoContainer.current &&
@@ -172,6 +184,7 @@ export default function DadosSisvan() {
         valorHomensElReg.current,
         valorTodosElReg.current
       );
+      window.addEventListener("resize", handleResizeRegional);
     }
 
     // Inicializa o gráfico Temporal
@@ -205,10 +218,13 @@ export default function DadosSisvan() {
         valorMulheresElTemp.current,
         valorTodosElTemp.current
       );
+      window.addEventListener("resize", handleResizeTemporal);
     }
     // Cleanup: remove o listener quando desmontar
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", handleResizeRegional);
+      window.removeEventListener("resize", handleResizeTemporal);
     };
   }, []);
   
@@ -325,10 +341,10 @@ export default function DadosSisvan() {
                                        
                   </div>
                   {/* coluna direita = gráfico + botão */}
-                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md relative h-[38.5rem]">
+                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md flex relative overflow-auto h-[38.5rem]">
 
                     {/*espaço para o gráfico*/}
-                    <div id='graficoMapeamento' ref={mapeamentoContainer} className="w-full h-full" />
+                    <div id='graficoMapeamento' ref={mapeamentoContainer} className="flex-1 mx-auto min-w-[600px] min-h-[550px] relative" />
 
                     {/*botão de adulto + checkboxes*/}
                     <button ref={btnMenuAdultoToggle} 
@@ -474,9 +490,11 @@ export default function DadosSisvan() {
                     </div>
                   </div>
 
-                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md flex items-center">
-                    <div id="mapaRegional" ref={regionalContainer} className="flex-1 mx-auto" />
-                    <div id="legendRegional" className="legendRegional" />
+                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md flex relative overflow-auto h-[38.5rem]">
+                    <div className="flex-1 min-w-[600px] min-h-[350px] relative">
+                      <div id="mapaRegional" ref={regionalContainer} className="h-full w-full" />
+                    </div>
+                    <div id="legendRegional" className="legendRegional ml-4 self-center" />
                   </div>
 
                 </div>
@@ -583,8 +601,8 @@ export default function DadosSisvan() {
                     </div>    
                   </div>
 
-                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md flex items-center">
-                    <div id="temporalContainer" ref={temporalContainer} className="mx-auto flex-1" />
+                  <div className="w-4/5 bg-white p-4 rounded-md shadow-md flex relative overflow-auto h-[38.5rem]">
+                    <div id="temporalContainer" ref={temporalContainer} className="flex-1 mx-auto min-w-[600px] min-h-[350px] relative" />
                   </div>
                   
                 

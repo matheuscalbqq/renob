@@ -2,112 +2,97 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Linkedin, Github } from "lucide-react";
+import LattesIcon from "@/components/LattesIcon"
+
+
 
 const membros = [
   {
     id: 1,
-    nome: "Dr. Ana Silva",
-    cargo: "Coordenadora do Projeto",
-    especialidade: "Nutrição em Saúde Pública",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
+    nome: "Daniela Mayumi Usuda Prado Rocha",
+    cargo: "Pós-Doutoranda",
+    especialidade: "Nutrição em Saúde Pública ?",
+    avatar: "http://servicosweb.cnpq.br/wspessoa/servletrecuperafoto?tipo=1&id=K4266471D1",
     descricao: [
-      "PhD em Nutrição pela USP",
-      "15 anos de experiência em políticas públicas de alimentação",
-      "Especialista em análise de dados do SISVAN",
-      "Coordenadora de projetos de pesquisa em nutrição populacional"
+      "Doutora em Nutrição pela UFV",
+      "Nutrição Clínica","Nutrição Bioquímica","Inflamação","Doenças Crônicas não Transmissíveis","Desenvolvimento e Tecnologia de Alimentos"
     ],
     contatos: {
-      email: "ana.silva@nutricao.br",
-      linkedin: "ana-silva-nutricao",
-      github: "anasilva-nut"
+      email:    "dani@dani.com.br",
+      lattes:   "1255736788675899",
+      linkedin: "dani",
+      github:   "dani"
     }
   },
   {
     id: 2,
-    nome: "Prof. Carlos Oliveira",
-    cargo: "Pesquisador Senior",
-    especialidade: "Epidemiologia Nutricional",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+    nome: "Gustavo de Oliveira Almeida",
+    cargo: "Doutorando",
+    especialidade: "Bioinformática",
+    avatar: "https://avatars.githubusercontent.com/u/110310596?v=4",
     descricao: [
-      "Doutor em Epidemiologia pela FIOCRUZ",
-      "Especialista em análises estatísticas complexas",
-      "Autor de mais de 50 artigos sobre nutrição brasileira",
-      "Consultor da OMS para políticas nutricionais"
+      "Mestre em Ciência da Computação pela UFV",
+      "Bacharel em Física Teórica pela UFV",
+      "Aprendizado de máquina",
+      "Caracterização de peptídeos naturais",
+      "Desenvolvedor na área de dados"
     ],
     contatos: {
-      email: "carlos.oliveira@pesquisa.br",
-      linkedin: "carlos-oliveira-epi"
+      email:  "gustavo.o.almeida@ufv.br",
+      github: "goalmeida05",
+      lattes: "7406360365770055"
     }
   },
   {
     id: 3,
-    nome: "Marina Santos",
-    cargo: "Desenvolvedora Front-end",
-    especialidade: "Visualização de Dados",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+    nome: "Prof. Helen Hermana Miranda Hermsdorff",
+    cargo: "Coordenadora do projeto",
+    especialidade: "Nutrição em doenças crônicas não transmissíveis",
+    avatar: "https://nit.ufv.br/wp-content/uploads/2024/11/Helen-Hermana-Miranda-Hermsdorff-150x150.jpg",
     descricao: [
-      "Especialista em D3.js e visualização interativa",
-      "Formada em Ciência da Computação pela UFMG",
-      "5 anos de experiência em dashboards de saúde pública",
-      "Desenvolvedora de soluções web responsivas e acessíveis"
+      "Doutora em Alimentação, Fisiologia e Saúde pela Universidad de Navarra, Espanha",
+      "Líder do Grupo de Estudos em Nutrição e Obesidade - GENO",
+      "Produção de material técnico-científico e análise de dados secundários no processo de qualificação de profissionais e gestores de saúde no manejo da obesidade e comorbidades"
     ],
     contatos: {
-      email: "marina.santos@dev.br",
-      linkedin: "marina-santos-dev",
-      github: "marinasantos-viz"
+      email:  "helenhermana@ufv.br",
+      lattes: "8193454290644430"
     }
   },
   {
     id: 4,
-    nome: "Dr. Roberto Lima",
-    cargo: "Analista de Dados",
+    nome: "Matheus Cavalcanti de Albuquerque",
+    cargo: "Desenvolvedor e Analista de Dados",
     especialidade: "Ciência de Dados em Saúde",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    avatar: "https://media.licdn.com/dms/image/v2/D4D03AQFiLooVjTzIzg/profile-displayphoto-shrink_800_800/B4DZchAJ1nHwAc-/0/1748605378434?e=1756944000&v=beta&t=uumnlpONZ40deIR73fvM8fjn8dFzuj-XyW1emfAMZxg",
     descricao: [
-      "PhD em Estatística Aplicada à Saúde",
-      "Especialista em machine learning para dados nutricionais",
-      "Experiência com big data em sistemas de saúde",
-      "Desenvolvedor de modelos preditivos para políticas públicas"
+      "",
+      "",
+      "",
+      ""
     ],
     contatos: {
-      email: "roberto.lima@dados.br",
-      linkedin: "roberto-lima-data",
-      github: "robertolima-ml"
+      email:    "matheusc.albqq@gmail.com",
+      linkedin: "matheusc-albqq",
+      github:   "matheuscalbqq",
+      lattes:   "9242679981831049"
     }
   },
   {
     id: 5,
-    nome: "Dra. Fernanda Costa",
-    cargo: "Consultora em Políticas Públicas",
-    especialidade: "Gestão em Saúde Pública",
-    avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=face",
+    nome: "Prof. Sabrina de Azevedo Silveira",
+    cargo: " ",
+    especialidade: "____",
+    avatar: "https://www2.dpi.ufv.br/wp-content/uploads/2015/12/sabrina-150x150.png",
     descricao: [
-      "Mestre em Administração Pública pela FGV",
-      "10 anos de experiência no Ministério da Saúde",
-      "Especialista em implementação de políticas nutricionais",
-      "Consultora em avaliação de programas de saúde"
+      " ",
+      " ",
+      " ",
+      " "
     ],
     contatos: {
-      email: "fernanda.costa@politicas.br",
-      linkedin: "fernanda-costa-saude"
-    }
-  },
-  {
-    id: 6,
-    nome: "Lucas Ferreira",
-    cargo: "Designer UX/UI",
-    especialidade: "Design de Interfaces para Saúde",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-    descricao: [
-      "Especialista em UX Design para aplicações de saúde",
-      "Formado em Design Digital pela ESPM",
-      "Experiência em design de sistemas complexos",
-      "Focado em acessibilidade e usabilidade"
-    ],
-    contatos: {
-      email: "lucas.ferreira@design.br",
-      linkedin: "lucas-ferreira-ux",
-      github: "lucasferreira-ui"
+      email: "sabrina@ufv.br",
+      lattes: "0899817111748167"
     }
   }
 ];
@@ -118,6 +103,7 @@ const Membros = () => {
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-16">
+          
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-primary">
             Nossa Equipe
           </h1>
@@ -130,32 +116,32 @@ const Membros = () => {
         {/* Team Members Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {membros.map((membro) => (
-            <Card key={membro.id} className="shadow-medium hover:shadow-strong transition-all duration-300 group">
-              <CardContent className="p-6">
+            <Card key={membro.id} className="shadow-medium hover:shadow-strong transition-all duration-300 group flex flex-col h-full">
+              <CardContent className="p-6 flex flex-col h-full">
                 {/* Avatar and Basic Info */}
                 <div className="text-center mb-6">
                   <Avatar className="h-24 w-24 mx-auto mb-4 ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all">
-                    <AvatarImage src={membro.avatar} alt={membro.nome} />
+                    <AvatarImage src={membro.avatar} alt={membro.nome} className="object-cover"/>
                     <AvatarFallback className="text-lg font-semibold bg-primary text-primary-foreground">
                       {membro.nome.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <h3 className="text-xl font-bold mb-2 text-foreground">
+                  <h3 className="text-xl font-bold mb-2 text-foreground w-60 flex-center ml-12">
                     {membro.nome}
                   </h3>
                   
-                  <Badge variant="secondary" className="mb-2">
+                  <Badge variant="accent" className="mb-2">
                     {membro.cargo}
                   </Badge>
                   
-                  <p className="text-sm text-nutrition-green font-medium">
+                  <p className="text-sm text-secondary/80 font-medium">
                     {membro.especialidade}
                   </p>
                 </div>
 
                 {/* Description */}
-                <div className="mb-6">
+                <div className="mb-6 flex-grow">
                   <h4 className="font-semibold mb-3 text-foreground">Experiência:</h4>
                   <ul className="space-y-2">
                     {membro.descricao.map((item, index) => (
@@ -168,27 +154,27 @@ const Membros = () => {
                 </div>
 
                 {/* Contact Links */}
-                <div className="border-t pt-4">
-                  <h4 className="font-semibold mb-3 text-foreground">Contato:</h4>
+                <div className="border-t pt-4 mt-auto">
+                  <h4 className="font-semibold mb-3 text-foreground">Links:</h4>
                   <div className="flex flex-wrap gap-2">
                     {membro.contatos.email && (
                       <a
                         href={`mailto:${membro.contatos.email}`}
-                        className="flex items-center space-x-1 px-3 py-1 bg-muted rounded-full text-xs hover:bg-muted/80 transition-colors"
+                        className="flex items-center space-x-1 px-3 py-1 bg-accent/30 rounded-full text-xs hover:bg-muted/80 transition-colors"
                       >
                         <Mail className="h-3 w-3" />
                         <span>Email</span>
                       </a>
-                    )}
-                    {membro.contatos.linkedin && (
+                    )}                    
+                    {membro.contatos.lattes && (
                       <a
-                        href={`https://linkedin.com/in/${membro.contatos.linkedin}`}
+                        href={`http://lattes.cnpq.br/${membro.contatos.lattes}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-1 px-3 py-1 bg-nutrition-blue/10 text-nutrition-blue rounded-full text-xs hover:bg-nutrition-blue/20 transition-colors"
+                        className="flex items-center space-x-1 px-3 py-1 bg-primary/40 rounded-full text-xs hover:bg-foreground/20 transition-colors"
                       >
-                        <Linkedin className="h-3 w-3" />
-                        <span>LinkedIn</span>
+                        <LattesIcon className="h-3 w-3 text-primary"/>
+                        <span className="text-white">Lattes</span>
                       </a>
                     )}
                     {membro.contatos.github && (
@@ -200,6 +186,17 @@ const Membros = () => {
                       >
                         <Github className="h-3 w-3" />
                         <span>GitHub</span>
+                      </a>
+                    )}
+                    {membro.contatos.linkedin && (
+                      <a
+                        href={`https://linkedin.com/in/${membro.contatos.linkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-1 px-3 py-1 bg-nutrition-blue/10 text-nutrition-blue rounded-full text-xs hover:bg-nutrition-blue/20 transition-colors"
+                      >
+                        <Linkedin className="h-3 w-3" />
+                        <span>LinkedIn</span>
                       </a>
                     )}
                   </div>
