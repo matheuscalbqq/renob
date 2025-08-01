@@ -28,6 +28,7 @@ export default function DadosSisvan() {
   const selectAno            = useRef<HTMLSelectElement>(null);
   const selectSexo           = useRef<HTMLSelectElement>(null);
   const selectFase           = useRef<HTMLSelectElement>(null);
+  const titleMap             = useRef<HTMLHeadingElement>(null);
   const btnMenuAdultoToggle  = useRef<HTMLButtonElement>(null);
   const menuAdultoContainer  = useRef<HTMLDivElement>(null);
   const valorHomensEl        = useRef<HTMLSpanElement>(null);
@@ -90,6 +91,7 @@ export default function DadosSisvan() {
       resizeMapeamento(
         data,
         regions,
+        titleMap.current!,
         selectUF.current!,
         selectMunicipio.current!,
         selectDivisao.current!,
@@ -130,6 +132,7 @@ export default function DadosSisvan() {
         selectAno.current,
         selectSexo.current,
         selectFase.current,
+        titleMap.current,
         btnMenuAdultoToggle.current,
         menuAdultoContainer.current,
         valorHomensEl.current,
@@ -239,7 +242,7 @@ export default function DadosSisvan() {
             </TabsTrigger>
             <TabsTrigger value="regional" className="flex items-center gap-2">
               <GiBrazil className="h-5 w-5" />
-              Mapeamento Regional
+              Mapeamento Demográfico
             </TabsTrigger>
             <TabsTrigger value="temporal" className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
@@ -252,12 +255,12 @@ export default function DadosSisvan() {
             <Card className="shadow-medium">
               <CardContent className="p-8">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold mb-3 text-foreground">
+                  <h2 ref={titleMap} className="text-2xl font-bold mb-3 text-foreground">
                     Mapeamento do Estado Nutricional
                   </h2>
                   <p className="text-muted-foreground">
-                    Visualização detalhada dos indicadores nutricionais distribuídos 
-                    pelos estados brasileiros, permitindo identificar padrões regionais 
+                    Visualização em barras de todos os estados nutricionais das diversas regiões do Brasil, 
+                    permitindo identificar a distribuição da população nos estados nutricionais
                     e áreas que requerem atenção especial.
                   </p>
                 </div>
@@ -410,9 +413,8 @@ export default function DadosSisvan() {
                     Mapeamento Regional
                   </h2>
                   <p className="text-muted-foreground">
-                    Comparação entre as cinco regiões brasileiras, destacando 
-                    diferenças regionais nos padrões nutricionais e identificando 
-                    características específicas de cada região.
+                    Mapa demográfico de cada estado nutricional no Brasil, com visualização de suas diversas regiões e divisões. 
+                    Nele é possível notar padrões e características específicas de cada região.
                   </p>
                 </div>
                 

@@ -34,6 +34,8 @@ const mapping: Record<string,string> = {
     'Todos': '--primary'
   };
 
+export const cores = {Todos: 'primary', Fem: 'secondary', Masc: 'accent'};
+
 export function getColorScale(sexo: string, min: number, max: number) {
    
   const base  = hsl(resolveCssColor(mapping[sexo]));
@@ -53,8 +55,7 @@ export function getColorScale(sexo: string, min: number, max: number) {
 export const getStrokeColor: Record<string,string> = {
   'Fem':   '#fff',
   'Masc':  '#fff',
-  'Todos': '#fff'
-  
+  'Todos': '#fff'  
 }
 
 // Labels de estados nutricionais
@@ -283,7 +284,7 @@ export function legendasMapa(
       const legendWidth    = 20;
       const legendHeight   = 200;
       const legendSvg = legendSel.append("svg")
-         .attr("width", 120)
+         .attr("width", 150)
          .attr("height", 250);
       const grad = legendSvg.append("defs").append("linearGradient")
          .attr("id", "legend-gradient")
@@ -294,7 +295,7 @@ export function legendasMapa(
       grad.append("stop").attr("offset","0%").attr("stop-color", colorScale(minVal));
       grad.append("stop").attr("offset","100%").attr("stop-color", colorScale(maxVal));
       legendSvg.append("rect")
-         .attr("x",10).attr("y",10)
+         .attr("x",30).attr("y",10)
          .attr("width",legendWidth)
          .attr("height",legendHeight)
          .style("fill","url(#legend-gradient)");
@@ -305,12 +306,18 @@ export function legendasMapa(
       // eixo direito tip-safe
       const legendAxis = d3.axisRight(legendScale)
       .ticks(4)
-      .tickFormat((d: number, i: number):string => {return `${d.toFixed(0)}%`;});
+      .tickFormat((d: number, i: number):string => {
+        if (maxVal - minVal <= 3){
+          return `${d.toFixed(1)}%`;
+        }else{
+        return `${d.toFixed(0)}%`;
+        }
+      });
       
 
       // adiciona o <g> para o eixo e chama o legendAxis diretamente
       const gLegend = legendSvg.append("g")
-         .attr("transform", `translate(${legendWidth + 20}, 10)`);
+         .attr("transform", `translate(${legendWidth + 35}, 10)`);
 
       // aqui você *invoca* o gerador como função, não via .call() do D3
       gLegend.call(legendAxis);
@@ -318,9 +325,10 @@ export function legendasMapa(
       // rótulo rotacionado
       legendSvg
       .append("text")
-         .attr("transform", `translate(${legendWidth + 65}, ${10 + legendHeight/2}) rotate(-90)`)
+         .attr("transform", `translate(${legendWidth+5}, ${10 + legendHeight/2}) rotate(-90)`)
          .attr("text-anchor", "middle")
          .attr("font-size", "18px")
+         .style("font-weight", "500")
          .text("Prevalência (%)");
   }
 //============== Filtros Cidade/Região de Saúde ===========================
@@ -390,9 +398,7 @@ export function FiltroChangerMunReg(
         })
     }
     const RegMap = regionPorUF[ufSelecionada];
-    selectMunicipio.innerHTML = "";
-    console.log("→ Construindo mapa para UF", ufSelecionada, ":",
-            Array.from(RegMap?.entries()||[]));
+    selectMunicipio.innerHTML = "";    
     Array.from(RegMap!.entries())
       .sort((a,b) => a[1].localeCompare(b[1]))
       .forEach(([code,name]) => {

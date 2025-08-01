@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import * as G from "./global";
-import { RegionCollection, RegionFeature } from "./geoTypes";
-import type { Feature, FeatureCollection, GeometryObject, MultiPolygon } from "geojson";
+import { RegionCollection } from "./geoTypes";
+import type { Feature, FeatureCollection, GeometryObject } from "geojson";
 
 // Tipagem para as linhas do CSV de dados regionais
 interface RegionalDataRow {
@@ -106,7 +106,7 @@ export function initRegional(
     const labelFase    = G.faseLabel[fase] || fase;
     const labelSexo    = sexo === "Todos" ? "" : G.sexoLabel[sexo] || sexo;
 
-    const titulo = `Mapeamento Regional de ${displayNutri} em ${labelFase} ${labelSexo} - ${lugar} ${ano}`;
+    const titulo = `Mapeamento Demográfico de ${displayNutri} em ${labelFase} ${labelSexo} - ${lugar} ${ano}`;
     titleEl.textContent = titulo;
   }  
 
@@ -323,30 +323,64 @@ export function initRegional(
       const filtroFase  = selectFase.value;
       const filtroNutr  = selectNutricional.value;
 
-      // 2) Filtra base e total geral
-      const arrAll = allData.filter(d =>
-         +d.ANO      === filtroAno &&
-         d.fase_vida === filtroFase &&
-         (filtroSexo === "Todos" || d.SEXO === filtroSexo)
+      // helpers locais: soma os subindicadores de obesidade e demais
+      function somaTotalNutricional(d: any): number {
+      return (
+         (+d.baixo_peso || 0) +
+         (+d.eutrofico || 0) +
+         (+d.sobrepeso || 0) +
+         (+d.obesidade_G_1 || 0) +
+         (+d.obesidade_G_2 || 0) +
+         (+d.obesidade_G_3 || 0)
       );
-      const totalAll = d3.sum(arrAll, d => +d.total);
+      }
 
-      // 3) Nomes e percentuais
+      // 2) Filtra base e total geral (usando os indicadores porque não existe `d.total`)
+      const arrAll = allData.filter(d =>
+      +d.ANO === filtroAno &&
+      d.fase_vida === filtroFase &&
+      (filtroSexo === "Todos" || d.SEXO === filtroSexo)
+      );
+
+      // total agregado como soma de todos os estados nutricionais
+      const totalAll = d3.sum(arrAll, d => somaTotalNutricional(d));
+
+      // 3) Nomes e percentuais (ajuste de nome amigável)
       const nomesIndicadores = filtroFase === "adulto"
-         ? G.nomesIndicadoresAdulto
-         : G.nomesIndicadoresAdolescente;
+      ? G.nomesIndicadoresAdulto
+      : G.nomesIndicadoresAdolescente;
       const nutricionalName = nomesIndicadores[filtroNutr] || filtroNutr;
 
-      const nutrCount = d3.sum(arrAll, d => +d[filtroNutr]);
+      // nutrCount depende do filtro nutricional selecionado
+      let nutrCount: number;
+      if (filtroNutr === "Total") {
+      nutrCount = totalAll;
+      } else if (filtroNutr === "obesidade") {
+      // soma das três categorias de obesidade se estiver usando esse indicador composto
+      nutrCount = d3.sum(arrAll, d =>
+         (+d.obesidade_G_1 || 0) + (+d.obesidade_G_2 || 0) + (+d.obesidade_G_3 || 0)
+      );
+      } else {
+      nutrCount = d3.sum(arrAll, d => +d[filtroNutr] || 0);
+      }
 
       const nutrPct = totalAll ? (nutrCount / totalAll) * 100 : 0;
 
       let pctFem = 0, pctMasc = 0;
       if (filtroSexo === "Todos") {
-         const totalFem  = d3.sum(arrAll.filter(d => d.SEXO === "Fem"),  d => +d.total);
-         const totalMasc = d3.sum(arrAll.filter(d => d.SEXO === "Masc"), d => +d.total);
-         pctFem  = totalAll ? (totalFem  / totalAll) * 100 : 0;
-         pctMasc = totalAll ? (totalMasc / totalAll) * 100 : 0;
+      const arrFem = arrAll.filter(d => {
+         const sexo = String(d.SEXO || "").trim().toLowerCase();
+         return sexo === "fem" || sexo === "feminino";
+      });
+      const arrMasc = arrAll.filter(d => {
+         const sexo = String(d.SEXO || "").trim().toLowerCase();
+         return sexo === "masc" || sexo === "masculino";
+      });
+
+      const totalFem = d3.sum(arrFem, d => somaTotalNutricional(d));
+      const totalMasc = d3.sum(arrMasc, d => somaTotalNutricional(d));
+      pctFem = totalAll ? (totalFem / totalAll) * 100 : 0;
+      pctMasc = totalAll ? (totalMasc / totalAll) * 100 : 0;
       }
 
       // 4) Escala de cor
@@ -368,11 +402,10 @@ export function initRegional(
       // 6) Tooltip local para Brasil
       const showTooltipBrasil = (event: MouseEvent, d: any) => {
          const lines = [
-            `<div class="tooltip-title">Brasil</div>`,
-            `<div><span class="tooltip-subtitle">${nutricionalName}:</span> ${nutrPct.toFixed(1)}%</div>`,
+            `<div class="tooltip-title">Brasil<span class="font-normal">: ${nutrPct.toFixed(1)}%</span></div>`,
             ...(filtroSexo === "Todos" ? [
-            `<div class="tooltip-fem">Fem: ${pctFem.toFixed(1)}%</div>`,
-            `<div class="tooltip-masc">Masc: ${pctMasc.toFixed(1)}%</div>`
+            `<div class="tooltip-fem">Feminino<span class="font-normal">: ${pctFem.toFixed(1)}%</span></div>`,
+            `<div class="tooltip-masc">Masculino<span class="font-normal">: ${pctMasc.toFixed(1)}%</span></div>`
             ] : [])
          ];
          G.showTooltip(`<div class="tooltip-content">${lines.join("")}</div>`, event);
@@ -912,31 +945,45 @@ export function initRegional(
       }).filter(d => d.regional_id);
   
       // 3) rollup por regional_id em vez de codigo_municipio
-      let agg:any;
-      agg = d3.rollup(
-          merged,
-          v => {
-            const catSum   = d3.sum(v, d => +d[selectedNutri]);
-            const totalSum = d3.sum(v, d =>
-               (+d.baixo_peso)
-             + (+d.eutrofico)
-             + (+d.sobrepeso)
-             + (+d.obesidade_G_1)
-             + (+d.obesidade_G_2)
-             + (+d.obesidade_G_3)
+      function somaEstadosNutricionais(d:any):number{
+         if (selectedFase === "adolescente"){
+            return (
+                  (+d.magreza)
+               +  (+d.magreza_acentuada)
+               +  (+d.obesidade)
+               +  (+d.obesidade_grave)
             );
+         }else{
+            return (
+                  (+d.baixo_peso)
+               +  (+d.eutrofico)
+               +  (+d.sobrepeso)
+               +  (+d.obesidade_G_1)
+               +  (+d.obesidade_G_2)
+               +  (+d.obesidade_G_3)
+            );
+         }
+      }
+      let agg: Map<string,number>;
+      const baseAgg = selectedSexo === "Todos" ? merged : merged.filter(d=>d.SEXO === selectedSexo);
+
+      agg = d3.rollup(
+         baseAgg,
+         v => {
+            const catSum   = d3.sum( v, d => +d[selectedNutri]          );
+            const totalSum = d3.sum( v, d => somaEstadosNutricionais(d) );
             return totalSum > 0 ? (catSum/totalSum)*100 : 0;
-          },
-          d => d.regional_id
+         },
+         d => d.regional_id
       );
+      
   
       // 4) mesmo código da cor, path e projeção da visão municipal,
       //    mas usando geo.features (regiões de saúde) e agg.get(feature.properties.regi_id)
       const values = Array.from(agg.values() as Iterable<number>);
-      const minVal = d3.min(values), maxVal = d3.max(values);
-      const colorScale = G.getColorScale(selectedSexo, minVal, maxVal);
-      const border   = { "Todos":"#b982a1","Fem":"#4682B4","Masc":"#DB7093" }[selectedSexo] || "#ccc";
-      
+      const minVal = d3.min(values) ?? 0;
+      const maxVal = d3.max(values) ?? 0;
+      const colorScale = G.getColorScale(selectedSexo, minVal, maxVal);      
       
       geo.features.forEach(f => {
         const key = String(f.properties.reg_id);
@@ -948,10 +995,12 @@ export function initRegional(
       const tooltipLookup = d3.rollup(
         regionAllData,
         v => ({
-          nutrient: d3.sum(v, d => +d[selectedNutri]),
-          total: d3.sum(v, d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3)),
-          fem:   d3.sum(v.filter(d => d.SEXO === "Fem"), d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3)),
-          masc:  d3.sum(v.filter(d => d.SEXO === "Masc"), d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3))
+          nutrient:  d3.sum(v, d => +d[selectedNutri]),
+          total:     d3.sum(v, d => somaEstadosNutricionais(d)),
+          nutriFem:  d3.sum(v.filter(d=> d.SEXO ==="Fem"),d=> +d[selectedNutri]),
+          nutriMasc: d3.sum(v.filter(d=> d.SEXO ==="Masc"),d=> +d[selectedNutri]),
+          fem:       d3.sum(v.filter(d => d.SEXO === "Fem"), d => somaEstadosNutricionais(d)),
+          masc:      d3.sum(v.filter(d => d.SEXO === "Masc"), d => somaEstadosNutricionais(d))
         }),
         d => d.regional_id
       );
@@ -981,17 +1030,30 @@ export function initRegional(
            .on("mouseover", function(event, d) {
                // 1) pega a agregação por região
                const key         = String(d.properties.reg_id);
-               const aggOver     = tooltipLookup.get(key) || { nutrient:0, total:0, fem:0, masc:0 };
-               const percFem     = aggOver.fem/aggOver.total*100;
-               const percMasc    = aggOver.masc/aggOver.total*100;
-               const regPerc     = aggOver.nutrient/aggOver.total*100;
+               const aggOver     = tooltipLookup.get(key) || { nutrient:0, nutriFem:0, nutriMasc:0, total:0, fem:0, masc:0 };
 
-   
-               // 2) monta o mesmo html de antes
-               const htmlContent =  `<strong>${d.properties.nome}</strong>: <span style="font-size:15px;">${regPerc.toFixed(1)}%<br>
-                    <span style="color:#DC143C;">Feminino: ${percFem.toFixed(1)}%</span><br>
-                    <span style="color:#4169E1;">Masculino: ${percMasc.toFixed(1)}%</span></span>`;
-   
+               const percTFem     = aggOver.total > 0 ? aggOver.fem/aggOver.total*100 :0;
+               const percTMasc    = aggOver.total > 0 ? aggOver.masc/aggOver.total*100 :0;
+               const regPerc     = aggOver.total > 0 ? aggOver.nutrient/aggOver.total*100 :0;
+               const percFem     = aggOver.fem > 0 ? aggOver.nutriFem/aggOver.fem*100 : 0;
+               const percMasc     = aggOver.masc > 0 ? aggOver.nutriMasc/aggOver.masc*100 : 0;
+
+               const lines: string[] = [];
+               
+               // 2) monta o html
+               if (selectedSexo === 'Todos'){
+                  lines.push(`<strong>${d.properties.nome}</strong>: ${regPerc.toFixed(1)}%</br>`);
+                  lines.push(`<span style="font-size:13px; color:#DC143C;"><strong>Feminino</strong>: ${percTFem.toFixed(1)}%</span></br>`);
+                  lines.push(`<span style="font-size:13px; color:#4169E1;"><strong>Masculino</strong>: ${percTMasc.toFixed(1)}%</span>`);
+                  }else{
+                     lines.push(
+                        selectedSexo === "Fem" 
+                        ? `<strong>${d.properties.nome}</strong>: ${percFem.toFixed(1)}%</br>` 
+                        : `<strong>${d.properties.nome}</strong>: ${percMasc.toFixed(1)}%</br>`
+                     );
+                  };
+               
+               const htmlContent = `<div class="tooltip-content">${lines.join("")}</div>`;
                // 3) exibe com as mesmas classes/transitions
                tooltip
                  .classed("hidden", false)

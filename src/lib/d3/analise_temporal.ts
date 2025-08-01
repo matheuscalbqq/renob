@@ -178,9 +178,25 @@ const promiseDados = d3.csv<G.DataRow>(
     const fase = G.faseLabel[selectFase.value] || "";
     const sexo = selectSexo.value === "Todos" ? "" : G.sexoLabel[selectSexo.value]    || "";
     const indi = G.nomeAmigavel[selectIndicador.value] || "";
-    const cidade = selectMunicipio.value === "Todos" ? "" : selectMunicipio.name || "";
+    const regionPorUF: Record<string, Map<string, string>> = {};
+    if (!regionPorUF[uf]){
+      regionPorUF[uf] = new Map();
+      regionDataTemporal
+        .filter(d => d.uf === uf)
+        .forEach(d => {
+          regionPorUF[uf]!.set(d.regional_id, d.nome_regiao);
+        })
+    }
+    const regMap = regionPorUF[uf]
+    const cidade = selectMunicipio.value === "" ? "" : `${G.cidadesFriendly[uf][selectMunicipio.value]} (${uf})` || "";
+    const regiao = `${regMap.get(`${selectMunicipio.value}`)} (${uf})`;
+    const local = cidade === "" 
+      ? G.ufLabel[uf] 
+      : selectModo.value === 'federativa' 
+      ? cidade
+      : regiao;
 
-    const titulo = `Análise Temporal de ${indi} em ${fase} ${sexo} - ${cidade} ${G.ufLabel[uf]}`;
+    const titulo = `Análise Temporal de ${indi} em ${fase} ${sexo} - ${local}`;
     titleEl.textContent = titulo;
   }
 
@@ -392,21 +408,17 @@ const promiseDados = d3.csv<G.DataRow>(
     (["Fem","Masc","Todos"] as const).forEach(sexo => {
       const key = sexo === "Todos" ? "all" : sexo.toLowerCase();
       const serie = dadosRecord[sexo];
-      const pathString = lineGen(serie);
-      console.log(sexo, "->", pathString);
 
       /* purgecss start ignore */
       /* fill-primary fill-secondary fill-accent
         stroke-primary stroke-secondary stroke-accent */
       /* purgecss end ignore */
-        
-      const cores = {all: 'primary', fem: 'secondary', masc: 'accent'};
 
       // LINHA
       linesGroup.append("path")
         .datum(serie)
         .attr("fill", "none")
-        .classed(`stroke-${cores[key]}`,true)
+        .classed(`stroke-${G.cores[sexo]}`,true)
         .attr("stroke-width", 2)
         .attr("d", lineGen);
 
@@ -419,7 +431,7 @@ const promiseDados = d3.csv<G.DataRow>(
           .attr("cx", d => x(d.ano)!)
           .attr("cy", d => y(d.valor))
           .attr("r", 4)
-          .classed(`fill-${cores[key]}`,true)
+          .classed(`fill-${G.cores[sexo]}`,true)
           .on("mouseover", (event, d) => {
             d3.select(event.currentTarget)
               .transition().duration(100).attr("r", 6);
