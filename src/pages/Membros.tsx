@@ -15,7 +15,11 @@ const membros = [
     avatar: "http://servicosweb.cnpq.br/wspessoa/servletrecuperafoto?tipo=1&id=K4266471D1",
     descricao: [
       "Doutora em Nutrição pela UFV",
-      "Nutrição Clínica","Nutrição Bioquímica","Inflamação","Doenças Crônicas não Transmissíveis","Desenvolvimento e Tecnologia de Alimentos"
+      "Desenvolvimento e Tecnologia de Alimentos",
+      "Doenças Crônicas não Transmissíveis",
+      "Inflamação",
+      "Nutrição Bioquímica",
+      "Nutrição Clínica"
     ],
     contatos: {
       email:    "dani@dani.com.br",
@@ -32,8 +36,8 @@ const membros = [
     avatar: "https://avatars.githubusercontent.com/u/110310596?v=4",
     descricao: [
       "Mestre em Ciência da Computação pela UFV",
+      "Aprendizagem de máquina",
       "Bacharel em Física Teórica pela UFV",
-      "Aprendizado de máquina",
       "Caracterização de peptídeos naturais",
       "Desenvolvedor na área de dados"
     ],
@@ -66,10 +70,10 @@ const membros = [
     especialidade: "Ciência de Dados em Saúde",
     avatar: "https://media.licdn.com/dms/image/v2/D4D03AQFiLooVjTzIzg/profile-displayphoto-shrink_800_800/B4DZchAJ1nHwAc-/0/1748605378434?e=1756944000&v=beta&t=uumnlpONZ40deIR73fvM8fjn8dFzuj-XyW1emfAMZxg",
     descricao: [
-      "",
-      "",
-      "",
-      ""
+      "Bacharel em Física Teórica pela UFV",
+      "Ciência de Dados",
+      "Data Pipeline (ETL) via Python",
+      "Desenvolvimento Front-End com foco em Visualização de Dados"
     ],
     contatos: {
       email:    "matheusc.albqq@gmail.com",
@@ -81,14 +85,15 @@ const membros = [
   {
     id: 5,
     nome: "Prof. Sabrina de Azevedo Silveira",
-    cargo: " ",
-    especialidade: "____",
+    cargo: "Colaboradora do Projeto",
+    especialidade: "Bioinformática",
     avatar: "https://www2.dpi.ufv.br/wp-content/uploads/2015/12/sabrina-150x150.png",
     descricao: [
-      " ",
-      " ",
-      " ",
-      " "
+      "Doutorado em Bioinformática pela UFMG",
+      "Aprendizagem de máquinas",
+      "Base de Dados Biológicos e Visualização de Dados",
+      "Mineração de Dados",      
+      "Predição de Função de Enzima"
     ],
     contatos: {
       email: "sabrina@ufv.br",
@@ -214,15 +219,15 @@ const Membros = () => {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-white">
               <div>
-                <h3 className="text-3xl font-bold mb-2">6</h3>
+                <h3 className="text-3xl font-bold mb-2">5</h3>
                 <p className="text-white/90">Membros</p>
               </div>
               <div>
-                <h3 className="text-3xl font-bold mb-2">4</h3>
-                <p className="text-white/90">PhDs</p>
+                <h3 className="text-3xl font-bold mb-2">3</h3>
+                <p className="text-white/90">Doutores</p>
               </div>
               <div>
-                <h3 className="text-3xl font-bold mb-2">50+</h3>
+                <h3 className="text-3xl font-bold mb-2">30+</h3>
                 <p className="text-white/90">Anos de Experiência</p>
               </div>
               <div>

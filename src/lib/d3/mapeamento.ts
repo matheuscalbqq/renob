@@ -76,7 +76,8 @@ function atualizarGrafico(
   const divSelecionada      = selectDivisao.value;
   const anoSelecionado      = selectAno.value;
   const faseSelecionada     = selectFase.value;   // “adolescente” | “adulto”
-  const sexoSelecionado     = selectSexo.value === "Todos" ? "Todos" : selectSexo.value;   // “Masc” | “Fem” | “Todos”
+  const rawSexo             = selectSexo.value;
+  const sexoSelecionado     = !rawSexo || rawSexo === "Todos" ? "Todos" : rawSexo;   // “Masc” | “Fem” | “Todos”
   const regionMap           : Map<string, string> = new Map();
 
   regionData.forEach(r =>

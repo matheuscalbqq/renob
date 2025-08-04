@@ -91,26 +91,26 @@ const recursos = [
   {
     titulo: "Portal SISVAN - Ministério da Saúde",
     descricao: "Acesso oficial aos dados e relatórios do Sistema de Vigilância Alimentar e Nutricional",
-    url: "https://sisvan.saude.gov.br/",
+    url: "https://sisaps.saude.gov.br/sisvan/index",
     categoria: "Governo"
   },
   {
     titulo: "Atlas da Obesidade - IBGE",
     descricao: "Dados complementares sobre obesidade e sobrepeso no Brasil",
     url: "https://www.ibge.gov.br/",
-    categoria: "Estatística"
+    categoria: "EXEMPLO"
   },
   {
     titulo: "OMS - Padrões de Crescimento Infantil",
     descricao: "Referências internacionais para avaliação nutricional",
     url: "https://www.who.int/childgrowth/",
-    categoria: "Internacional"
+    categoria: "EXEMPLO"
   },
   {
     titulo: "Guia Alimentar para a População Brasileira",
     descricao: "Diretrizes oficiais do Ministério da Saúde para alimentação saudável",
     url: "https://bvsms.saude.gov.br/",
-    categoria: "Política Pública"
+    categoria: "EXEMPLO"
   }
 ];
 

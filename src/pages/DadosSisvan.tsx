@@ -80,10 +80,19 @@ export default function DadosSisvan() {
     preload();
   }, []);
 
-
+  const initializedRef = useRef(false);
   useEffect(() => {
-    const adultoCols = adultoColsRef.current   ?.querySelectorAll<HTMLInputElement>("input") ?? null;
-    const containerDivSelection = containerDivisaoReg.current  ? select<HTMLElement, unknown>(containerDivisaoReg.current): null;
+    if(!data.length || !regions.length) return;
+    if (initializedRef.current) return; // já inicializou antes
+    initializedRef.current = true;
+
+
+    const adultoCols            = adultoColsRef.current   
+                                ?.querySelectorAll<HTMLInputElement>("input") 
+                                ?? null;
+    const containerDivSelection = containerDivisaoReg.current  
+                                ? select<HTMLElement, unknown>(containerDivisaoReg.current)
+                                : null;
     
     // ←── AQUI: configura o resize só para o Mapeamento ──→
     const handleResize = () => {
@@ -117,6 +126,14 @@ export default function DadosSisvan() {
         if (typeof resizeFn === "function") resizeFn();
       }
     };
+    function debounce<F extends (...args:any[]) => void>(fn:F, delay = 100){
+      let timer:number | undefined;
+      return (...args:Parameters<F>) => {
+        if(timer) clearTimeout(timer);
+        timer = window.setTimeout(() => fn(...args),delay);
+      };
+    }
+    const debResizeMapeamento = debounce(handleResize, 120);
     // Inicializa o gráfico de Mapeamento
     if (
       mapeamentoContainer.current &&
@@ -153,7 +170,7 @@ export default function DadosSisvan() {
         adultoCols
       );
       
-      window.addEventListener("resize", handleResize);
+      window.addEventListener("resize", debResizeMapeamento);
             
     }
 
@@ -222,11 +239,11 @@ export default function DadosSisvan() {
     }
     // Cleanup: remove o listener quando desmontar
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debResizeMapeamento);
       window.removeEventListener("resize", handleResizeRegional);
       window.removeEventListener("resize", handleResizeTemporal);
     };
-  }, []);
+  }, [data, regions]);
   
   return (
         
