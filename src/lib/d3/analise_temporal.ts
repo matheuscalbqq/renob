@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 import * as G from "./global";
-import { totalmem } from "os";
 
 interface TemporalPoint {
   ano:   string;
@@ -309,8 +308,6 @@ const promiseDados = d3.csv<G.DataRow>(
   function atualizarQuadroEntrevistados(dadosFiltrados: G.DataRow[]) {
       // Agrupar por sexo
       const dadosPorSexo = d3.group(dadosFiltrados, d => d.SEXO);
-
-      console.log("este é o dadosPorSexo:", dadosPorSexo);
 
       let totalFemEntrevistados = 0;
       let totalMascEntrevistados = 0;

@@ -1,0 +1,95 @@
+timestamp, input_file, master_file, added_count, total_after
+11-08-2025 13:22:19,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2008 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 5570
+11-08-2025 13:22:27,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2008 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 5570
+11-08-2025 13:22:27,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2009 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 11140
+11-08-2025 13:22:27,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2010 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 16710
+11-08-2025 13:22:27,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2011 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 22280
+11-08-2025 13:22:27,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2012 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 27850
+11-08-2025 13:22:28,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2013 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 33420
+11-08-2025 13:22:28,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2014 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 38990
+11-08-2025 13:22:28,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2015 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 44560
+11-08-2025 13:22:28,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2016 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 50130
+11-08-2025 13:22:29,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2017 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 55700
+11-08-2025 13:22:29,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2018 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 61270
+11-08-2025 13:22:29,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2019 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 66840
+11-08-2025 13:22:30,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2020 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 72410
+11-08-2025 13:22:30,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2021 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 77980
+11-08-2025 13:22:38,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2008 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 83550
+11-08-2025 13:22:39,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2009 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 89120
+11-08-2025 13:22:39,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2010 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 94690
+11-08-2025 13:22:40,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2011 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 100260
+11-08-2025 13:22:40,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2012 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 105830
+11-08-2025 13:22:41,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2013 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 111400
+11-08-2025 13:22:41,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2014 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 116970
+11-08-2025 13:22:42,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2015 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 122540
+11-08-2025 13:22:42,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2016 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 128110
+11-08-2025 13:22:43,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2017 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 133680
+11-08-2025 13:22:43,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2018 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 139250
+11-08-2025 13:22:44,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2019 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 144820
+11-08-2025 13:22:45,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2020 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 150390
+11-08-2025 13:22:46,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2021 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 155960
+11-08-2025 13:23:59,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2008 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 161530
+11-08-2025 13:24:00,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2009 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 167100
+11-08-2025 13:24:00,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2010 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 172670
+11-08-2025 13:24:01,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2011 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 178240
+11-08-2025 13:24:02,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2012 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 183810
+11-08-2025 13:24:02,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2013 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 189380
+11-08-2025 13:24:03,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2014 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 194950
+11-08-2025 13:24:04,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2015 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 200520
+11-08-2025 13:24:05,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2016 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 206090
+11-08-2025 13:24:05,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2017 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 211660
+11-08-2025 13:24:06,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2018 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 217230
+11-08-2025 13:24:07,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2019 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 222800
+11-08-2025 13:24:08,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2020 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 228370
+11-08-2025 13:24:09,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2021 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 233940
+11-08-2025 13:24:10,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2022 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5571, 239511
+11-08-2025 13:24:10,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2023 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5571, 245082
+11-08-2025 13:24:11,"C:/Users/Matheus/Downloads/adultos_name/masculino/adulto masculino 2024 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5571, 250653
+11-08-2025 13:24:21,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2008 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 256223
+11-08-2025 13:24:22,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2009 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 261793
+11-08-2025 13:24:23,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2010 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 267363
+11-08-2025 13:24:24,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2011 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 272933
+11-08-2025 13:24:25,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2012 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 278503
+11-08-2025 13:24:26,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2013 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 284073
+11-08-2025 13:24:27,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2014 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 289643
+11-08-2025 13:24:29,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2015 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 295213
+11-08-2025 13:24:30,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2016 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 300783
+11-08-2025 13:24:31,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2017 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 306353
+11-08-2025 13:24:32,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2018 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 311923
+11-08-2025 13:24:33,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2019 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 317493
+11-08-2025 13:24:35,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2020 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 323063
+11-08-2025 13:24:36,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2021 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5570, 328633
+11-08-2025 13:24:37,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2022 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5571, 334204
+11-08-2025 13:24:38,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2023 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5571, 339775
+11-08-2025 13:24:39,"C:/Users/Matheus/Downloads/adultos_name/feminino/adulto feminino 2024 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 5571, 345346
+12-08-2025 08:20:52,"E:/GitHubRepositories/renob/public/data/db_region.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5570, 5570
+12-08-2025 08:32:13,"E:/GitHubRepositories/renob/public/data/db_region.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5570, 5570
+12-08-2025 09:14:25,"E:/GitHubRepositories/renob/public/data/db_region.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 0, 5570
+12-08-2025 09:17:14,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2008 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:16,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2009 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:17,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2010 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:19,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2011 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:20,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2012 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:21,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2013 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:23,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2014 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:24,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2015 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:26,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2016 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:27,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2017 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:28,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2018 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:30,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2019 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:31,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2020 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:33,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/masculino/adolescentes masculino 2021 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:52,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2008 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:54,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2009 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:55,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2010 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:57,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2011 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:58,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2012 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:17:59,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2013 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:01,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2014 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:02,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2015 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:04,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2016 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:05,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2017 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:07,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2018 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:08,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2019 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:09,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2020 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+12-08-2025 09:18:11,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2021 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346

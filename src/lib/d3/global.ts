@@ -1,11 +1,29 @@
 import * as d3 from "d3";
 import type { FeatureCollection } from "geojson";
 import { json } from "d3-fetch";
-import {hsl, hcl} from "d3-color";
+import {hsl} from "d3-color";
 
 // Tamanhos do SVG
 export const width  = 800;
 export const height = 520;
+
+//=============== Função para resize dos gráficos ===================//
+export function debounce<F extends (...args: any[]) => void>(fn: F, delay: number = 120) {
+  let timer: number | undefined;
+  return (...args: Parameters<F>) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = window.setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
+export const REGIONAL_RESIZE_PROP = "resizeRegional";
+export const TEMPORAL_RESIZE_PROP = "__resizeTemporal";
+//====================================================================//
+
 
 export function getChartSize(
   container: HTMLElement,
@@ -217,6 +235,8 @@ export const nomesIndicadoresAdulto: Record<string, string> = {
 };
 
 export const nomesIndicadoresAdolescente: Record<string, string> = {
+  eutrofico:     "Eutrófico",
+  sobrepeso:     "Sobrepeso",
   magreza_acentuada: "Magreza Acentuada",
   magreza:           "Magreza",
   obesidade:         "Obesidade",
@@ -233,6 +253,8 @@ export const filtroNutricionalFase: Record<string, Array<string>> = {
     "obesidade_G_3"
   ],
   "adolescente": [
+    "eutrofico",
+    "sobrepeso",
     "magreza_acentuada",
     "magreza",
     "obesidade",

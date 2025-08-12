@@ -951,7 +951,9 @@ export function initRegional(
       function somaEstadosNutricionais(d:any):number{
          if (selectedFase === "adolescente"){
             return (
-                  (+d.magreza)
+                  (+d.eutrofico)
+               +  (+d.sobrepeso)
+               +  (+d.magreza)
                +  (+d.magreza_acentuada)
                +  (+d.obesidade)
                +  (+d.obesidade_grave)

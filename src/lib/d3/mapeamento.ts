@@ -1,3 +1,4 @@
+import { Container } from "lucide-react";
 import * as G from "./global";
 import * as d3 from "d3";
 
@@ -69,6 +70,7 @@ function atualizarGrafico(
   valorHomensEl: HTMLElement,
   valorMulheresEl: HTMLElement,
   valorTodosEl: HTMLElement,
+  container: HTMLElement
 ): void {
   // 1) captura valores dos selects (todos são HTMLSelectElement)
   const ufSelecionada       = selectUF.value;
@@ -118,7 +120,7 @@ function atualizarGrafico(
   // 4) decide quais colunas usar
   let colunasIndicadores: (keyof G.DataRow)[];
   if (faseSelecionada === "adolescente") {
-    colunasIndicadores = ["magreza_acentuada","magreza","obesidade","obesidade_grave"];
+    colunasIndicadores = ["eutrofico","sobrepeso","magreza_acentuada","magreza","obesidade","obesidade_grave"];
   } else {
     // pega todos os checkboxes adultos marcados
     const chks = Array.from(
@@ -174,7 +176,7 @@ function atualizarGrafico(
   }));
 
   // 10) chama sua função de desenho, passando o array tipado
-  desenharGrafico(dadosParaGrafico);
+  desenharGrafico(dadosParaGrafico,container);
   
   function somarColunaCustom(
     arr: G.DataRow[],
@@ -210,10 +212,10 @@ function atualizarGrafico(
     }
   }
 
-  function desenharGrafico(dados: IndicadorDatum[]) {
+  function desenharGrafico(dados: IndicadorDatum[], host: HTMLElement) {
     // 1) Limpa tudo que já existe no container
-    const container = d3.select("#graficoMapeamento");
-    container.selectAll("*").remove();
+    const containerSel = d3.select(host);
+    containerSel.selectAll("*").remove();
 
     // 2) Define margens e dimensões
     const margin = { top: 30, right: 30, bottom: 50, left: 60 };
@@ -221,7 +223,7 @@ function atualizarGrafico(
     const minInternHeight = 500;
 
     // 2.1) Pega o tamanho real do container em Pixels
-    const bbox = (container.node() as HTMLElement).getBoundingClientRect();
+    const bbox = (containerSel.node() as HTMLElement).getBoundingClientRect();
     const minTotalWidth   = minInternWidth  + margin.left + margin.right  ;
     const minTotalHeight  = minInternHeight + margin.top  + margin.bottom ;
     const totalWidthRaw   = Math.max( bbox.width,  minTotalWidth    );
@@ -238,11 +240,11 @@ function atualizarGrafico(
 
 
     // 3) Cria o SVG com viewBox e preserveAspectRatio
-    const svg = container
+    const svg = containerSel
       .append("svg")
         .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
         .attr("preserveAspectRatio", "xMinYMin meet")
-      .append("g")
+      const g = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const selectedSexo = selectSexo.value;
@@ -605,13 +607,13 @@ export async function initMapeamento(
   );
   //desenha o título e o gráfico iniciais
   atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
 
   // Listeners
   selectUFEl.addEventListener("change", () => {        
     G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
     atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-    atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl); 
+    atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container); 
   });
   selectDivisaoEl.addEventListener("change",()=>{
         G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
@@ -619,17 +621,17 @@ export async function initMapeamento(
         ? 'Municípios' 
         : 'Regiões de Saúde';
         atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
       });
   selectMunicipioEl.addEventListener("change", () =>{
         atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
       });
   [selectAnoEl,selectFaseEl,selectSexoEl].forEach(s =>{
     s.addEventListener("change", () =>{
       G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
       atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-      atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+      atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
     })
   });
     
@@ -714,7 +716,7 @@ export async function initMapeamento(
         }
       });
     }
-  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
   }
    
 
@@ -735,7 +737,8 @@ export function resizeMapeamento(
   valorHomensEl: HTMLElement,
   valorMulheresEl: HTMLElement,
   valorTodosEl: HTMLElement,
+  container: HTMLElement
 ){
   atualizarTitulo(dados,regionData,selectDivisao,title,selectUF,selectMunicipio,selectAno,selectSexo,selectFase);
-  atualizarGrafico(dados,regionData,selectUF,selectMunicipio,selectDivisao,selectAno,selectSexo,selectFase,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl);
+  atualizarGrafico(dados,regionData,selectUF,selectMunicipio,selectDivisao,selectAno,selectSexo,selectFase,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
 }

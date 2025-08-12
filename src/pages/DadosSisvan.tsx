@@ -7,7 +7,7 @@ import { initRegional }     from "@/lib/d3/regional";
 import { initTemporal }     from "@/lib/d3/analise_temporal";
 import { useRef, useEffect, useState } from "react";
 import { select } from "d3-selection";
-import { preloadCidadesFriendly } from "@/lib/d3/global";
+import { preloadCidadesFriendly, debounce, REGIONAL_RESIZE_PROP, TEMPORAL_RESIZE_PROP } from "@/lib/d3/global";
 import * as G from "@/lib/d3/global";
 
 
@@ -112,28 +112,38 @@ export default function DadosSisvan() {
         valorHomensEl.current!,
         valorMulheresEl.current!,
         valorTodosEl.current!,
-      )
+        mapeamentoContainer.current!
+      );
     };
-    const handleResizeRegional = () => {
-      if (regionalContainer.current) {
-        const resizeFn = (regionalContainer.current as any).resizeRegional;
-        if (typeof resizeFn === "function") resizeFn();
+  const debouncedResizeMapeamento = debounce(handleResize, 120);
+
+  const handleResizeRegional = () => {
+    if (regionalContainer.current) {
+      const host = regionalContainer.current as unknown as Record<string, unknown>;
+      const resizeFn = host[REGIONAL_RESIZE_PROP];
+      if (typeof resizeFn === "function") {
+        (resizeFn as () => void)();
       }
-    };
-    const handleResizeTemporal = () => {
-      if (temporalContainer.current) {
-        const resizeFn = (temporalContainer.current as any).__resizeTemporal;
-        if (typeof resizeFn === "function") resizeFn();
-      }
-    };
-    function debounce<F extends (...args:any[]) => void>(fn:F, delay = 100){
-      let timer:number | undefined;
-      return (...args:Parameters<F>) => {
-        if(timer) clearTimeout(timer);
-        timer = window.setTimeout(() => fn(...args),delay);
-      };
     }
-    const debResizeMapeamento = debounce(handleResize, 120);
+  };
+
+  const handleResizeTemporal = () => {
+    if (temporalContainer.current) {
+      const host = temporalContainer.current as unknown as Record<string, unknown>;
+      const resizeFn = host[TEMPORAL_RESIZE_PROP];
+      if (typeof resizeFn === "function") {
+        (resizeFn as () => void)();
+      }
+    }
+  };
+
+  // Listener único de window para os três gráficos
+  const handleResizeAll = () => {
+    // mantém o mesmo comportamento: mapeamento com debounce, demais imediatos
+    debouncedResizeMapeamento();
+    handleResizeRegional();
+    handleResizeTemporal();
+  };
     // Inicializa o gráfico de Mapeamento
     if (
       mapeamentoContainer.current &&
@@ -170,7 +180,7 @@ export default function DadosSisvan() {
         adultoCols
       );
       
-      window.addEventListener("resize", debResizeMapeamento);
+      window.addEventListener("resize", debouncedResizeMapeamento);
             
     }
 
@@ -235,13 +245,11 @@ export default function DadosSisvan() {
         valorMulheresElTemp.current,
         valorTodosElTemp.current
       );
-      window.addEventListener("resize", handleResizeTemporal);
+      window.addEventListener("resize", handleResizeAll);
     }
     // Cleanup: remove o listener quando desmontar
     return () => {
-      window.removeEventListener("resize", debResizeMapeamento);
-      window.removeEventListener("resize", handleResizeRegional);
-      window.removeEventListener("resize", handleResizeTemporal);
+      window.removeEventListener("resize", handleResizeAll);
     };
   }, [data, regions]);
   
