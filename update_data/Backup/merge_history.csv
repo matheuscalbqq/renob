@@ -93,3 +93,14 @@ timestamp, input_file, master_file, added_count, total_after
 12-08-2025 09:18:08,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2019 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
 12-08-2025 09:18:09,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2020 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
 12-08-2025 09:18:11,"E:/GitHubRepositories/renob-pythonSide/Raw data/adolescentes/feminino/adolescentes feminino 2021 .csv","E:\GitHubRepositories\renob\update_data\Data\db_sisvan.csv", 0, 345346
+14-08-2025 11:49:15,"E:/GitHubRepositories/renob/update_data/db_regional_2019.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 0, 5570
+14-08-2025 15:12:07,"E:/GitHubRepositories/renob/update_data/db_regional_2011.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5566, 11136
+14-08-2025 15:12:07,"E:/GitHubRepositories/renob/update_data/db_regional_2019.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5, 11141
+14-08-2025 15:12:08,"E:/GitHubRepositories/renob/update_data/db_regional_2024.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5570, 16711
+14-08-2025 15:33:28,"E:/GitHubRepositories/renob/update_data/db_regionala.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5570, 11140
+14-08-2025 15:33:53,"E:/GitHubRepositories/renob/update_data/db_regionala.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5570, 5570
+14-08-2025 15:34:22,"E:/GitHubRepositories/renob/update_data/db_regional_2011.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5566, 11136
+14-08-2025 15:34:22,"E:/GitHubRepositories/renob/update_data/db_regional_2024.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5570, 16706
+14-08-2025 15:51:06,"E:/GitHubRepositories/renob/update_data/db_regional_2011.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5566, 11136
+14-08-2025 15:51:06,"E:/GitHubRepositories/renob/update_data/db_regional_2019.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 0, 11136
+14-08-2025 15:51:06,"E:/GitHubRepositories/renob/update_data/db_regional_2024.csv","E:\GitHubRepositories\renob\update_data\Data\db_regional.csv", 5570, 16706

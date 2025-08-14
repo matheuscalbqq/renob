@@ -4,7 +4,7 @@
   "regional_path": "db_regional.csv",
   "backup_dir": "Backup",
   "log_path": "merge_history.csv",
-  "date_format": "%Y%m%dT%H%M%S",
+  "date_format": "%d%m%YT%H%M%S",
   "max_rows_in_memory": 1000000,
   "colunasSisvan" : [
           "UF",               "codigo_municipio", "municipio",     "baixo_peso", 
@@ -12,5 +12,5 @@
           "obesidade_G_3",    "magreza_acentuada","magreza",       "obesidade",
           "obesidade_grave",  "total", "SEXO",    "ANO",           "fase_vida"
           ],
-  "colunasRegional": ["estado_abrev", "regional_id", "regional_nome", "municipio_id_sdv"]
+  "colunasRegional": ["estado_abrev", "regional_id", "regional_nome", "municipio_id_sdv","ano"]
 }
