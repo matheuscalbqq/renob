@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Eye, Heart, Lightbulb, Shield } from "lucide-react";
+import { Eye, UsersRound, Lightbulb, Shield } from "lucide-react";
 
 const Missao = () => {
   return (
@@ -33,7 +33,7 @@ const Missao = () => {
         </section>
         {/* Impact Phrase */}
         <div className="text-center mb-16">
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto italic">
+          <p className="text-xl text-muted-foreground max-w-4xl mx-auto italic">
             Explore nossos mapas e gráficos para obter uma compreensão aprofundada do estado nutricional no Brasil e ajude-nos a construir um futuro mais saudável para todos.
           </p>
         </div>
@@ -45,23 +45,23 @@ const Missao = () => {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="text-center shadow-soft hover:shadow-medium transition-all duration-300 group">
+            <Card className="text-center shadow-soft hover:shadow-strong transition-all duration-300 group">
               <CardContent className="p-6">
-                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-nutrition-green/10 flex items-center justify-center group-hover:bg-nutrition-green/20 transition-colors">
-                  <Eye className="h-8 w-8 text-nutrition-green" />
+                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                  <Eye className="h-8 w-8 text-secondary/80" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">Transparência</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-semibold mb-3 text-secondary/80">Transparência</h3>
+                <p className="text-secondary/60">
                   Apresentamos dados de forma clara e acessível, promovendo transparência 
                   na comunicação científica.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="text-center shadow-soft hover:shadow-medium transition-all duration-300 group">
+            <Card className="text-center shadow-soft hover:shadow-strong transition-all duration-300 group">
               <CardContent className="p-6">
-                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-nutrition-orange/10 flex items-center justify-center group-hover:bg-nutrition-orange/20 transition-colors">
-                  <Heart className="h-8 w-8 text-nutrition-orange" />
+                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <UsersRound className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-foreground">Impacto Social</h3>
                 <p className="text-muted-foreground">
@@ -71,20 +71,20 @@ const Missao = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center shadow-soft hover:shadow-medium transition-all duration-300 group">
+            <Card className="text-center shadow-soft hover:shadow-strong transition-all duration-300 group">
               <CardContent className="p-6">
-                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-nutrition-blue/10 flex items-center justify-center group-hover:bg-nutrition-blue/20 transition-colors">
-                  <Lightbulb className="h-8 w-8 text-nutrition-blue" />
+                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                  <Lightbulb className="h-8 w-8 text-secondary/80" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">Inovação</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-semibold mb-3 text-secondary/80">Inovação</h3>
+                <p className="text-secondary/60">
                   Utilizamos tecnologias modernas de visualização para tornar 
                   dados complexos compreensíveis e actionáveis.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="text-center shadow-soft hover:shadow-medium transition-all duration-300 group">
+            <Card className="text-center shadow-soft hover:shadow-strong transition-all duration-300 group">
               <CardContent className="p-6">
                 <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <Shield className="h-8 w-8 text-primary" />
@@ -113,7 +113,7 @@ const Missao = () => {
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-primary mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-secondary mt-2"></div>
                     <span className="text-muted-foreground">
                       Facilitar o acesso e compreensão dos dados do SISVAN
                     </span>
@@ -125,7 +125,7 @@ const Missao = () => {
                     </span>
                   </li>
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-primary mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-accent mt-2"></div>
                     <span className="text-muted-foreground">
                       Contribuir para políticas públicas de nutrição mais efetivas
                     </span>
@@ -141,19 +141,19 @@ const Missao = () => {
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-nutrition-green mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-secondary mt-2"></div>
                     <span className="text-muted-foreground">
                       Mapear o estado nutricional por região e estado
                     </span>
                   </li>
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-nutrition-orange mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-primary mt-2"></div>
                     <span className="text-muted-foreground">
                       Analisar tendências temporais dos indicadores nutricionais
                     </span>
                   </li>
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-nutrition-blue mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-accent mt-2"></div>
                     <span className="text-muted-foreground">
                       Identificar padrões e correlações nos dados
                     </span>
@@ -173,10 +173,10 @@ const Missao = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div>
-                  <h4 className="text-xl font-semibold mb-3 text-foreground">
+                  <h4 className="text-xl font-semibold mb-3 text-secondary">
                     Para Gestores
                   </h4>
-                  <p className="text-muted-foreground">
+                  <p className="text-secondary/70">
                     Informações claras para formulação de políticas públicas 
                     direcionadas e eficazes.
                   </p>
@@ -191,10 +191,10 @@ const Missao = () => {
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-xl font-semibold mb-3 text-foreground">
+                  <h4 className="text-xl font-semibold mb-3 text-accent">
                     Para a Sociedade
                   </h4>
-                  <p className="text-muted-foreground">
+                  <p className="text-accent/80">
                     Maior transparência e conscientização sobre questões 
                     nutricionais no país.
                   </p>

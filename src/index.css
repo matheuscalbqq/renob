@@ -64,6 +64,7 @@ pessego: 10 80% 70%
     --primary-hover: 205 100% 25%;      /* leve clareamento para hover */
     --primary-active: 205 100% 10%;     /* leve escurecimento para active */
     --primary-muted: 205 100% 90%;
+    --primary-muted2: 205 100% 80%;
     --primary-muted-fg: 205 30% 50%;
 
     --secondary: 358 84% 56%;           /* vermelho médio */
@@ -92,23 +93,16 @@ pessego: 10 80% 70%
     --destructive-foreground: 0 0% 98%;
 
     --muted: var(--primary-muted);
+    --muted2: var(--primary-muted2);
     --muted-foreground: var(--primary-muted-fg);
+
+    --hover-primary: var(var(--primary-hover));
 
     --border: 120 20% 90%;
     --input: 120 20% 92%;
     --ring: var(--primary);
 
     --radius: 0.5rem;
-
-    /* Custom nutrition theme colors */
-    --nutrition-green: 142 70% 45%;
-    --nutrition-green-light: 142 50% 85%;
-    --nutrition-orange: 25 95% 53%;
-    --nutrition-orange-light: 25 80% 90%;
-    --nutrition-blue: 207 90% 54%;
-    --nutrition-blue-light: 207 80% 90%;
-    --nutrition-pink: 306 60% 60%;
-    --nutrition-pink-light: 306 90% 80%;
 
     /* Gradients for data visualization */
     --gradient-primary: linear-gradient(135deg,hsl(var(--secondary)), hsl(var(--primary)));

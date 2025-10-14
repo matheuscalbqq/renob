@@ -12,7 +12,6 @@ interface TemporalPoint {
  * @param selectUF - select de UFs
  * @param selectMunicipio - select de Municípios
  * @param selectSexo - select de Sexo
- * @param selectFase - select de Fase de Vida
  * @param selectIndicador - select de Indicador
  * @param selectModo - select de Divisão (Saúde/Federativa)
  * @param labelMunicipio - label do selectMunicipio para mostrar/ocultar
@@ -22,7 +21,6 @@ export function initTemporal(
   selectUF: HTMLSelectElement,
   selectMunicipio: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
-  selectFase: HTMLSelectElement,
   selectIndicador: HTMLSelectElement,
   selectModo: HTMLSelectElement,
   labelMunicipio: HTMLLabelElement,
@@ -36,9 +34,7 @@ export function initTemporal(
   const regionMap: Map<string, string> = new Map();
 
   let allDataTemporal: G.DataRow[] = [];
-  const municipiosPorUF: Record<string, Map<string,string>> = {};
   let regionDataTemporal: G.RegionDataRow[] = [];
-  const regionPorUF: Record<string, Map<string, string>> = {};
 
   // 1) Cria as duas Promises de carregamento
 const promiseRegioes = d3.csv<G.RegionDataRow>(
@@ -59,7 +55,6 @@ const promiseDados = d3.csv<G.DataRow>(
     municipio:          row.municipio,
     ANO:                row.ANO,
     SEXO:               row.SEXO,
-    fase_vida:          row.fase_vida,
     total:              row.total,
     baixo_peso:        +row.baixo_peso,
     eutrofico:         +row.eutrofico,
@@ -99,19 +94,19 @@ const promiseDados = d3.csv<G.DataRow>(
       atualizarGrafico();
       atualizarTitulo();
     });
-    [selectUF, selectSexo, selectFase, selectIndicador]
-      .forEach(sel => sel.addEventListener("change", () => {
+    selectUF.addEventListener("change", () => {
         G.FiltroChangerMunReg(selectModo,labelModo,selectUF,selectMunicipio,labelMunicipio,allDataTemporal,regionDataTemporal);
         atualizarGrafico();
         atualizarTitulo();
-      }));
-    selectMunicipio.addEventListener("change", () =>{
+      });
+    [selectMunicipio, selectIndicador, selectSexo]
+    .forEach(sel => sel.addEventListener("change", () =>{
       atualizarGrafico();
       atualizarTitulo();
-    });
+    }));
   });
 
-  // Popula selects de UF, Mun, Sexo, Fase e Indicador
+  // Popula selects de UF, Mun, Sexo e Indicador
   function popularSelects(): void {
     // --- UF ---
     const ufs = Array.from(new Set(allDataTemporal.map(d => d.UF))).sort();
@@ -135,21 +130,10 @@ const promiseDados = d3.csv<G.DataRow>(
       selectSexo.appendChild(o);
     });
 
-    // --- Fase ---
-    selectFase.innerHTML = "";
-    Object.entries(G.faseLabel).forEach(([key,label]) => {
-      const o = document.createElement("option");
-      o.value = key;
-      o.text  = label;
-      selectFase.appendChild(o);
-    });
-
     // --- Indicador ---
     function PopulateNutri(){
       selectIndicador.innerHTML = "";
-      const NomeIndicador = selectFase.value === "adulto" 
-      ? G.nomesIndicadoresAdulto 
-      : G.nomesIndicadoresAdolescente;
+      const NomeIndicador =  G.nomesIndicadoresAdulto;
 
     Object.entries(NomeIndicador).forEach(([key,label]) => {
       const o = document.createElement("option");
@@ -159,7 +143,6 @@ const promiseDados = d3.csv<G.DataRow>(
     });
     }
     PopulateNutri();
-    selectFase.addEventListener("change", PopulateNutri);
 
     // --- Divisão ---
     selectModo.innerHTML = "";
@@ -174,7 +157,6 @@ const promiseDados = d3.csv<G.DataRow>(
   // Atualiza o título de acordo com filtros
   function atualizarTitulo(): void {
     const uf   = selectUF.value || "Brasil";
-    const fase = G.faseLabel[selectFase.value] || "";
     const sexo = selectSexo.value === "Todos" ? "" : G.sexoLabel[selectSexo.value]    || "";
     const indi = G.nomeAmigavel[selectIndicador.value] || "";
     const regionPorUF: Record<string, Map<string, string>> = {};
@@ -195,7 +177,7 @@ const promiseDados = d3.csv<G.DataRow>(
       ? cidade
       : regiao;
 
-    const titulo = `Análise Temporal de ${indi} em ${fase} ${sexo} - ${local}`;
+    const titulo = `Análise Temporal de ${indi} em Adultos ${sexo} - ${local}`;
     titleEl.textContent = titulo;
   }
 
@@ -210,14 +192,12 @@ const promiseDados = d3.csv<G.DataRow>(
     const uf        = selectUF.value;
     const modo      = selectModo.value;       // “federativa” | “saude”
     const sexo      = selectSexo.value;
-    const fase      = selectFase.value;
     const muni      = selectMunicipio.value; // cidade ou região de saúde | depende do modo
     const indicador = selectIndicador.value;
 
     
     // Filtra o dataset
     const dadosFiltrados = allDataTemporal.filter(d => {
-      if (fase && d.fase_vida !== fase)         return false;
       if (sexo !== "Todos" && d.SEXO !== sexo)   return false;
       if (uf && d.UF !== uf)                     return false;
       if (muni) {
@@ -242,14 +222,6 @@ const promiseDados = d3.csv<G.DataRow>(
 
     if (totalEntrevistadosPorAno.size === 0){
       desenharGraficoTemporal({Masc:[], Fem: [], Todos: []},[],100);
-    }
-
-
-    let colunasIndicadores: (keyof G.DataRow)[];
-    if (selectFase.value === "adolescente") {
-      colunasIndicadores = G.filtroNutricionalFase["adolescente"];
-    } else {
-      colunasIndicadores = G.filtroNutricionalFase["adulto"];
     }
 
     // Gera array de anos ordenados

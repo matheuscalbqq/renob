@@ -18,7 +18,6 @@ interface RegionalDataRow {
   obesidade: string;
   obesidade_grave: string;
   SEXO: string;
-  fase_vida: string;
 
   [key: string]: string;
 }
@@ -39,7 +38,6 @@ export function initRegional(
   mapContainer: HTMLElement,
   selectAno: HTMLSelectElement,           // ← ano
   selectSexo: HTMLSelectElement,          // ← sexo
-  selectFase: HTMLSelectElement,          // ← fase de vida
   selectNutricional: HTMLSelectElement,   // ← indicador
   selectModo: HTMLSelectElement,          // ← divisão
   containerDivisao: d3.Selection<HTMLElement, unknown, null, undefined>,
@@ -62,13 +60,11 @@ export function initRegional(
   function atualizarQuadroRegional(): void {
     const anoSel         = +selectAno.value;
     const sexoSel        = selectSexo.value;
-    const faseSel        = selectFase.value;
     const nutricionalSel = selectNutricional.value;
 
-    // Filtra a base por ano, fase e (se estadual) UF
+    // Filtra a base por ano e (se estadual) UF
     let arr = allData.filter(d =>
       +d.ANO === anoSel &&
-      d.fase_vida === faseSel &&
       (currentMode !== "cidades" || d.UF === currentUF)
     );
     if (sexoSel !== "Todos") {
@@ -99,15 +95,13 @@ export function initRegional(
     const ano          = selectAno.value;
     const sexo         = selectSexo.value;
     const nutricional  = selectNutricional.value;
-    const fase         = selectFase.value;
     const lugar        = (currentMode === "cidades" && currentUF)
       ? (G.ufLabel[currentUF] || currentUF)
       : "";
     const displayNutri = G.nomeAmigavel[nutricional] || nutricional;
-    const labelFase    = G.faseLabel[fase] || fase;
     const labelSexo    = sexo === "Todos" ? "" : G.sexoLabel[sexo] || sexo;
 
-    const titulo = `Mapeamento Demográfico de ${displayNutri} em ${labelFase} ${labelSexo} - ${lugar} ${ano}`;
+    const titulo = `Mapeamento Demográfico de ${displayNutri} em Adultos ${labelSexo} - ${lugar} ${ano}`;
     titleEl.textContent = titulo;
   }  
 
@@ -127,7 +121,6 @@ export function initRegional(
       codigo_municipio: row.codigo_municipio,
       SEXO:             row.SEXO,
       ANO:              row.ANO,
-      fase_vida:        row.fase_vida,
       baixo_peso:       row.baixo_peso,
       eutrofico:        row.eutrofico,
       sobrepeso:        row.sobrepeso,
@@ -160,7 +153,7 @@ export function initRegional(
     setupListeners();
   });
 
-  // Popula selects de fase e nutricional
+  // Popula selects de nutricional
   function populateFilters() {
 
     // Ano
@@ -181,20 +174,11 @@ export function initRegional(
       o.value = key; o.text = label;
       selectSexo.appendChild(o);
     });
-    // Fase
-    selectFase.innerHTML = "";
-    Object.entries(G.faseLabel).forEach(([key,label]) => {
-      const o = document.createElement("option");
-      o.value = key; o.text = label;
-      selectFase.appendChild(o);
-    });
 
     populateNutricional();
-    selectFase.addEventListener("change",populateNutricional)
 
     function populateNutricional(){
-      const fase = selectFase.value;
-      const opts = G.filtroNutricionalFase[fase] || [];
+      const opts = G.filtroNutricionalFase["adulto"] || [];
       selectNutricional.innerHTML="";
       opts.forEach((value)=>{
          const o = document.createElement("option");
@@ -218,13 +202,12 @@ export function initRegional(
   function setupListeners() {
    selectAno.onchange = () =>          reloadMap();
    selectSexo.onchange = () =>         reloadMap();
-   selectFase.onchange = () =>         reloadMap();
    selectNutricional.onchange = () =>  reloadMap();
    selectModo.onchange = () =>         reloadMap();
   }
 
   function AtualizarMapa(LastGeoData){
-   [selectAno,selectSexo,selectFase,selectNutricional].forEach(selecao =>
+   [selectAno,selectSexo,selectNutricional].forEach(selecao =>
       selecao.onchange = () => {
          reloadUpdate(LastGeoData);
          atualizarQuadroRegional();
@@ -323,7 +306,6 @@ export function initRegional(
       // 1) Lê filtros
       const filtroAno   = +selectAno.value;
       const filtroSexo  = selectSexo.value;
-      const filtroFase  = selectFase.value;
       const filtroNutr  = selectNutricional.value;
 
       // helpers locais: soma os subindicadores de obesidade e demais
@@ -341,7 +323,6 @@ export function initRegional(
       // 2) Filtra base e total geral (usando os indicadores porque não existe `d.total`)
       const arrAll = allData.filter(d =>
       +d.ANO === filtroAno &&
-      d.fase_vida === filtroFase &&
       (filtroSexo === "Todos" || d.SEXO === filtroSexo)
       );
 
@@ -349,10 +330,7 @@ export function initRegional(
       const totalAll = d3.sum(arrAll, d => somaTotalNutricional(d));
 
       // 3) Nomes e percentuais (ajuste de nome amigável)
-      const nomesIndicadores = filtroFase === "adulto"
-      ? G.nomesIndicadoresAdulto
-      : G.nomesIndicadoresAdolescente;
-      const nutricionalName = nomesIndicadores[filtroNutr] || filtroNutr;
+      const nomesIndicadores =  G.nomesIndicadoresAdulto;
 
       // nutrCount depende do filtro nutricional selecionado
       let nutrCount: number;
@@ -449,7 +427,6 @@ export function initRegional(
   // === Estados ===
    function initEstadosMap(): void {
       // oculta subviews
-      d3.select(mapContainer).selectAll(".hidden");
       containerDivisao.classed("hidden", true);
       LimpaMapa();
 
@@ -483,11 +460,10 @@ export function initRegional(
       const filtroAno = selectAno.value;
       const filtroSexo = selectSexo.value;
       const filtroNutricional = selectNutricional.value;
-      const filtroFase = selectFase.value;
 
       // filtra dados por ano e fase
       const allStateData = allData.filter(d =>
-         +d.ANO === +filtroAno && d.fase_vida === filtroFase
+         +d.ANO === +filtroAno
       );
 
       const valoresMapa = new Map<string, number>();
@@ -671,13 +647,15 @@ export function initRegional(
    // VISÃO MUNICIPAL (Divisão Federativa) OU Regiões de Saúde
    // =======================
    function initCidadesMap(uf: string): void {
-   currentMode = "cidades";
-   currentUF = uf;
+   d3.select(mapContainer).selectAll(".hidden");
+   containerDivisao.classed("hidden", false);
+   
    LimpaMapa();
 
    // mostra o container de divisões
-   containerDivisao.classed("hidden", false);
    selectModo.value = "federativa";
+   currentMode = "cidades";
+   currentUF = uf;
 
    // ao mudar o modo (federativa ↔ saude)
    selectModo.onchange = () => {
@@ -689,7 +667,6 @@ export function initRegional(
    };
 
    // limpa mapa e legenda
-   d3.select(mapContainer).html("");
    d3.select(mapContainer.parentElement!)
       .select(".legendRegional")
       .html("");
@@ -713,13 +690,12 @@ export function initRegional(
    const selectedYear     = selectAno.value;
    const selectedSexo     = selectSexo.value;
    const selectedNutricao = selectNutricional.value;
-   const filtroFase       = selectFase.value;
 
    // carrega o GeoJSON correto
    const geojsonFile = G.stateGeojsonFiles[uf];
    d3.json<any>(geojsonFile).then(geo => {
       // filtra a base
-      let stateCSV = allData.filter(d => d.UF === uf && d.fase_vida === filtroFase && d.ANO === selectedYear);
+      let stateCSV = allData.filter(d => d.UF === uf && d.ANO === selectedYear);
       
       if (selectedSexo !== "Todos") {
          stateCSV = stateCSV.filter(d => d.SEXO === selectedSexo);
@@ -766,31 +742,32 @@ export function initRegional(
          f.properties.value = agg.get(code) || 0;
       });
 
+      // projeção e path com a largura útil
+      const projection = d3.geoMercator().fitSize([chartW, chartH], geo);
+      const pathGen    = d3.geoPath().projection(projection);
+
       // cria ou seleciona svg
       let svgEstado = d3.select(mapContainer).select<SVGSVGElement>("svg");
       if (svgEstado.empty()) {
-         svgEstado = d3.select(mapContainer)
-         .append("svg")
-         .attr("width", chartW)
-         .attr("height", chartH);
+      svgEstado = d3.select(mapContainer)
+      .append("svg")
+      .attr("width", chartW)
+      .attr("height", chartH);
       }
 
-      // projeção e path
-      const projection = d3.geoMercator().fitSize([chartW, chartH], geo);
-      const pathGen    = d3.geoPath().projection(projection);
 
       // desenha municípios/regiões
       svgEstado.selectAll<SVGPathElement, any>("path.map-path.municipio")
          .data(geo.features as any[])
          .join("path")
-         .classed("map-path municipio", true)
-         .attr("stroke", G.getStrokeColor[selectedSexo])
-         .attr("d", pathGen as any)
-         .attr("fill", d => {
-            const code = d.properties.id || d.properties.CODMUN || d.properties.cod_mun;
-            const v = agg.get(code) ?? 0;
-            return v === 0 ? "#ccc" : colorScale(v);
-         })
+            .classed("map-path municipio", true)
+            .attr("stroke", G.getStrokeColor[selectedSexo])
+            .attr("d", pathGen as any)
+            .attr("fill", d => {
+               const code = d.properties.id || d.properties.CODMUN || d.properties.cod_mun;
+               const v = agg.get(code) ?? 0;
+               return v === 0 ? "#ccc" : colorScale(v);
+            })
          
         .on("contextmenu", (event) => {
             event.preventDefault();
@@ -928,7 +905,7 @@ export function initRegional(
     const selectedYear  = +selectAno.value;
     const selectedSexo  = selectSexo.value;
     const selectedNutri = selectNutricional.value;
-    const selectedFase  = selectFase.value;
+    const selectedFase = "";
         
     // 1) carrega o GeoJSON de regiões de saúde para este UF
     const geojsonFile = G.stateRGeojsonFiles[uf];
@@ -939,7 +916,6 @@ export function initRegional(
       let stateCSV = allData.filter(
          d =>  d.UF === uf 
            && +d.ANO === +selectedYear 
-           && d.fase_vida === selectedFase
       );
       // junta regionData para obter regional_id
       const merged = stateCSV.map(d => {
@@ -949,16 +925,7 @@ export function initRegional(
   
       // 3) rollup por regional_id em vez de codigo_municipio
       function somaEstadosNutricionais(d:any):number{
-         if (selectedFase === "adolescente"){
-            return (
-                  (+d.eutrofico)
-               +  (+d.sobrepeso)
-               +  (+d.magreza)
-               +  (+d.magreza_acentuada)
-               +  (+d.obesidade)
-               +  (+d.obesidade_grave)
-            );
-         }else{
+         if (selectedFase === ""){
             return (
                   (+d.baixo_peso)
                +  (+d.eutrofico)
@@ -967,6 +934,8 @@ export function initRegional(
                +  (+d.obesidade_G_2)
                +  (+d.obesidade_G_3)
             );
+         }else{
+            return 0
          }
       }
       let agg: Map<string,number>;
@@ -1012,19 +981,30 @@ export function initRegional(
   
       let svg = d3.select("#mapaRegional svg");
       if (svg.empty()) {
-        svg = d3.select("#mapaRegional")
-                .append("svg")
-                  .attr("width", chartW)
-                  .attr("height", chartH);
+      svg = d3.select("#mapaRegional").append("svg");
       }
-  
+
+      // calcula largura útil descontando a legenda
+      const legendElHR = mapContainer.parentElement
+      ? mapContainer.parentElement.querySelector(".legendRegional") as HTMLElement | null
+      : null;
+      const legendWHR = legendElHR ? legendElHR.getBoundingClientRect().width : 0;
+      const gapHR = 8;
+      const widthUsableHR = Math.max(200, chartW - legendWHR - gapHR);
+
+      // aplica dimensões
+      svg.attr("width", widthUsableHR).attr("height", chartH);
+
+      // usa a largura útil na projeção
+      const path = d3.geoPath().projection(
+      d3.geoMercator().fitSize([widthUsableHR, chartH], geo)
+      );
+
       svg.selectAll("path")
-         .data(geo.features)
-         .join("path")
-           .attr("class", "regiao-saude")
-           .attr("d", d3.geoPath().projection(
-              d3.geoMercator().fitSize([chartW,chartH], geo)
-           ))
+      .data(geo.features)
+      .join("path")
+      .attr("class", "regiao-saude")
+      .attr("d", path)
            .attr("fill", d => {
              return d.properties.value === 0
              ? "#ccc"

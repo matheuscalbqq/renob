@@ -27,7 +27,6 @@ export default function DadosSisvan() {
   const labelDiv             = useRef<HTMLLabelElement>(null);
   const selectAno            = useRef<HTMLSelectElement>(null);
   const selectSexo           = useRef<HTMLSelectElement>(null);
-  const selectFase           = useRef<HTMLSelectElement>(null);
   const titleMap             = useRef<HTMLHeadingElement>(null);
   const btnMenuAdultoToggle  = useRef<HTMLButtonElement>(null);
   const menuAdultoContainer  = useRef<HTMLDivElement>(null);
@@ -40,7 +39,6 @@ export default function DadosSisvan() {
   // Refs para o gráfico Regional
   const selectAnoReg         = useRef<HTMLSelectElement>(null);
   const selectSexoReg        = useRef<HTMLSelectElement>(null);
-  const selectFaseReg        = useRef<HTMLSelectElement>(null);
   const selectNutricional    = useRef<HTMLSelectElement>(null);
   const selectModoReg        = useRef<HTMLSelectElement>(null);
   const containerDivisaoReg  = useRef<HTMLDivElement>(null);
@@ -54,7 +52,6 @@ export default function DadosSisvan() {
   const selectUFTemp         = useRef<HTMLSelectElement>(null);
   const selectMunicipioTemp  = useRef<HTMLSelectElement>(null);
   const selectSexoTemp       = useRef<HTMLSelectElement>(null);
-  const selectFaseTemp       = useRef<HTMLSelectElement>(null);
   const selectIndicadorTemp  = useRef<HTMLSelectElement>(null);
   const selectModoTemp       = useRef<HTMLSelectElement>(null);
   const labelMunicipioTemp   = useRef<HTMLLabelElement>(null);
@@ -106,7 +103,6 @@ export default function DadosSisvan() {
         selectDivisao.current!,
         selectAno.current!,
         selectSexo.current!,
-        selectFase.current!,
         btnMenuAdultoToggle.current!,
         menuAdultoContainer.current!,
         valorHomensEl.current!,
@@ -153,7 +149,6 @@ export default function DadosSisvan() {
       labelMunReg.current &&
       selectAno.current &&
       selectSexo.current &&
-      selectFase.current &&
       btnMenuAdultoToggle.current &&
       menuAdultoContainer.current &&
       valorHomensEl.current &&
@@ -170,7 +165,6 @@ export default function DadosSisvan() {
         labelDiv.current,
         selectAno.current,
         selectSexo.current,
-        selectFase.current,
         titleMap.current,
         btnMenuAdultoToggle.current,
         menuAdultoContainer.current,
@@ -189,7 +183,6 @@ export default function DadosSisvan() {
       regionalContainer.current &&
       selectAnoReg.current &&
       selectSexoReg.current &&
-      selectFaseReg.current &&
       selectNutricional.current &&
       selectModoReg.current &&
       containerDivSelection &&
@@ -202,7 +195,6 @@ export default function DadosSisvan() {
         regionalContainer.current,
         selectAnoReg.current,
         selectSexoReg.current,
-        selectFaseReg.current,
         selectNutricional.current,
         selectModoReg.current,
         containerDivSelection,
@@ -220,7 +212,6 @@ export default function DadosSisvan() {
       selectUFTemp.current &&
       selectMunicipioTemp.current &&
       selectSexoTemp.current &&
-      selectFaseTemp.current &&
       selectIndicadorTemp.current &&
       selectModoTemp.current &&
       labelMunicipioTemp.current &&
@@ -235,7 +226,6 @@ export default function DadosSisvan() {
         selectUFTemp.current,
         selectMunicipioTemp.current,
         selectSexoTemp.current,
-        selectFaseTemp.current,
         selectIndicadorTemp.current,
         selectModoTemp.current,
         labelMunicipioTemp.current,
@@ -269,9 +259,6 @@ export default function DadosSisvan() {
             Explore visualizações interativas dos dados do Sistema de Vigilância 
             Alimentar e Nutricional, organizados em três perspectivas complementares.
           </p>
-        </div>
-        <div className="fixed bottom-10 right-5 z-50 max-w-md bg-yellow-100 text-gray-800 p-4 border border-yellow-300 rounded shadow font-bold">
-          🚨 Atenção: Projeto em transição! Terá alguns bugs, como por exemplo: alguns dados/gráficos podem estar errados/quebrados. Este aviso será removido quando estiver tudo certo. Att. Dev.
         </div>
 
         {/* Data Visualization Tabs */}
@@ -334,11 +321,6 @@ export default function DadosSisvan() {
                       <label htmlFor="selectSexo" className="block font-semibold mt-2 text-base">Gênero</label>
                       <select ref={selectSexo} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione o gênero</option>
-                      </select>
-
-                      <label htmlFor="selectFase" className="block font-semibold mt-2 text-base">Fase da Vida</label>
-                      <select id="selectFase" ref={selectFase} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Selecione a fase de vida</option>
                       </select>
                     </div>
 
@@ -423,21 +405,21 @@ export default function DadosSisvan() {
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-primary/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-nutrition-green mb-2">Baixo Peso</h4>
+                    <h4 className="font-semibold text-primary mb-2">Diferença na quantidade de entrevistados</h4>
                     <p className="text-sm text-muted-foreground">
-                      Estados com maior prevalência de baixo peso
+                      Há muito mais adultos femininos que masculinos presentes nos dados, com mais de 50 vezes mais nos anos iniciais e até 3 vezes nos anos mais recentes
                     </p>
                   </div>
                   <div className="bg-secondary/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-secondary mb-2">Sobrepeso</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Distribuição do sobrepeso por estado
+                    <h4 className="font-semibold text-secondary mb-2">Proporções semelhantes</h4>
+                    <p className="text-sm text-secondary/80">
+                      Apesar da grande diferença na quantidade de entrevistados, ambos os gêneros possuem proporções similares dos indicativos
                     </p>
                   </div>
                   <div className="bg-accent/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-accent mb-2">Obesidade</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Índices de obesidade por região
+                    <h4 className="font-semibold text-accent mb-2">Mudança de moda</h4>
+                    <p className="text-sm text-accent/70">
+                      Entre 2018 e 2020 há uma mudança no valor mais frenquente de Eutrófico para Sobrepeso 
                     </p>
                   </div>
                 </div>
@@ -472,11 +454,6 @@ export default function DadosSisvan() {
                       <label htmlFor="filtro-sexo" className="block font-semibold mt-2 text-base">Gênero</label>
                       <select id="filtro-sexo" ref={selectSexoReg} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Gênero</option>
-                      </select>
-
-                      <label htmlFor="filtro-fasevida" className="block font-semibold mt-2 text-base">Fase da vida</label>
-                      <select id="filtro-fasevida" ref={selectFaseReg} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Fase de vida</option>
                       </select>
                       
                       <label htmlFor="filtroNutricional" className="block font-semibold mt-2 text-base">Estado Nutricional</label>
@@ -527,23 +504,23 @@ export default function DadosSisvan() {
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-5 gap-4">
                   <div className="bg-gradient-accent p-4 rounded-lg text-center">
                     <h4 className="font-bold text-primary mb-1">Norte</h4>
-                    <p className="text-xs text-background">7 Estados</p>
+                    <p className="text-xs text-background">Maiores prevalências de Sobrepeso</p>
                   </div>
                   <div className="bg-gradient-accent p-4 rounded-lg text-center">
                     <h4 className="font-bold text-primary mb-1">Nordeste</h4>
-                    <p className="text-xs text-background">9 Estados</p>
+                    <p className="text-xs text-background">Maiores prevalências de Baixo Peso</p>
                   </div>
                   <div className="bg-gradient-accent p-4 rounded-lg text-center">
                     <h4 className="font-bold text-primary mb-1">Centro-Oeste</h4>
-                    <p className="text-xs text-background">4 Estados</p>
+                    <p className="text-xs text-background">Prevalência mediana na maioria dos indicadores</p>
                   </div>
                   <div className="bg-gradient-accent p-4 rounded-lg text-center">
                     <h4 className="font-bold text-primary mb-1">Sudeste</h4>
-                    <p className="text-xs text-background">4 Estados</p>
+                    <p className="text-xs text-background">Prevalência mediana em todos os indicadores</p>
                   </div>
                   <div className="bg-gradient-accent p-4 rounded-lg text-center">
                     <h4 className="font-bold text-primary mb-1">Sul</h4>
-                    <p className="text-xs text-background">3 Estados</p>
+                    <p className="text-xs text-background">Maiores prevalências de Obesidade</p>
                   </div>
                   
                 </div>
@@ -592,11 +569,6 @@ export default function DadosSisvan() {
                         <option value="">Selecione o Gênero</option>
                       </select>
 
-                      <label htmlFor="filtroFaseTemp" className="block font-semibold mt-2 text-base">Fase da Vida</label>
-                      <select id="filtroFaseTemp" ref={selectFaseTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Selecione a Fase da Vida</option>
-                      </select>
-
                       <label htmlFor="filtroNutriTemp" className="block font-semibold mt-2 text-base">Estado Nutricional</label>
                       <select id="filtroNutriTemp" ref={selectIndicadorTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
                         <option value="">Selecione o Estado Nutricional</option>
@@ -633,86 +605,14 @@ export default function DadosSisvan() {
                 
                 </div>
 
-                {/*Cards abaixo do gráfico */}
-                <div className="mt-6 grid grid-cols-3 md:grid-cols-3 gap-6">
-                  <Card className="shadow-soft">
-                    <CardContent className="p-6">
-                      <h4 className="font-semibold mb-3 text-foreground">Número de Entrevistados</h4>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start space-x-2">
-                          <div className="h-3 w-3 rounded-[30%] bg-primary mt-1"></div>
-                          <span className="text-muted-foreground">Todos:</span>
-                        </li>
-                        <li className="flex items-start space-x-2">
-                          <div className="h-3 w-3 rounded-[30%] bg-secondary mt-1"></div>
-                          <span className="text-muted-foreground">Feminino:</span>
-                        </li>
-                        <li className="flex items-start space-x-2">
-                          <div className="h-3 w-3 rounded-[30%] bg-accent mt-1"></div>
-                          <span className="text-muted-foreground">Masculino:</span>
-                        </li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="shadow-soft">
-                    <CardContent className="p-6">
-                      <h4 className="font-semibold mb-3 text-foreground">Tendências Identificadas</h4>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start space-x-2">
-                          <div className="h-2 w-2 rounded-full bg-primary mt-1.5"></div>
-                          <span className="text-muted-foreground">Redução da desnutrição infantil</span>
-                        </li>
-                        <li className="flex items-start space-x-2">
-                          <div className="h-2 w-2 rounded-full bg-secondary mt-1.5"></div>
-                          <span className="text-muted-foreground">Aumento do sobrepeso em adultos</span>
-                        </li>
-                        <li className="flex items-start space-x-2">
-                          <div className="h-2 w-2 rounded-full bg-accent mt-1.5"></div>
-                          <span className="text-muted-foreground">Estabilização da obesidade infantil</span>
-                        </li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="shadow-soft">
-                    <CardContent className="p-6">
-                      <h4 className="font-semibold mb-3 text-foreground">Período Analisado</h4>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Início dos dados:</span>
-                          <span className="font-medium">2008</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Dados mais recentes:</span>
-                          <span className="font-medium">2024</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Frequência:</span>
-                          <span className="font-medium">Anual</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
 
         {/* Additional Information */}
-        <Card className="mt-8 shadow-medium bg-muted/50">
-          <CardContent className="p-8">
-            <h3 className="text-xl font-semibold mb-4 text-center text-foreground">
-              Sobre os Gráficos D3.js
-            </h3>
-            <p className="text-center text-muted-foreground max-w-2xl mx-auto">
-              Os espaços acima estão preparados para receber gráficos interativos desenvolvidos 
-              com a biblioteca D3.js. Cada seção foi projetada para apresentar os dados do SISVAN 
-              de forma clara e intuitiva, permitindo exploração detalhada dos indicadores nutricionais.
-            </p>
-          </CardContent>
-        </Card>
+        
       </div>
     </div>
   );

@@ -4,15 +4,53 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Linkedin, Github } from "lucide-react";
 import LattesIcon from "@/components/LattesIcon"
 
-
-
 const membros = [
   {
     id: 1,
+    nome: "Prof. Helen Hermana Miranda Hermsdorff",
+    cargo: "Coordenadora do projeto",
+    especialidade: "Nutrição e Saúde",
+    avatar: "https://i.postimg.cc/8Cn4KtSZ/profa-Helen.jpg",
+    descricao: [
+      "Professora do Departamento de Nutrição e Saúde da Universidade Federal de Viçosa",
+      "Pesquisadora do Instituto de Políticas Públicas e Desenvolvimento Sustentável – IPPDS",
+      "Doutora em Alimentação, Fisiologia e Saúde pela Universidad de Navarra, Espanha",
+      "Líder do Grupo de Estudos em Nutrição e Obesidade - GENO",
+      "Produção de material técnico-científico e análise de dados secundários no processo de qualificação de profissionais e gestores de saúde no manejo da obesidade e comorbidades"
+    ],
+    contatos: {
+      email:  "helenhermana@ufv.br",
+      lattes: "8193454290644430",
+      linkedin: "https://www.linkedin.com/in/helen-hermana-hermsdorff-61aa191b3/"
+    }
+  },
+  {
+    id: 2,
+    nome: "Prof. Sabrina de Azevedo Silveira",
+    cargo: "Colaboradora do Projeto",
+    especialidade: "Bioinformática",
+    avatar: "https://i.postimg.cc/KRM1FPjb/sabrina.png",
+    descricao: [
+      "Professora do Departamento de Informática da Universidade Federal de Viçosa",
+      "Pesquisadora do Instituto de Políticas Públicas e Desenvolvimento Sustentável – IPPDS",
+      "Doutorado em Bioinformática pela UFMG",
+      "Aprendizagem de máquinas",
+      "Base de Dados Biológicos e Visualização de Dados",
+      "Mineração de Dados",      
+      "Predição de Função de Enzima"
+    ],
+    contatos: {
+      email: "sabrina@ufv.br",
+      lattes: "0899817111748167",
+      linkedin: "https://br.linkedin.com/in/sabrina-de-azevedo-silveira-494b8721"
+    }
+  },
+  {
+    id: 3,
     nome: "Daniela Mayumi Usuda Prado Rocha",
     cargo: "Pós-Doutoranda",
-    especialidade: "Nutrição em Saúde Pública ?",
-    avatar: "http://servicosweb.cnpq.br/wspessoa/servletrecuperafoto?tipo=1&id=K4266471D1",
+    especialidade: "Nutrição e Saúde",
+    avatar: "https://i.postimg.cc/ncHcFtgj/Daniela.png",
     descricao: [
       "Doutora em Nutrição pela UFV",
       "Desenvolvimento e Tecnologia de Alimentos",
@@ -24,16 +62,15 @@ const membros = [
     contatos: {
       email:    "dani@dani.com.br",
       lattes:   "1255736788675899",
-      linkedin: "dani",
-      github:   "dani"
+      linkedin: "https://www.linkedin.com/in/daniela-mayumi/"
     }
   },
   {
-    id: 2,
+    id: 4,
     nome: "Gustavo de Oliveira Almeida",
     cargo: "Doutorando",
     especialidade: "Bioinformática",
-    avatar: "https://avatars.githubusercontent.com/u/110310596?v=4",
+    avatar: "https://i.postimg.cc/43GfmkFz/gustavo.png",
     descricao: [
       "Mestre em Ciência da Computação pela UFV",
       "Aprendizagem de máquina",
@@ -48,27 +85,11 @@ const membros = [
     }
   },
   {
-    id: 3,
-    nome: "Prof. Helen Hermana Miranda Hermsdorff",
-    cargo: "Coordenadora do projeto",
-    especialidade: "Nutrição em doenças crônicas não transmissíveis",
-    avatar: "https://nit.ufv.br/wp-content/uploads/2024/11/Helen-Hermana-Miranda-Hermsdorff-150x150.jpg",
-    descricao: [
-      "Doutora em Alimentação, Fisiologia e Saúde pela Universidad de Navarra, Espanha",
-      "Líder do Grupo de Estudos em Nutrição e Obesidade - GENO",
-      "Produção de material técnico-científico e análise de dados secundários no processo de qualificação de profissionais e gestores de saúde no manejo da obesidade e comorbidades"
-    ],
-    contatos: {
-      email:  "helenhermana@ufv.br",
-      lattes: "8193454290644430"
-    }
-  },
-  {
-    id: 4,
+    id: 5,
     nome: "Matheus Cavalcanti de Albuquerque",
     cargo: "Desenvolvedor e Analista de Dados",
     especialidade: "Ciência de Dados em Saúde",
-    avatar: "https://media.licdn.com/dms/image/v2/D4D03AQFiLooVjTzIzg/profile-displayphoto-shrink_800_800/B4DZchAJ1nHwAc-/0/1748605378434?e=1756944000&v=beta&t=uumnlpONZ40deIR73fvM8fjn8dFzuj-XyW1emfAMZxg",
+    avatar: "https://i.postimg.cc/Xq1h6FtQ/eu2.jpg",
     descricao: [
       "Bacharel em Física Teórica pela UFV",
       "Ciência de Dados",
@@ -81,34 +102,106 @@ const membros = [
       github:   "matheuscalbqq",
       lattes:   "9242679981831049"
     }
-  },
-  {
-    id: 5,
-    nome: "Prof. Sabrina de Azevedo Silveira",
-    cargo: "Colaboradora do Projeto",
-    especialidade: "Bioinformática",
-    avatar: "https://www2.dpi.ufv.br/wp-content/uploads/2015/12/sabrina-150x150.png",
-    descricao: [
-      "Doutorado em Bioinformática pela UFMG",
-      "Aprendizagem de máquinas",
-      "Base de Dados Biológicos e Visualização de Dados",
-      "Mineração de Dados",      
-      "Predição de Função de Enzima"
-    ],
-    contatos: {
-      email: "sabrina@ufv.br",
-      lattes: "0899817111748167"
-    }
   }
 ];
 
 const Membros = () => {
+  // helper para não duplicar o JSX do card
+  const renderCard = (membro: typeof membros[number]) => (
+    <Card key={membro.id} className="w-full max-w-sm shadow-medium hover:shadow-strong transition-all duration-300 group flex flex-col h-full">
+      <CardContent className="p-6 flex flex-col h-full">
+        {/* Avatar and Basic Info */}
+        <div className="text-center mb-6">
+          <Avatar className="h-24 w-24 mx-auto mb-4 ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all">
+            <AvatarImage src={membro.avatar} alt={membro.nome} className="object-cover"/>
+            <AvatarFallback className="text-lg font-semibold bg-primary text-primary-foreground">
+              {membro.nome.split(' ').map(n => n[0]).join('')}
+            </AvatarFallback>
+          </Avatar>
+          
+          <h3 className="text-xl font-bold mb-2 text-foreground w-60 flex-center ml-12">
+            {membro.nome}
+          </h3>
+          
+          <Badge variant="accent" className="mb-2">
+            {membro.cargo}
+          </Badge>
+          
+          <p className="text-sm text-secondary/80 font-medium">
+            {membro.especialidade}
+          </p>
+        </div>
+
+        {/* Description */}
+        <div className="mb-6 flex-grow">
+          <h4 className="font-semibold mb-3 text-foreground">Experiência:</h4>
+          <ul className="space-y-2">
+            {membro.descricao.map((item, index) => (
+              <li key={index} className="flex items-start space-x-2 text-sm">
+                <div className="h-1.5 w-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                <span className="text-muted-foreground">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Contact Links */}
+        <div className="border-t pt-4 mt-auto">
+          <h4 className="font-semibold mb-3 text-foreground">Links:</h4>
+          <div className="flex flex-wrap gap-2">
+            {membro.contatos.email && (
+              <a
+                href={`mailto:${membro.contatos.email}`}
+                className="flex items-center space-x-1 px-3 py-1 bg-accent/30 rounded-full text-xs hover:bg-muted/80 transition-colors"
+              >
+                <Mail className="h-3 w-3" />
+                <span>Email</span>
+              </a>
+            )}                    
+            {membro.contatos.lattes && (
+              <a
+                href={`http://lattes.cnpq.br/${membro.contatos.lattes}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-1 bg-primary/40 rounded-full text-xs hover:bg-foreground/20 transition-colors"
+              >
+                <LattesIcon className="h-3 w-3 text-primary"/>
+                <span className="text-white">Lattes</span>
+              </a>
+            )}
+            {membro.contatos.github && (
+              <a
+                href={`https://github.com/${membro.contatos.github}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-1 bg-foreground/10 rounded-full text-xs hover:bg-foreground/20 transition-colors"
+              >
+                <Github className="h-3 w-3" />
+                <span>GitHub</span>
+              </a>
+            )}
+            {membro.contatos.linkedin && (
+              <a
+                href={`https://linkedin.com/in/${membro.contatos.linkedin}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs hover:bg-primary/20 transition-colors"
+              >
+                <Linkedin className="h-3 w-3" />
+                <span>LinkedIn</span>
+              </a>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen py-16">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-16">
-          
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-primary">
             Nossa Equipe
           </h1>
@@ -118,97 +211,15 @@ const Membros = () => {
           </p>
         </div>
 
-        {/* Team Members Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {membros.map((membro) => (
-            <Card key={membro.id} className="shadow-medium hover:shadow-strong transition-all duration-300 group flex flex-col h-full">
-              <CardContent className="p-6 flex flex-col h-full">
-                {/* Avatar and Basic Info */}
-                <div className="text-center mb-6">
-                  <Avatar className="h-24 w-24 mx-auto mb-4 ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all">
-                    <AvatarImage src={membro.avatar} alt={membro.nome} className="object-cover"/>
-                    <AvatarFallback className="text-lg font-semibold bg-primary text-primary-foreground">
-                      {membro.nome.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <h3 className="text-xl font-bold mb-2 text-foreground w-60 flex-center ml-12">
-                    {membro.nome}
-                  </h3>
-                  
-                  <Badge variant="accent" className="mb-2">
-                    {membro.cargo}
-                  </Badge>
-                  
-                  <p className="text-sm text-secondary/80 font-medium">
-                    {membro.especialidade}
-                  </p>
-                </div>
+        {/* Team Members Grid (Opção A: 2 em cima, 3 embaixo) */}
+        {/* Primeira linha: 2 cards centralizados */}
+        <div className="grid grid-cols-1 sm:grid-cols-[auto_auto] justify-center gap-12 mb-8">
+          {membros.slice(0, 2).map(renderCard)}
+        </div>
 
-                {/* Description */}
-                <div className="mb-6 flex-grow">
-                  <h4 className="font-semibold mb-3 text-foreground">Experiência:</h4>
-                  <ul className="space-y-2">
-                    {membro.descricao.map((item, index) => (
-                      <li key={index} className="flex items-start space-x-2 text-sm">
-                        <div className="h-1.5 w-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Contact Links */}
-                <div className="border-t pt-4 mt-auto">
-                  <h4 className="font-semibold mb-3 text-foreground">Links:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {membro.contatos.email && (
-                      <a
-                        href={`mailto:${membro.contatos.email}`}
-                        className="flex items-center space-x-1 px-3 py-1 bg-accent/30 rounded-full text-xs hover:bg-muted/80 transition-colors"
-                      >
-                        <Mail className="h-3 w-3" />
-                        <span>Email</span>
-                      </a>
-                    )}                    
-                    {membro.contatos.lattes && (
-                      <a
-                        href={`http://lattes.cnpq.br/${membro.contatos.lattes}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-1 px-3 py-1 bg-primary/40 rounded-full text-xs hover:bg-foreground/20 transition-colors"
-                      >
-                        <LattesIcon className="h-3 w-3 text-primary"/>
-                        <span className="text-white">Lattes</span>
-                      </a>
-                    )}
-                    {membro.contatos.github && (
-                      <a
-                        href={`https://github.com/${membro.contatos.github}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-1 px-3 py-1 bg-foreground/10 rounded-full text-xs hover:bg-foreground/20 transition-colors"
-                      >
-                        <Github className="h-3 w-3" />
-                        <span>GitHub</span>
-                      </a>
-                    )}
-                    {membro.contatos.linkedin && (
-                      <a
-                        href={`https://linkedin.com/in/${membro.contatos.linkedin}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-1 px-3 py-1 bg-nutrition-blue/10 text-nutrition-blue rounded-full text-xs hover:bg-nutrition-blue/20 transition-colors"
-                      >
-                        <Linkedin className="h-3 w-3" />
-                        <span>LinkedIn</span>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Segunda linha: 3 cards centralizados */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center mb-16">
+          {membros.slice(2).map(renderCard)}
         </div>
 
         {/* Team Statistics */}

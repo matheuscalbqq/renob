@@ -9,7 +9,6 @@ import * as d3 from "d3";
  * @param {HTMLSelectElement} selectMunicipio - select de Município
  * @param {HTMLSelectElement} selectAno - select de Ano
  * @param {HTMLSelectElement} selectSexo - select de Sexo
- * @param {HTMLSelectElement} selectFase - select de Fase de Vida
  * @param {HTMLButtonElement} btnMenuAdultoToggleEl - botão que alterna o menu adulto
  * @param {HTMLElement} menuAdultoContainerEl - container do menu adulto
  * @param {NodeListOf<HTMLInputElement>} adultoCols - checkboxes de indicadores adultos
@@ -41,7 +40,6 @@ export const promiseDados = d3.csv<G.DataRow>(
     municipio:          row.municipio,
     ANO:                row.ANO,
     SEXO:               row.SEXO,
-    fase_vida:          row.fase_vida,
     total:              row.total,
     baixo_peso:        +row.baixo_peso,
     eutrofico:         +row.eutrofico,
@@ -64,7 +62,6 @@ function atualizarGrafico(
   selectDivisao: HTMLSelectElement,
   selectAno: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
-  selectFase: HTMLSelectElement,
   btnMenuAdultoToggleEl: HTMLButtonElement,
   menuAdultoContainerEl: HTMLElement,
   valorHomensEl: HTMLElement,
@@ -77,7 +74,6 @@ function atualizarGrafico(
   const municipioSelecionado= selectMunicipio.value;
   const divSelecionada      = selectDivisao.value;
   const anoSelecionado      = selectAno.value;
-  const faseSelecionada     = selectFase.value;   // “adolescente” | “adulto”
   const rawSexo             = selectSexo.value;
   const sexoSelecionado     = !rawSexo || rawSexo === "Todos" ? "Todos" : rawSexo;   // “Masc” | “Fem” | “Todos”
   const regionMap           : Map<string, string> = new Map();
@@ -86,19 +82,12 @@ function atualizarGrafico(
       regionMap.set(r.municipio_id_sdv, r.regional_id)
     )
 
-  // 2) exibe ou oculta botão/menu de adulto (HTMLButtonElement e HTMLElement)
-  if (faseSelecionada === "adulto") {
-    btnMenuAdultoToggleEl.classList.remove("hidden");
-    menuAdultoContainerEl.classList.add("hidden");
-  } else {
-    btnMenuAdultoToggleEl.classList.add("hidden");
-    menuAdultoContainerEl.classList.add("hidden");
-  }
+  btnMenuAdultoToggleEl.classList.remove("hidden");
+  menuAdultoContainerEl.classList.add("hidden");
+  
 
   // 3) filtra o allData (DataRow[]) conforme seleções
   const dadosFiltrados = dados.filter(d => {
-
-    if (faseSelecionada             && d.fase_vida                !== faseSelecionada     ) return false;
     if (ufSelecionada               && d.UF                       !== ufSelecionada       ) return false;
     if (anoSelecionado              && d.ANO                      !== anoSelecionado      ) return false;
     if (sexoSelecionado !== "Todos" && d.SEXO                     !== sexoSelecionado     ) return false;
@@ -119,15 +108,10 @@ function atualizarGrafico(
   
   // 4) decide quais colunas usar
   let colunasIndicadores: (keyof G.DataRow)[];
-  if (faseSelecionada === "adolescente") {
-    colunasIndicadores = ["eutrofico","sobrepeso","magreza_acentuada","magreza","obesidade","obesidade_grave"];
-  } else {
-    // pega todos os checkboxes adultos marcados
-    const chks = Array.from(
+  const chks = Array.from(
       document.querySelectorAll<HTMLInputElement>('input[name="adultoCols"]:checked')
     );
-    colunasIndicadores = chks.map(c => c.value as keyof G.DataRow);
-  }
+  colunasIndicadores = chks.map(c => c.value as keyof G.DataRow);
 
   // 5) agrupa por SEXO e soma entrevistados
   const dadosPorSexo = d3.group(dadosFiltrados, d => d.SEXO);
@@ -243,9 +227,10 @@ function atualizarGrafico(
     const svg = containerSel
       .append("svg")
         .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
-        .attr("preserveAspectRatio", "xMinYMin meet")
-      const g = svg.append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+        .attr("preserveAspectRatio", "xMinYMin meet");
+    
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const selectedSexo = selectSexo.value;
 
@@ -271,13 +256,14 @@ function atualizarGrafico(
       .range([height, 0]);
 
     // 5) Eixos
-    const xAxis = svg.append("g")
+    const xAxis = g.append("g")
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x0).tickFormat(d => G.nomeAmigavel[d] || d));
-    xAxis.selectAll("text").classed("text-[14px]", true);
 
-    const yAxis = svg.append("g")
+    const yAxis = g.append("g")
       .call(d3.axisLeft(y).ticks(10).tickFormat(d => d + "%"));
+
+    xAxis.selectAll("text").classed("text-[14px]", true);
     yAxis.selectAll("text").classed("text-[14px]", true);
 
     // 6) Qual filtro de sexo está ativo?    
@@ -290,7 +276,7 @@ function atualizarGrafico(
         .padding(0.1);
 
       // G container por indicador
-      const gIndicador = svg.selectAll("g.indicador-group")
+      const gIndicador = g.selectAll("g.indicador-group")
         .data(dados)
         .enter()
         .append("g")
@@ -362,7 +348,7 @@ function atualizarGrafico(
     } else {
       // Apenas Masc ou Fem
       const key = selectSexo.value;
-      svg.selectAll("g.indicador-group")
+      g.selectAll("g.indicador-group")
         .data(dados)
         .enter()
         .append("g")
@@ -396,7 +382,7 @@ function atualizarGrafico(
 
     // 7) Rótulo do eixo Y
     // desenha o rótulo do eixo Y, rotacionado e centralizado
-    svg.append("text")
+    g.append("text")
       .attr("transform", "rotate(-90)")
       // ajusta o X para ficar centrado verticalmente, considerando margin.top
       .attr("x", -(height/(1.5) - margin.top))
@@ -406,7 +392,7 @@ function atualizarGrafico(
     
     // 7) Rótulo do eixo X
     // desenha o rótulo do eixo X e centralizado
-    svg.append("text")      
+    g.append("text")      
       .attr("x", width/(2.4))
       .attr("text-anchor","middle")
       .attr("y", height + margin.bottom -5)
@@ -427,10 +413,8 @@ function atualizarGrafico(
   selectMunicipio: HTMLSelectElement,
   selectAno: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
-  selectFase: HTMLSelectElement,
 ) {
     // 1) capta valores dos selects
-    const fase = selectFase.value;
     const sexo = selectSexo.value;
     const uf = selectUF.value || "Brasil";
     const ano = selectAno.value;
@@ -460,7 +444,7 @@ function atualizarGrafico(
       // 3) monta a string do título
       const genero = sexo === "Todos" ? "" : G.sexoLabel[sexo];
       const regMap = regionPorUF[uf];
-      const base = `Mapeamento de Estados Nutricionais em ${G.faseLabel[fase]} ${genero}`;
+      const base = `Mapeamento de Estados Nutricionais em Adultos ${genero}`;
       const cidade = municipioAmigavel && municipioAmigavel.trim()
         ? `${municipioAmigavel} ${ano}`
         : `${G.ufLabel[uf]} ${ano}`;
@@ -485,7 +469,6 @@ export function populateSelectsMapeamento (
     labelDivisaoEl:HTMLLabelElement,
     selectAnoEl: HTMLSelectElement,
     selectSexoEl: HTMLSelectElement,
-    selectFaseEl: HTMLSelectElement,
     data: G.DataRow[],
     regionData: G.RegionDataRow[]
   ){      
@@ -533,21 +516,6 @@ export function populateSelectsMapeamento (
         selectSexoEl.appendChild(opt);
       });
 
-      // ---Fase de vida---
-      const fases = Array.from(new Set(data.map(d => d.fase_vida)));
-      selectFaseEl.innerHTML = "";
-      fases.forEach(f => {
-        const opt = document.createElement("option");
-        opt.value = f;
-        opt.text = G.faseLabel[f] ?? f;
-        selectFaseEl.appendChild(opt);        
-      });
-
-
-      if (fases.length) {
-          selectFaseEl.value = fases[fases.length - 1];
-          selectFaseEl.dispatchEvent(new Event("change"));
-        }
       G.FiltroChangerMunReg(selectDivisaoEl,labelDivisaoEl,selectUFEl,selectMunicipioEl,labelMunRegEl,data,regionData);
      
 
@@ -569,7 +537,6 @@ export async function initMapeamento(
   labelDiv:HTMLLabelElement,
   selectAno: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
-  selectFase: HTMLSelectElement,
   title: HTMLHeadingElement,
   btnMenuAdultoToggleEl: HTMLButtonElement,
   menuAdultoContainerEl: HTMLElement,
@@ -587,7 +554,6 @@ export async function initMapeamento(
   const selectDivisaoEl = selectDivisao;
   const selectAnoEl = selectAno;
   const selectSexoEl = selectSexo;
-  const selectFaseEl = selectFase;
   const labelMunRegEl = labelMunReg;
   const labelDivEl = labelDiv;
   const titleEl = title;
@@ -601,37 +567,36 @@ export async function initMapeamento(
     labelDivEl,
     selectAnoEl,
     selectSexoEl,
-    selectFaseEl,
     allData,
     regionData
   );
   //desenha o título e o gráfico iniciais
-  atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
+  atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl);
+  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
 
   // Listeners
   selectUFEl.addEventListener("change", () => {        
     G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
-    atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-    atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container); 
+    atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl);
+    atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container); 
   });
   selectDivisaoEl.addEventListener("change",()=>{
         G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
         labelMunRegEl.textContent = selectDivisaoEl.value === 'federativa' 
         ? 'Municípios' 
         : 'Regiões de Saúde';
-        atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
+        atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl);
+        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
       });
   selectMunicipioEl.addEventListener("change", () =>{
-        atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
+        atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl);
+        atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
       });
-  [selectAnoEl,selectFaseEl,selectSexoEl].forEach(s =>{
+  [selectAnoEl,selectSexoEl].forEach(s =>{
     s.addEventListener("change", () =>{
       G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
-      atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl,selectFaseEl);
-      atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
+      atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl);
+      atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
     })
   });
     
@@ -716,7 +681,7 @@ export async function initMapeamento(
         }
       });
     }
-  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,selectFaseEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
+  atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
   }
    
 
@@ -731,7 +696,6 @@ export function resizeMapeamento(
   selectDivisao: HTMLSelectElement,
   selectAno: HTMLSelectElement,
   selectSexo: HTMLSelectElement,
-  selectFase: HTMLSelectElement,
   btnMenuAdultoToggleEl: HTMLButtonElement,
   menuAdultoContainerEl: HTMLElement,
   valorHomensEl: HTMLElement,
@@ -739,6 +703,6 @@ export function resizeMapeamento(
   valorTodosEl: HTMLElement,
   container: HTMLElement
 ){
-  atualizarTitulo(dados,regionData,selectDivisao,title,selectUF,selectMunicipio,selectAno,selectSexo,selectFase);
-  atualizarGrafico(dados,regionData,selectUF,selectMunicipio,selectDivisao,selectAno,selectSexo,selectFase,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
+  atualizarTitulo(dados,regionData,selectDivisao,title,selectUF,selectMunicipio,selectAno,selectSexo);
+  atualizarGrafico(dados,regionData,selectUF,selectMunicipio,selectDivisao,selectAno,selectSexo,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
 }

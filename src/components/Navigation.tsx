@@ -6,10 +6,11 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
 const navigationItems = [
-  { name: "Introdução", path: "/" },
-  { name: "Nossa Missão", path: "/missao" },
-  { name: "Dados SISVAN", path: "/dados" },
-  { name: "Membros", path: "/membros" },
+  { name: "Apresentação", path: "/" },
+  { name: "Missão", path: "/missao" },
+  { name: "Equipe", path: "/equipe" },
+  { name: "Metodologia", path: "/metodologia" },
+  { name: "Mapas e Análises", path: "/analise" },
   { name: "Materiais de Apoio", path: "/materiais" },
 ];
 

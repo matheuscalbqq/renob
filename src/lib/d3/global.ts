@@ -399,7 +399,6 @@ export interface DataRow {
   codigo_municipio: string
   municipio: string
   ANO: string
-  fase_vida: string
   SEXO: string
   total: string
 
