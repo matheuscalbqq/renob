@@ -32,6 +32,7 @@ export function initTemporal(
 ) {
   // Mapa para resolver qual região de saúde pertence a cada município (código)
   const regionMap: Map<string, string> = new Map();
+  const macroMap: Map<string, string> = new Map();
 
   let allDataTemporal: G.DataRow[] = [];
   let regionDataTemporal: G.RegionDataRow[] = [];
@@ -41,8 +42,10 @@ const promiseRegioes = d3.csv<G.RegionDataRow>(
   G.csvRegionUrl,
   row => ({
     municipio_id_sdv: row.municipio_id_sdv,
-    regional_id:      row.regional_id,
+    macro_id:         row.macro_id,
+    macro_nome:       row.macro_nome,
     uf:               row.estado_abrev,
+    regional_id:      row.regional_id,
     nome_regiao:      row.regional_nome
   })
 );
@@ -77,6 +80,10 @@ const promiseDados = d3.csv<G.DataRow>(
     regioes.forEach(r =>
       regionMap.set(r.municipio_id_sdv, r.regional_id)
     );
+    macroMap.clear();
+    regioes.forEach(r =>
+      macroMap.set(r.municipio_id_sdv, r.macro_id)
+    );
 
     allDataTemporal = dados;
 
@@ -87,10 +94,17 @@ const promiseDados = d3.csv<G.DataRow>(
 
     // Listeners para refazer gráfico ao mudar filtros
     selectModo.addEventListener("change", () => {
+      let nome_div = "";
       G.FiltroChangerMunReg(selectModo,labelModo,selectUF,selectMunicipio,labelMunicipio,allDataTemporal,regionDataTemporal);
-      labelMunicipio.textContent = selectModo.value === 'federativa' 
-        ? 'Municípios'
-        : 'Regiões de Saúde';
+      if (selectModo.value === "federativa"){
+            nome_div = "Divisão Federativa"
+        } else if (selectModo.value === "saude"){
+            nome_div = "Regiões de Saúde"
+        } else{
+            nome_div = "Macrorregiões de Saúde"
+        }
+        
+        labelModo.textContent = nome_div;
       atualizarGrafico();
       atualizarTitulo();
     });
@@ -144,14 +158,20 @@ const promiseDados = d3.csv<G.DataRow>(
     }
     PopulateNutri();
 
-    // --- Divisão ---
-    selectModo.innerHTML = "";
-    ["federativa","saude"].forEach(val => {
-      const o = document.createElement("option");
-      o.value = val;
-      o.text  = val === "federativa" ? "Divisão Federativa" : "Regiões de Saúde";
-      selectModo.appendChild(o);
-    });
+    // --- Divisao ----
+      selectModo.innerHTML = "";
+      ["federativa","saude","macro"].forEach(d =>{
+        const opt = document.createElement("option");
+        opt.value = d;
+        if (d==="federativa"){
+          opt.text = "Divisão Federativa";
+        } else if (d==="saude"){
+          opt.text = "Regiões de Saúde"
+        } else {
+          opt.text = "Macrorregiões de Saúde"
+        }
+        selectModo.appendChild(opt);
+      })
   }
 
   // Atualiza o título de acordo com filtros
@@ -160,6 +180,7 @@ const promiseDados = d3.csv<G.DataRow>(
     const sexo = selectSexo.value === "Todos" ? "" : G.sexoLabel[selectSexo.value]    || "";
     const indi = G.nomeAmigavel[selectIndicador.value] || "";
     const regionPorUF: Record<string, Map<string, string>> = {};
+    const macroPorUF: Record<string, Map<string, string>> = {};
     if (!regionPorUF[uf]){
       regionPorUF[uf] = new Map();
       regionDataTemporal
@@ -169,13 +190,26 @@ const promiseDados = d3.csv<G.DataRow>(
         })
     }
     const regMap = regionPorUF[uf]
+    if (!macroPorUF[uf]){
+      macroPorUF[uf] = new Map();
+      regionDataTemporal
+        .filter(d => d.uf === uf)
+        .forEach(d => {
+          macroPorUF[uf]!.set(d.macro_id, d.macro_nome);
+        })
+    }
+    const macroMap = macroPorUF[uf]
+
     const cidade = selectMunicipio.value === "" ? "" : `${G.cidadesFriendly[uf][selectMunicipio.value]} (${uf})` || "";
     const regiao = `${regMap.get(`${selectMunicipio.value}`)} (${uf})`;
+    const macro = `${macroMap.get(`${selectMunicipio.value}`)} (${uf})`;
     const local = cidade === "" 
       ? G.ufLabel[uf] 
       : selectModo.value === 'federativa' 
       ? cidade
-      : regiao;
+      : selectModo.value === 'saude' 
+      ? regiao
+      : macro;
 
     const titulo = `Análise Temporal de ${indi} em Adultos ${sexo} - ${local}`;
     titleEl.textContent = titulo;
@@ -194,6 +228,7 @@ const promiseDados = d3.csv<G.DataRow>(
     const sexo      = selectSexo.value;
     const muni      = selectMunicipio.value; // cidade ou região de saúde | depende do modo
     const indicador = selectIndicador.value;
+    const col       = G.mapNutricional(indicador);
 
     
     // Filtra o dataset
@@ -202,12 +237,13 @@ const promiseDados = d3.csv<G.DataRow>(
       if (uf && d.UF !== uf)                     return false;
       if (muni) {
         if (modo === "federativa") {
-          if(String(d.codigo_municipio) !== muni) return false;
-        } else {
-
-          const regiaoDoMunicipio = regionMap.get(d.codigo_municipio);
-          if (regiaoDoMunicipio !== muni) return false;
-
+            if(String(d.codigo_municipio) !== muni) return false;
+        } else if (modo === "saude") {
+            const regiaoDoMunicipio = regionMap.get(d.codigo_municipio);
+            if (regiaoDoMunicipio !== muni) return false;
+        } else{
+            const macroDoMunicipio = macroMap.get(d.codigo_municipio);
+            if (macroDoMunicipio !== muni) return false;
         }
       }
       return true;
@@ -216,7 +252,7 @@ const promiseDados = d3.csv<G.DataRow>(
     // agrupar entrevistados por ano
     const totalEntrevistadosPorAno = d3.rollup(
       dadosFiltrados,
-      v => d3.sum(v,d => +d.total),
+      v => G.denominadorSoma(v as G.DataRow[]),
       d => d.ANO
     );
 
@@ -241,8 +277,8 @@ const promiseDados = d3.csv<G.DataRow>(
         let totalEntrevistadosAno = totalEntrevistadosPorAno.get(ano) || 0;
 
         if (totalEntrevistadosAno > 0) {
-          let valorMasc = masc.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
-          let valorFem = fem.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
+          let valorMasc = G.somarColunaCustom(masc as G.DataRow[], col);
+          let valorFem  = G.somarColunaCustom(fem  as G.DataRow[], col);
 
           // 🔹 Normalizar os valores como porcentagem do total de entrevistados NO ANO
           let percMasc = (valorMasc / totalEntrevistadosAno) * 100;
@@ -251,20 +287,21 @@ const promiseDados = d3.csv<G.DataRow>(
 
           maxPct = Math.max(maxPct, percMasc, percFem, percTodos);
 
-          dadosGrafico.Masc.push({ ano, valor: percMasc });
-          dadosGrafico.Fem.push({ ano, valor: percFem });
+          dadosGrafico.Masc.push({  ano, valor: percMasc  });
+          dadosGrafico.Fem.push({   ano, valor: percFem   });
           dadosGrafico.Todos.push({ ano, valor: percTodos });
         
         }  
       });
     } else{
       anos.forEach(ano => {
-        let dadosPorSexo = dadosFiltrados.filter(d => d.ANO === ano && d.SEXO === sexo);
-        let totalEntrevistadosAno = totalEntrevistadosPorAno.get(ano) || 0;
+        const dadosPorSexo = dadosFiltrados.filter(d => d.ANO === ano && d.SEXO === sexo);
+        const totalEntrevistadosAno = G.denominadorSoma(dadosPorSexo as G.DataRow[]);
+
         if (totalEntrevistadosAno > 0) {
-            let valor = dadosPorSexo.reduce((sum, d) => sum + Number(d[indicador] || 0), 0);
-            let perc = (valor / totalEntrevistadosAno) * 100;
-            maxPct = Math.max(maxPct, perc);
+            const valor = G.somarColunaCustom(dadosPorSexo as G.DataRow[], col);
+            const perc  = (valor / totalEntrevistadosAno) * 100;
+            maxPct      = Math.max(maxPct, perc);
             dadosGrafico[sexo].push({ ano, valor: perc });
         }
       });
@@ -285,12 +322,12 @@ const promiseDados = d3.csv<G.DataRow>(
       let totalMascEntrevistados = 0;
 
       if (dadosPorSexo.has("Fem")) {
-          const arrFem = dadosPorSexo.get("Fem");
-          totalFemEntrevistados = d3.sum(arrFem, d => +d.total);
+          const arrFem = dadosPorSexo.get("Fem") as G.DataRow[];
+          totalFemEntrevistados = G.denominadorSoma(arrFem);
       }
       if (dadosPorSexo.has("Masc")) {
-          const arrMasc = dadosPorSexo.get("Masc");
-          totalMascEntrevistados = d3.sum(arrMasc, d => +d.total);
+          const arrMasc = dadosPorSexo.get("Masc") as G.DataRow[];
+          totalMascEntrevistados = G.denominadorSoma(arrMasc);
       }
 
       const totalTodos = totalFemEntrevistados + totalMascEntrevistados;
@@ -430,7 +467,14 @@ const promiseDados = d3.csv<G.DataRow>(
               d3.select("#regional-tooltip").classed("tooltip-temporalFem", true);
             };
 
-            const htmlContent = `${d.ano}: ${d.valor.toFixed(1)}%`;
+            let htmlContent = `${d.ano}: ${d.valor.toFixed(1)}%`;
+            if (selectSexo.value === "Todos" && (sexo === "Fem" || sexo === "Masc")){
+              const todosPoint = (dadosRecord.Todos || []).find(p => p.ano === d.ano);
+              if (todosPoint && todosPoint.valor > 0){
+                const part = (d.valor / todosPoint.valor)* 100;
+                htmlContent = `${d.ano}: ${d.valor.toFixed(1)}% (${part.toFixed(0)}%)`;
+              }
+            }
 
             G.showTooltip(htmlContent, event);
           })

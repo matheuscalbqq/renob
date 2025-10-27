@@ -1,4 +1,3 @@
-import { Container } from "lucide-react";
 import * as G from "./global";
 import * as d3 from "d3";
 
@@ -26,6 +25,8 @@ export const promiseRegioes = d3.csv<G.RegionDataRow>(
   G.csvRegionUrl,
   row => ({
     municipio_id_sdv: row.municipio_id_sdv,
+    macro_id:         row.macro_id,
+    macro_nome:       row.macro_nome,
     regional_id:      row.regional_id,
     uf:               row.estado_abrev,
     nome_regiao:      row.regional_nome
@@ -77,10 +78,14 @@ function atualizarGrafico(
   const rawSexo             = selectSexo.value;
   const sexoSelecionado     = !rawSexo || rawSexo === "Todos" ? "Todos" : rawSexo;   // “Masc” | “Fem” | “Todos”
   const regionMap           : Map<string, string> = new Map();
+  const macroMap           : Map<string, string> = new Map();
 
   regionData.forEach(r =>
       regionMap.set(r.municipio_id_sdv, r.regional_id)
     )
+  regionData.forEach(m => 
+      macroMap.set(m.municipio_id_sdv,m.macro_id)
+  )
 
   btnMenuAdultoToggleEl.classList.remove("hidden");
   menuAdultoContainerEl.classList.add("hidden");
@@ -95,11 +100,13 @@ function atualizarGrafico(
     if (municipioSelecionado){
       if (divSelecionada === "federativa") {
           if(String(d.codigo_municipio) !== municipioSelecionado) return false;
-        } else {
-
+        } else if (divSelecionada === "saude") {
           const regiaoDoMunicipio = regionMap.get(d.codigo_municipio);
           if (regiaoDoMunicipio !== municipioSelecionado) return false;
 
+        } else{
+          const macroDoMunicipio = macroMap.get(d.codigo_municipio);
+          if (macroDoMunicipio !== municipioSelecionado) return false;
         }
     }
     
@@ -134,8 +141,8 @@ function atualizarGrafico(
     Fem: {}, Masc: {}, Todos: {}
   };
   colunasIndicadores.forEach(col => {
-    somaPorSexo.Fem[col]   = somarColunaCustom(dadosPorSexo.get("Fem")   || [], col);
-    somaPorSexo.Masc[col]  = somarColunaCustom(dadosPorSexo.get("Masc")  || [], col);
+    somaPorSexo.Fem[col]   = G.somarColunaCustom(dadosPorSexo.get("Fem")   || [], col);
+    somaPorSexo.Masc[col]  = G.somarColunaCustom(dadosPorSexo.get("Masc")  || [], col);
     somaPorSexo.Todos[col] = somaPorSexo.Fem[col] + somaPorSexo.Masc[col];
   });
 
@@ -161,41 +168,7 @@ function atualizarGrafico(
 
   // 10) chama sua função de desenho, passando o array tipado
   desenharGrafico(dadosParaGrafico,container);
-  
-  function somarColunaCustom(
-    arr: G.DataRow[],
-    col: keyof G.DataRow
-  ): number {
-    if (col === "excesso_peso") {
-      // soma sobrepeso + todos os obesidade_G_*
-      return (
-        d3.sum(arr, x =>
-          x.sobrepeso
-          + x.obesidade_G_1
-          + x.obesidade_G_2
-          + x.obesidade_G_3
-        ) ?? 0
-      )
-    } else if (col === "obesidade_calc") {
-      // soma apenas obesidade_G_1 + G_2 + G_3
-      return (
-        d3.sum(arr, x =>
-          x.obesidade_G_1
-          + x.obesidade_G_2
-          + x.obesidade_G_3
-        ) ?? 0
-      )
-    } else {
-      // qualquer outra coluna — garantimos que seja número
-      return (
-        d3.sum(arr, x => {
-          const v = x[col]
-          return typeof v === "number" ? v : +v
-        }) ?? 0
-      )
-    }
-  }
-
+    
   function desenharGrafico(dados: IndicadorDatum[], host: HTMLElement) {
     // 1) Limpa tudo que já existe no container
     const containerSel = d3.select(host);
@@ -483,10 +456,16 @@ export function populateSelectsMapeamento (
       });
       // --- Divisao ----
       selectDivisaoEl.innerHTML = "";
-      ["federativa","saude"].forEach(d =>{
+      ["federativa","saude","macro"].forEach(d =>{
         const opt = document.createElement("option");
         opt.value = d;
-        opt.text = d === "federativa" ? "Divisão Federativa" : "Regiões de Saúde";
+        if (d==="federativa"){
+          opt.text = "Divisão Federativa";
+        } else if (d==="saude"){
+          opt.text = "Regiões de Saúde"
+        } else {
+          opt.text = "Macrorregiões de Saúde"
+        }
         selectDivisaoEl.appendChild(opt);
       })      
 
@@ -581,10 +560,17 @@ export async function initMapeamento(
     atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container); 
   });
   selectDivisaoEl.addEventListener("change",()=>{
+        let nome_div = ""
         G.FiltroChangerMunReg(selectDivisaoEl,labelDivEl,selectUFEl,selectMunicipioEl,labelMunRegEl,allData,regionData);
-        labelMunRegEl.textContent = selectDivisaoEl.value === 'federativa' 
-        ? 'Municípios' 
-        : 'Regiões de Saúde';
+        if (selectDivisaoEl.value === "federativa"){
+            nome_div = "Divisão Federativa"
+        } else if (selectDivisaoEl.value === "saude"){
+            nome_div = "Regiões de Saúde"
+        } else{
+            nome_div = "Macrorregiões de Saúde"
+        }
+        
+        labelMunRegEl.textContent = nome_div;
         atualizarTitulo(allData,regionData,selectDivisaoEl,titleEl,selectUFEl,selectMunicipioEl,selectAnoEl,selectSexoEl);
         atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
       });
@@ -612,75 +598,121 @@ export async function initMapeamento(
 
 
 
-  // --- Funções originais --- //
   function handleAdultoCheckboxChange(e) {
-    const checkbox = e.target as HTMLInputElement;
-    checkbox.dataset.userModified = "true";
-    const isChecked = checkbox.checked;
-    const value = checkbox.value;
+  const checkbox = e.target as HTMLInputElement;
+  checkbox.dataset.userModified = "true";
+  const isChecked = checkbox.checked;
+  const value = checkbox.value;
 
-    if (value === "excesso_peso" && isChecked) {
-      G.conflicts.excesso_peso.forEach(col => {
-        if (col === "excesso_peso") return;
-        const chkEl = document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="${col}"]`);
-        if (chkEl) {
-          chkEl.checked = false;
-          chkEl.disabled = true;
-          chkEl.parentElement.classList.add("checkbox-disabled");
-        }
-      });
-    } else if (value === "excesso_peso" && !isChecked) {
-      G.conflicts.excesso_peso.forEach(col => {
-        if (col === "excesso_peso") return;
-        const chkEl = document.querySelector<HTMLSelectElement>(`input[name="adultoCols"][value="${col}"]`);
-        if (chkEl) {
-          chkEl.disabled = false;
-          chkEl.parentElement.classList.remove("checkbox-disabled");
-        }
-      });
+  // Helper opcional para reduzir repetição
+  const q = (v: string) =>
+    document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="${v}"]`);
+
+  // Alternância entre "excesso_peso" e "obesidade_calc" (sem disparar 'change')
+  if (isChecked && (value === "excesso_peso" || value === "obesidade_calc")) {
+    const other = value === "excesso_peso" ? "obesidade_calc" : "excesso_peso";
+    const otherEl = q(other);
+
+    if (otherEl && otherEl.checked) {
+      otherEl.checked = false;
+      otherEl.dataset.userModified = "true";
+
+      // Reabilita o que foi desabilitado pelo "other", exceto conflitos do "value" atual
+      const currentConflicts = (G.conflicts as any)[value] as string[] || [];
+      const otherConflicts   = (G.conflicts as any)[other] as string[] || [];
+
+      otherConflicts
+        .filter(col => col !== other && !currentConflicts.includes(col))
+        .forEach(col => {
+          const el = q(col);
+          if (el) {
+            el.disabled = false;
+            el.parentElement?.classList.remove("checkbox-disabled", "line-through", "text-gray-400");
+          }
+        });
     }
-    if (value === "obesidade_calc" && isChecked) {
-      G.conflicts.obesidade_calc.forEach(col => {
-        if (col === "obesidade_calc") return;
-        const chkEl = document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="${col}"]`);
-        if (chkEl) {
-          chkEl.checked = false;
-          chkEl.disabled = true;
-          chkEl.parentElement.classList.add("line-through", "text-gray-400");
-        }
-      });
-    } else if (value === "obesidade_calc" && !isChecked) {
-      G.conflicts.obesidade_calc.forEach(col => {
-        if (col === "obesidade_calc") return;
-        const chkEl = document.querySelector<HTMLSelectElement>(`input[name="adultoCols"][value="${col}"]`);
-        if (chkEl) {
-          chkEl.disabled = false;
-          chkEl.parentElement.classList.remove("line-through", "text-gray-400");
-        }
-      });
-    }
-    // Sincronizações adicionais
-    if (document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="obesidade_calc"]`).checked) {
-      ["baixo_peso", "eutrofico", "sobrepeso"].forEach(col => {
-        const chkEl = document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="${col}"]`);
-        if (chkEl && !chkEl.checked) chkEl.checked = true;
-      });
-    }
-    if (document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="excesso_peso"]`).checked) {
-      ["baixo_peso", "eutrofico"].forEach(col => {
-        const chkEl = document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="${col}"]`);
-        if (chkEl && !chkEl.checked) chkEl.checked = true;
-      });
-    }
-    const excessoPesoMarcado = document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="excesso_peso"]`).checked;
-    const obesidadeCalcMarcado = document.querySelector<HTMLInputElement>(`input[name="adultoCols"][value="obesidade_calc"]`).checked;
-    if (!excessoPesoMarcado && !obesidadeCalcMarcado) {
-      document.querySelectorAll<HTMLInputElement>(`input[name="adultoCols"]`).forEach(chk => {
-        if (chk.value !== "excesso_peso" && chk.value !== "obesidade_calc" && !chk.dataset.userModified) {
-          chk.checked = true;
-        }
-      });
-    }
+  }
+
+  if (value === "excesso_peso" && isChecked) {
+    G.conflicts.excesso_peso.forEach(col => {
+      if (col === "excesso_peso") return;
+      const chkEl = q(col);
+      if (chkEl) {
+        chkEl.checked = false;
+        chkEl.disabled = true;
+        chkEl.parentElement?.classList.add("checkbox-disabled");
+      }
+    });
+  } else if (value === "excesso_peso" && !isChecked) {
+    G.conflicts.excesso_peso.forEach(col => {
+      if (col === "excesso_peso") return;
+      const chkEl = q(col); // ✅ era HTMLSelectElement; corrigido para HTMLInputElement
+      if (chkEl) {
+        chkEl.disabled = false;
+        chkEl.parentElement?.classList.remove("checkbox-disabled");
+      }
+    });
+  }
+
+  if (value === "obesidade_calc" && isChecked) {
+    G.conflicts.obesidade_calc.forEach(col => {
+      if (col === "obesidade_calc") return;
+      const chkEl = q(col);
+      if (chkEl) {
+        chkEl.checked = false;
+        chkEl.disabled = true;
+        chkEl.parentElement?.classList.add("line-through", "text-gray-400");
+      }
+    });
+  } else if (value === "obesidade_calc" && !isChecked) {
+    G.conflicts.obesidade_calc.forEach(col => {
+      if (col === "obesidade_calc") return;
+      const chkEl = q(col); // ✅ era HTMLSelectElement; corrigido para HTMLInputElement
+      if (chkEl) {
+        chkEl.disabled = false;
+        chkEl.parentElement?.classList.remove("line-through", "text-gray-400");
+      }
+    });
+  }
+
+  // Sincronizações adicionais
+  if (q("obesidade_calc")?.checked) {
+    ["baixo_peso", "eutrofico", "sobrepeso"].forEach(col => {
+      const chkEl = q(col);
+      if (chkEl && !chkEl.checked) chkEl.checked = true;
+    });
+  }
+  if (q("excesso_peso")?.checked) {
+    ["baixo_peso", "eutrofico"].forEach(col => {
+      const chkEl = q(col);
+      if (chkEl && !chkEl.checked) chkEl.checked = true;
+    });
+  }
+
+  const excessoPesoMarcado   = q("excesso_peso")?.checked;
+  const obesidadeCalcMarcado = q("obesidade_calc")?.checked;
+
+  if (!excessoPesoMarcado && !obesidadeCalcMarcado) {
+    const allConflicts = Array.from(new Set([
+      ...G.conflicts.excesso_peso,
+      ...G.conflicts.obesidade_calc
+    ])).filter(col => col !== "excesso_peso" && col !== "obesidade_calc");
+
+    allConflicts.forEach(col => {
+      const chkEl = q(col);
+      if (chkEl) {
+        chkEl.disabled = false;
+        chkEl.parentElement?.classList.remove("checkbox-disabled", "line-through", "text-gray-400");
+      }
+    });
+
+    document.querySelectorAll<HTMLInputElement>(`input[name="adultoCols"]`).forEach(chk => {
+      if (chk.value !== "excesso_peso" && chk.value !== "obesidade_calc" && !chk.dataset.userModified) {
+        chk.checked = true;
+      }
+    });
+  }
+
   atualizarGrafico(allData,regionData,selectUFEl,selectMunicipioEl,selectDivisaoEl,selectAnoEl,selectSexoEl,btnMenuAdultoToggleEl,menuAdultoContainerEl,valorHomensEl,valorMulheresEl,valorTodosEl,container);
   }
    

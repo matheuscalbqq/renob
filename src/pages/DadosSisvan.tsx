@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, TrendingUp} from "lucide-react";
+import { BarChart3, TrendingUp, CheckSquare2} from "lucide-react";
 import { GiBrazil } from "react-icons/gi";
 import { initMapeamento, resizeMapeamento, promiseDados, promiseRegioes }   from "@/lib/d3/mapeamento";
 import { initRegional }     from "@/lib/d3/regional";
@@ -355,47 +355,47 @@ export default function DadosSisvan() {
 
                     {/*botão de adulto + checkboxes*/}
                     <button ref={btnMenuAdultoToggle} 
-                    className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded">	&#10695;</button>
+                    className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded">	<CheckSquare2 className="h-5 w-5" /></button>
                     
                     <div ref={menuAdultoContainer}  id="menuAdultoContainer" 
-                    className="absolute top-12 right-2 bg-white p-2 shadow-md rounded-md hidden">
-                      <h2 className="font-bold mb-2">Indicadores</h2>
+                    className="absolute top-12 right-2 bg-muted p-2 shadow-lg rounded-md hidden">
+                      <h2 className="font-bold mb-2 border p-2 border-2 rounded-wlg text-white bg-primary">Estado Nutricional</h2>
 
                       <div ref={adultoColsRef} className="space-y-1 flex flex-col">
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="baixo_peso" defaultChecked={true} />
-                          Baixo Peso
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="baixo_peso" className="accent-red-700" defaultChecked={true} />
+                          <span className="ml-1 text-red-700" >Baixo Peso</span>
                         </label>
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="eutrofico" defaultChecked={true} />
-                          Eutrófico
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="eutrofico" className="accent-red-700" defaultChecked={true} />
+                          <span className="ml-1 text-red-700" >Eutrófico</span>
                         </label>
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="sobrepeso" defaultChecked={true} />
-                          Sobrepeso
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="sobrepeso" className="accent-red-700" defaultChecked={true} />
+                          <span className="ml-1 text-red-700" >Sobrepeso</span>
                         </label>
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_G_1" defaultChecked={true} />
-                          Obesidade I
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="obesidade_G_1" className="accent-red-700" defaultChecked={true} />
+                          <span className="ml-1 text-red-700" >Obesidade I</span>
                         </label>
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_G_2" defaultChecked={true} />
-                          Obesidade II
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="obesidade_G_2" className="accent-red-700" defaultChecked={true} />
+                          <span className="ml-1 text-red-700" >Obesidade II</span>
                         </label>
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_G_3" defaultChecked={true} />
-                          Obesidade III
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="obesidade_G_3" className="accent-red-700" defaultChecked={true} />
+                          <span className="ml-1 text-red-700" >Obesidade III</span>
                         </label>
 
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="excesso_peso" defaultChecked={false} />
-                          Excesso de Peso
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="excesso_peso" className="accent-red-700" defaultChecked={false} />
+                          <span className="ml-1 text-red-700" >Excesso de Peso</span>
                         </label>
                         
                         {/*<!-- Obesidade (soma de obesidade_G_1 + obesidade_G_2 + obesidade_G_3) -->*/}
-                        <label>
-                          <input type="checkbox" name="adultoCols" value="obesidade_calc" defaultChecked={false} />
-                          Obesidade
+                        <label className="p-1">
+                          <input type="checkbox" name="adultoCols" value="obesidade_calc" className="accent-red-700" defaultChecked={false} />
+                          <span className="ml-1 text-red-700" >Obesidade</span>
                         </label>
                       </div>
                     </div>                    

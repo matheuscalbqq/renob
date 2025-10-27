@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, BarChart3, TrendingUp } from "lucide-react";
+import { ExternalLink, BarChart3, TrendingUp, TriangleAlert } from "lucide-react";
 import { GiBrazil } from "react-icons/gi";
 const legend = [
   { imc: "< 18,5", label: "Baixo peso" },
@@ -35,7 +35,7 @@ const Metodologia = () => {
           <Card className="shadow-medium bg-muted/50">
             <CardContent className="p-6 md:p-4">
               <p className="text-lg text-muted-foreground md:text-justify">
-                Os dados vêm do SISVAN e das Regiões de Saúde de 2019, permitindo análises entre 2008 e 2024 sobre o estado nutricional de adultos. As visualizações — Mapeamento Nutricional, Demográfico e Análise Temporal — mostram como o Brasil evolui em diferentes recortes. A metodologia garante comparabilidade ao longo dos anos, transformando informações em insumos para decisões em saúde pública.
+                Os dados vêm do SISVAN e das Regiões de Saúde de 2024, permitindo análises entre 2008 e 2024 sobre o estado nutricional de adultos. As visualizações — Mapeamento Nutricional, Demográfico e Análise Temporal — mostram como o Brasil evolui em diferentes recortes. A metodologia garante comparabilidade ao longo dos anos, transformando informações em insumos para decisões em saúde pública.
               </p>
             </CardContent>
           </Card>
@@ -51,19 +51,27 @@ const Metodologia = () => {
             </CardContent>
           </Card>
           <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
-          Todas as análises e construções desenvolvidas aqui se baseiam nos dados coletados e disponibilizados 
+          Todas as análises e construções desenvolvidas aqui se baseiam nos dados nutricionais coletados e disponibilizados 
           pelo SISVAN
           <sup id="cite-sisvan">
             <a href="#ref-sisvan" aria-label="Ir para referência 1">[1]</a>
-          </sup>
-          , além de contar com as divisões de regiões de saúde de 2019 criadas a partir dos
-          dados do IBGE e DATASUS
+          </sup>, 
+          nas divisões de macrorregiões e regiões de saúde de 2024 criadas a partir dos
+          dados do DEMAS-SEIDIGI
+          <sup id="cite-macro">
+            <a href="#ref-macro" aria-label="Ir para referência 2">[2]</a>
+          </sup> e das malhas municipais disponibilizadas pelo IBGE
           <sup id="cite-shape">
-            <a href="#ref-shape" aria-label="Ir para referência 2">[2]</a>
+            <a href="#ref-shape" aria-label="Ir para referência 3">[3]</a>
+          </sup>
+          <sup id="cite-ibge">
+            <a href="#ref-ibge" aria-label="Ir para referência 4">[4]</a>
           </sup>.
+
+
           </p>
           <p className="text-lg leading-relaxed text-muted-foreground mb-6 md:text-justify">
-            Os percentuais de “prevalência” são calculados como <span className="font-semibold">(contagem do indicador ÷ total no recorte) × 100</span>.
+            Os percentuais de “prevalência” são calculados como <span className="font-semibold">(contagem do estado nutricional ÷ total no recorte) × 100</span>.
             A mesma base alimenta três visões — Temporal, Mapeamento e Regional — variando o tipo de agregação, o denominador e a escala geográfica.
           </p>
           <div>
@@ -99,7 +107,7 @@ const Metodologia = () => {
                   <li className="relative pl-5">
                     <span
                       className="absolute left-0 top-3 h-2 w-2 rounded-full bg-accent"
-                    />{''}<span className="text-accent font-semibold">Unidades geográficas:</span>{''} País, Estados, Cidades e Regiões de Saúde;
+                    />{''}<span className="text-accent font-semibold">Unidades geográficas:</span>{''} País, Estados, Cidades, Macrorregiões e Regiões de Saúde;
                   </li>
                   <li className="relative pl-5">
                     <span
@@ -211,7 +219,7 @@ const Metodologia = () => {
         </section>
 
         {/* Visualization */}
-        <section className="mb-12" id="como-calculamos">
+        <section className="mb-8" id="como-calculamos">
           <Card className="shadow-medium bg-gradient-accent mb-4">
             <CardContent className="p-2 md:p-2 text-left">
               <h2 className="text-3xl font-bold text-white">Nossas Visualizações</h2>
@@ -220,127 +228,146 @@ const Metodologia = () => {
 
           {/* Comum */}
           <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-6">
-            O fluxo começa pela escolha do recorte, que define o universo do cálculo: UF → (Município ou Região de Saúde) → Ano → Gênero. Em qualquer módulo, a opção
-            <span className="font-semibold"> “Todos”</span> é a soma de Feminino + Masculino. Percentuais são arredondados na interface,
-            mas os cálculos preservam precisão para evitar distorções por arredondamento acumulado.
-            Cada visualização define uma ou duas dessas variáveis do recorte como "constante" enquanto compara as outras naquele universo.
+            O fluxo começa pela escolha do <span className="font-semibold">recorte</span>, que define o universo do cálculo:
+            UF → (Município ou <span className="font-semibold">Macrorregião de Saúde</span> ou Região de Saúde) → Ano → Gênero.
+            Em qualquer módulo, a opção <span className="font-semibold">“Todos”</span> é a soma de Feminino + Masculino.
+            Percentuais são arredondados na interface, mas os cálculos preservam precisão para evitar distorções por arredondamento acumulado.
+            Cada visualização fixa uma ou duas variáveis do recorte como “constantes” e compara as demais dentro desse mesmo universo.
+            Foram criados os <span className="font-semibold">agrupamentos “Obesidade” e "Excesso de peso"</span>, sendo o agregado de todos os três graus de obesidade e
+            o agregado de sobrepeso com os três graus de obesidade, respectivamente. Ambos disponíveis em todas três visões. 
           </p>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:items-start mt-4">
 
             {/* Mapeamento */}
             <div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Mapeamento Nutricional</h3>
-            <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
-              A pergunta aqui é “<span className="text-accent font-semibold"><em>como se reparte o todo entre os estados nutricionais marcados</em>?</span>”. 
-              Para cada selecionado, pegamos o recorte e em seguida calculamos a soma de todas 
-              as parcelas dos estados nutricionais marcados gerando um Total<sub>group</sub>.
-              Cada barra representa a fração do estado nutricional sobre esse Total<sub>group</sub>, ou seja, 
-              uma distribuição interna condicionada ao conjunto escolhido.
-              A visualização mostra barras agrupadas (Masculino, Feminino, Todos) e uma <span className="font-semibold">barra empilhada</span> (Masculino+Feminino) para evidenciar a 
-              composição por gênero na visualização <i>Todos</i>.
-            </p>
-            
-            {/* Callout 1 */}
-            <div className="rounded-xl border border-accent bg-accent/20 p-4 mb-2">
-              <p className="text-lg text-yellow-800 md:text-justify ">
-                <span className="font-semibold">Denominador variável:</span> é uma distribuição <em>interna</em> aos estados nutricionais marcados.
-                Marcar/desmarcar categorias muda o <em>Total<sub>rec</sub></em> e todas as porcentagens. Não compare diretamente com prevalências da Análise Temporal
-                ou Mapeamento Demográfico.
+              <h3 className="text-2xl font-semibold mb-4 text-foreground">Mapeamento Nutricional</h3>
+              <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
+                A pergunta aqui é “<span className="text-accent font-semibold"><em>como se reparte o todo entre os estados nutricionais marcados</em>?</span>”.
+                Para cada selecionado, partimos do recorte e calculamos a soma das parcelas dos estados marcados, gerando um
+                <em> Total</em><sub>group</sub>. Cada barra representa a fração de um estado nutricional sobre esse
+                <em> Total</em><sub>group</sub> — uma distribuição <em>interna</em> condicionada ao conjunto escolhido.
+                A visualização mostra barras agrupadas (Masculino, Feminino, Todos) e uma barra empilhada (Feminino sobre Masculino) para evidenciar a composição por gênero em <i>Todos</i>.
               </p>
+
+              {/* Callout 1 */}
+              <div className="rounded-xl border border-accent bg-accent/20 p-4 mb-2">
+                <div className="text-lg text-yellow-800 md:text-justify ">
+                  <p>
+                  <TriangleAlert className="inline-block h-6 w-6 align-text-top" aria-hidden /> <span className="text-xl">Denominador variável</span>
+                  </p>
+                  <p> 
+                    A distribuição é <em>interna</em> aos estados nutricionais marcados, ou seja, marcar/desmarcar categorias altera o denominador e, portanto, todas as porcentagens. Evite comparar diretamente com prevalências da Análise Temporal ou do Mapeamento Demográfico.
+                  </p>
+                </div>
+              </div>
             </div>
-            </div>
+
+            {/* Regional / Demográfico */}
             <div>
-            {/* Regional */}
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Mapeamento Demográfico</h3>
-            <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
-              A unidade básica nesta visualização é o município. Atribuímos cada município à sua região na visualização atual, somamos o numerador do estado nutricional e o total por região, calculando
-              <div className="col-span-2 text-center text-muted-foreground mt-6 mb-6">
-                    <math display="block">
-                      <mrow>
-                        <mi>prevalência regional (%)</mi>
-                        <mo>=</mo>
-                        <mfrac>
-                          <msub>
-                            <mi>Total</mi>
-                            <mn>nutri</mn>
-                          </msub>
-                          <mrow>
-                            <mi>Total</mi>
-                          </mrow>
-                        </mfrac>
-                        <mo> &times; </mo>
-                        <mn>100 %.</mn>
-                      </mrow>
-                    </math>
-                    {/* em JSX o <br> precisa ser self-closed */}
-                    <br />
-                  </div>
-               Além disso, usamos escala de cores <span className="font-semibold">quantizada</span> para faixas e 
-              legenda textual dos intervalos, enquanto regiões sem valores (total = 0) aparecem
-              em cinza.
-            </p>
-            
-            {/* Callout 2 */}
-            <div className="rounded-xl border border-blue-300 bg-blue-50 p-4 mb-4">
-              <p className="text-lg text-blue-900 md:text-justify">
-                <span className="font-semibold">MAUP/escala geográfica:</span> prevalências por Região de Saúde são agregações de municípios.
-                Evite inferir comportamento municipal ou individual a partir do mapa (“falácia ecológica”).
+              <h3 className="text-2xl font-semibold mb-4 text-foreground">Mapeamento Demográfico</h3>
+              <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
+                A unidade básica é o município, associado à região do recorte vigente na visualização, seja Unidade Federativa,
+                Região de Saúde ou <span className="font-semibold">Macrorregião de Saúde</span>. Para cada região,
+                somamos tanto o numerador do estado nutricional quanto o seu total, e calculamos:
               </p>
+
+              <div className="col-span-2 text-center text-muted-foreground mt-6 mb-6">
+                <math display="block">
+                  <mrow>
+                    <mi>prevalência regional (%)</mi>
+                    <mo>=</mo>
+                    <mfrac>
+                      <msub><mi>Total</mi><mn>nutri</mn></msub>
+                      <mrow><mi>Total</mi></mrow>
+                    </mfrac>
+                    <mo>×</mo>
+                    <mn>100 %.</mn>
+                  </mrow>
+                </math>
+                <br />
+              </div>
+
+              <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
+                Usamos escala de cores <span className="font-semibold">quantizada</span> com faixas e legenda textual;
+                regiões sem valores (Total = 0) aparecem em cinza.
+              </p>
+
+              {/* Callout 2 */}
+              <div className="rounded-xl border border-blue-300 bg-blue-50 p-4 mt-4 mb-4">
+                <div className="text-lg text-blue-900 md:text-justify">
+                  <p><TriangleAlert className="inline-block h-6 w-6 align-text-top" aria-hidden /> <span className="text-xl">MAUP/escala geográfica</span></p> 
+                  <p>Prevalências por Macrorregião ou Região de Saúde agregam municípios.
+                  Evite inferir comportamento municipal ou individual a partir do mapa (“falácia ecológica”).</p>
+                </div>
+              </div>
             </div>
           </div>
-          </div>
-          
+
           {/* Callout 3 */}
           <div className="rounded-xl border border-secondary bg-secondary/20 p-4 mb">
-              <p className="text-lg text-red-800 md:text-justify">
-                <span className="font-semibold">Malha de Regiões de Saúde fixada em 2019:</span>
-                {" "}as análises espaciais utilizam a configuração de Regiões de Saúde vigente em 2019 como referência
-                <span className="font-semibold"> fixa</span> para todos os anos exibidos. Essa escolha garante
-                <span className="font-semibold"> comparabilidade temporal</span>. Em anos em que o SUS tenha alterado a composição regional,
-                os resultados <span className="font-semibold">não representam a malha administrativa daquele ano</span>, mas a
-                projeção dos dados na malha 2019. Variações ao longo do tempo refletem mudanças nos indicadores,
-                <span className="font-semibold"> não</span> mudanças de desenho regional.
-              </p>
-            </div>
+            <p className="text-lg text-red-800 md:text-justify">
+              <TriangleAlert className="inline-block h-6 w-6 align-text-top" aria-hidden /> <span className="text-xl">Malha de Regiões e Macrorregiões fixadas em 2025 </span></p>
+            <p className="text-lg text-red-800 md:text-justify">
+              As análises espaciais utilizam a configuração vigente em 2025 como referência
+              <span className="font-semibold"> fixa</span> para todos os anos exibidos.
+              Nos anos em que o SUS tenha alterado a composição regional, os resultados
+              <span className="font-semibold"> não</span> representam a malha administrativa daquele ano,
+              mas a projeção dos dados na malha 2025. Assim, variações ao longo do tempo refletem mudanças
+              nos estados nutricionais, <span className="font-semibold">não</span> no desenho regional.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:items-start mt-4">
 
             {/* Temporal */}
             <div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Análises Temporais</h3>
-            <p className="text-lg leading-relaxed text-muted-foreground md:text-justify">
-              Seleciona-se um estado nutricional e calcula-se sua <span className="font-semibold">prevalência por ano</span> no recorte. Para cada ano, somamos o numerador daquele estado nutricional
-              e o total; então tomamos a razão deles (× 100) para obter o valor exibido. O eixo X usa anos ordenados e o eixo Y é percentual, com teto ajustado ao máximo observado
-              (com margem). Mostramos linhas por gênero (quando aplicável) e pontos com rótulos do valor daquele ano.
-            </p>
+              <h3 className="text-2xl font-semibold mb-4 text-foreground">Análises Temporais</h3>
+              <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
+                Seleciona-se um estado nutricional e calcula-se sua <span className="font-semibold">prevalência por ano</span> no recorte.
+                Para cada ano, somamos o numerador do estado nutricional e o total; então tomamos a razão (× 100) para o valor exibido.
+                O eixo X usa anos ordenados e o eixo Y é percentual, com teto ajustado ao máximo observado (com margem).
+                Mostramos linhas por gênero (quando aplicável) e marcadores com rótulos do valor anual.
+              </p>
             </div>
+
+            {/* Tabela “o que cada visualização fixa/compare” */}
             <div>
-            <Card className="shadow-strong">
+              <Card className="shadow-strong">
                 <CardContent className="p-8">
-                  
-                    <table className="w-full text-sm text-left">
-                      <thead className="bg-muted-foreground/5">
-                        <tr>
-                          <th className="px-4 py-2 text-center">Visualização</th>
-                          <th className="px-20 py-2 text-center">Recorte</th>
-                          <th className="px-4 py-2 text-center">Compare</th>
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-muted-foreground/5">
+                      <tr>
+                        <th className="px-4 py-2 text-center">Visualização</th>
+                        <th className="px-20 py-2 text-center">Recorte</th>
+                        <th className="px-4 py-2 text-center">Compare</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {visualize.map(({ symbol, viz, show, compare }) => (
+                        <tr key={viz}>
+                          <td className="flex px-4 py-2 text-muted-foreground text-start items-center">{symbol} {viz}</td>
+                          <td className="px-4 py-2 text-muted-foreground text-center">{show}</td>
+                          <td className="px-4 py-2 text-muted-foreground text-center">{compare}</td>
                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {visualize.map(({ symbol, viz, show, compare }) => (
-                          <tr key={viz}>
-                            <td className="flex px-4 py-2 text-muted-foreground text-start items-center">{symbol} {viz}</td>
-                            <td className="px-4 py-2 text-muted-foreground text-center">{show}</td>
-                            <td className="px-4 py-2 text-muted-foreground text-center">{compare}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  
-              </CardContent>
-            </Card>
+                      ))}
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
+          <div className="rounded-xl border border-accent bg-accent/20 p-4 mt-4">
+            <p className="text-lg text-yellow-800 md:text-justify">
+              <TriangleAlert className="inline-block h-6 w-6 align-text-center" aria-hidden /> <span className="text-xl">Atenção para como ler valores por gênero!</span><br />
+              • Quando Gênero = <span className="text-primary italic"> Todos</span>, os valores mostrados para Feminino e Masculino representam a
+              <span className="font-semibold"> parcela interna</span> de cada gênero <em>dentro do total</em> “Todos” naquele ano (não são as prevalências em seus próprios denominadores).<br />
+              • Quando Gênero = <span className="text-secondary italic">Feminino</span> ou Gênero = <span className="text-accent italic">Masculino</span>, os valores são
+              <span className="font-semibold"> calculados a partir do total daquele gênero</span> no ano/recorte — portanto, podem diferir dos exibidos em “Todos”.
+            </p>
+          </div>
         </section>
+
 
 
 
@@ -361,11 +388,25 @@ const Metodologia = () => {
               <a href="#cite-sisvan" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
             </li>
 
+            <li id="ref-macro" className="scroll-mt-24">
+              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://infoms.saude.gov.br/extensions/SEIDIGI_DEMAS_MACRORREGIOES/SEIDIGI_DEMAS_MACRORREGIOES.html">
+             Ministério da Saúde - Macrorregiões e Regiões de Saúde. Desenvolvido pelo DEMAS-SEIDIGI.
+          <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
+              <a href="#cite-macro" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
+            </li>
+
             <li id="ref-shape" className="scroll-mt-24">
-              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://github.com/lansaviniec/shapefile_das_regionais_de_saude_sus">
-             SAVINIEC, Landir; ROCHA, Alexsandra Bezerra da. Shape das Regiões de Saúde do Brasil. 13 de jul. de 2020.
+              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://github.com/tbrugz/geodata-br">
+             Projeto Geodata BR - Brasil. Criado por Telmo Brugnara - github/tbrugz.
           <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
               <a href="#cite-shape" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
+            </li>
+
+            <li id="ref-ibge" className="scroll-mt-24">
+              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html?=&t=downloads">
+             Malha Municipal - Instituto Brasileiro de Geografia e Estatística (IBGE).
+          <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
+              <a href="#cite-ibge" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
             </li>
           </ol>
         </section>

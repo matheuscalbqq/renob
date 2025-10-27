@@ -1,35 +1,7 @@
 import * as d3 from "d3";
 import * as G from "./global";
-import { RegionCollection } from "./geoTypes";
+import { RegionCollection, MacroCollection} from "./geoTypes";
 import type { Feature, FeatureCollection, GeometryObject } from "geojson";
-
-// Tipagem para as linhas do CSV de dados regionais
-interface RegionalDataRow {
-  UF: string;
-  codigo_municipio: string;
-  baixo_peso: string;
-  eutrofico: string;
-  sobrepeso: string;
-  obesidade_G_1: string;
-  obesidade_G_2: string;
-  obesidade_G_3: string;
-  magreza_acentuada: string;
-  magreza: string;
-  obesidade: string;
-  obesidade_grave: string;
-  SEXO: string;
-
-  [key: string]: string;
-}
-
-
-// Tipagem para info de regiões de saúde
-interface RegionInfo {
-  municipio_id_sdv: string;
-  regional_id: string;
-  regional_nome: string;
-  uf: string;
-}
 
 /**
  * Inicializa a visualização regional (Brasil > Estados > Municípios ou Regiões de Saúde)
@@ -47,41 +19,37 @@ export function initRegional(
   valorTodosEl: HTMLElement
 ) {
   // Estado interno
-  let currentMode: "brasil" | "estados" | "cidades" | "healthRegion" = "brasil";
+  let currentMode: "brasil" | "estados" | "cidades" | "healthRegion" | "macroRegion" = "brasil";
   let currentUF: string | null = null;
   let lastGeoBrasilData: any, lastGeoEstadosData: any;
-  const regionInfo: RegionInfo[] = [];
+  const regionInfo: G.RegionDataRow[] = [];
   const regionMap = new Map<string,string>();
-  let allData: RegionalDataRow[] = [];
+  let allData: G.DataRow[] = [];
   const tooltip = d3.select<HTMLDivElement, unknown>(".tooltip-regional");
   const { width: chartW, height: chartH } = G.getChartSize(mapContainer);
 
+
    // Quadro de Entrevistados (atualiza os counters de Mulheres, Homens e Total)
   function atualizarQuadroRegional(): void {
-    const anoSel         = +selectAno.value;
-    const sexoSel        = selectSexo.value;
-    const nutricionalSel = selectNutricional.value;
+    const selectedAno         = +selectAno.value;
+    const selectedNutricional = selectNutricional.value;
+    const col                 = G.mapNutricional(selectedNutricional);
 
     // Filtra a base por ano e (se estadual) UF
     let arr = allData.filter(d =>
-      +d.ANO === anoSel &&
+      +d.ANO === selectedAno &&
       (currentMode !== "cidades" || d.UF === currentUF)
     );
-    if (sexoSel !== "Todos") {
-      arr = arr.filter(d => d.SEXO === sexoSel);
-    }
-    if (nutricionalSel !== "Total") {
-      arr = arr.filter(d => +d[nutricionalSel] > 0);
-    }
 
     // Soma por sexo
     let totalFem = 0, totalMasc = 0;
-    if (nutricionalSel === "Total") {
-      totalFem  = d3.sum(arr.filter(d => d.SEXO === "Fem"),  d => +d.total);
-      totalMasc = d3.sum(arr.filter(d => d.SEXO === "Masc"), d => +d.total);
+
+    if (selectedNutricional === "Total") {
+      totalFem  = G.denominadorSoma(arr.filter(d => d.SEXO === "Fem"));
+      totalMasc = G.denominadorSoma(arr.filter(d => d.SEXO === "Masc"));
     } else {
-      totalFem  = d3.sum(arr.filter(d => d.SEXO === "Fem"),  d => +d[nutricionalSel]);
-      totalMasc = d3.sum(arr.filter(d => d.SEXO === "Masc"), d => +d[nutricionalSel]);
+      totalFem  = G.somarColunaCustom(arr.filter(d => d.SEXO === "Fem"),  col);
+      totalMasc = G.somarColunaCustom(arr.filter(d => d.SEXO === "Masc"), col);
     }
     const totalAll = totalFem + totalMasc;
 
@@ -92,51 +60,42 @@ export function initRegional(
 
   // Atualiza o título da visualização regional
   function atualizarTituloRegional(): void {
-    const ano          = selectAno.value;
-    const sexo         = selectSexo.value;
-    const nutricional  = selectNutricional.value;
-    const lugar        = (currentMode === "cidades" && currentUF)
+    const selectedAno          = selectAno.value;
+    const selectedSexo         = selectSexo.value;
+    const selectedNutricional  = selectNutricional.value;
+    const selectedPlace        = (currentMode === "cidades" && currentUF)
       ? (G.ufLabel[currentUF] || currentUF)
       : "";
-    const displayNutri = G.nomeAmigavel[nutricional] || nutricional;
-    const labelSexo    = sexo === "Todos" ? "" : G.sexoLabel[sexo] || sexo;
+    const displayNutri = G.nomeAmigavel[selectedNutricional] || selectedNutricional;
+    const labelSexo    = selectedSexo === "Todos" ? "" : G.sexoLabel[selectedSexo] || selectedSexo;
 
-    const titulo = `Mapeamento Demográfico de ${displayNutri} em Adultos ${labelSexo} - ${lugar} ${ano}`;
+    const titulo = `Mapeamento Demográfico de ${displayNutri} em Adultos ${labelSexo} - ${selectedPlace} ${selectedAno}`;
     titleEl.textContent = titulo;
   }  
 
-  // formata valores absolutos e percentuais
-  const formatNumber = d3.formatLocale({
-   decimal:  ",",
-   thousands: ".",
-   grouping:  [3],            // agrupa dígitos em milhares
-   currency:  ["R$",""]       // símbolo antes e depois (no caso só antes)
-   }).format(",");
-  const formatPercent = d3.format(".1f");
-
   // 1) Carrega CSV de dados e de regions
   Promise.all([
-    d3.csv<RegionalDataRow>(G.csvDataUrl, row => ({
-      UF:               row.UF,
-      codigo_municipio: row.codigo_municipio,
-      SEXO:             row.SEXO,
-      ANO:              row.ANO,
-      baixo_peso:       row.baixo_peso,
-      eutrofico:        row.eutrofico,
-      sobrepeso:        row.sobrepeso,
-      obesidade_G_1:    row.obesidade_G_1,
-      obesidade_G_2:    row.obesidade_G_2,
-      obesidade_G_3:    row.obesidade_G_3,
-      magreza_acentuada:row.magreza_acentuada,
-      magreza:          row.magreza,
-      obesidade:        row.obesidade,
-      obesidade_grave:  row.obesidade_grave
+      d3.csv<G.DataRow>(G.csvDataUrl, row => ({
+      UF:                 row.UF,
+      codigo_municipio:   row.codigo_municipio,
+      municipio:          row.municipio,
+      ANO:                row.ANO,
+      SEXO:               row.SEXO,
+      total:              row.total,
+      baixo_peso:       +row.baixo_peso,
+      eutrofico:        +row.eutrofico,
+      sobrepeso:        +row.sobrepeso,
+      obesidade_G_1:    +row.obesidade_G_1,
+      obesidade_G_2:    +row.obesidade_G_2,
+      obesidade_G_3:    +row.obesidade_G_3
       // caso existam outras colunas no CSV que você use, adicione-as aqui
       })),
-    d3.csv<RegionInfo>(G.csvRegionUrl, row => ({
+    d3.csv<G.RegionDataRow>(G.csvRegionUrl, row => ({
       municipio_id_sdv: row.municipio_id_sdv,
+      macro_id:         row.macro_id,
+      macro_nome:       row.macro_nome,
       regional_id:      row.regional_id,
-      regional_nome:    row.regional_nome || row.nome,
+      nome_regiao:      row.regional_nome || row.nome,
       uf:               row.estado_abrev
     }))
   ]).then(([dataRows, regions]) => {
@@ -191,7 +150,7 @@ export function initRegional(
 
     // Modo
     selectModo.innerHTML = "";
-    [["federativa","Divisão Federativa"],["saude","Regiões de Saúde"]]
+    [["federativa","Divisão Federativa"],["saude","Regiões de Saúde"],["macro","Macrorregiões de Saúde"]]
       .forEach(([v,l]) => {
         const o = document.createElement("option"); o.value = String(v); o.text = String(l);
         selectModo.appendChild(o);
@@ -228,6 +187,8 @@ export function initRegional(
       updateEstadosMap(geodata);
    } else if (currentMode === "cidades"){
       updateCidadesMap(geodata);
+   } else if (currentMode === "macroRegion"){
+      updateMacroRegionMap(geodata);
    } else 
       updateHealthRegionMap(geodata);
   } 
@@ -249,6 +210,10 @@ export function initRegional(
 
       case "healthRegion":
          initHealthRegionMap(currentUF!);
+         break;
+      
+      case "macroRegion":
+         initMacroRegionMap(currentUF!);
          break;
 
       default:
@@ -304,9 +269,10 @@ export function initRegional(
    // Re-renderiza o mapa do Brasil com o geoData carregado
    function updateBrasilMap(geoData: any): void {
       // 1) Lê filtros
-      const filtroAno   = +selectAno.value;
-      const filtroSexo  = selectSexo.value;
-      const filtroNutr  = selectNutricional.value;
+      const selectedAno   = +selectAno.value;
+      const selectedSexo  = selectSexo.value;
+      const selectedNutricional  = selectNutricional.value;
+      const col         = G.mapNutricional(selectedNutricional);
 
       // helpers locais: soma os subindicadores de obesidade e demais
       function somaTotalNutricional(d: any): number {
@@ -322,8 +288,8 @@ export function initRegional(
 
       // 2) Filtra base e total geral (usando os indicadores porque não existe `d.total`)
       const arrAll = allData.filter(d =>
-      +d.ANO === filtroAno &&
-      (filtroSexo === "Todos" || d.SEXO === filtroSexo)
+      +d.ANO === selectedAno &&
+      (selectedSexo === "Todos" || d.SEXO === selectedSexo)
       );
 
       // total agregado como soma de todos os estados nutricionais
@@ -333,22 +299,12 @@ export function initRegional(
       const nomesIndicadores =  G.nomesIndicadoresAdulto;
 
       // nutrCount depende do filtro nutricional selecionado
-      let nutrCount: number;
-      if (filtroNutr === "Total") {
-      nutrCount = totalAll;
-      } else if (filtroNutr === "obesidade") {
-      // soma das três categorias de obesidade se estiver usando esse indicador composto
-      nutrCount = d3.sum(arrAll, d =>
-         (+d.obesidade_G_1 || 0) + (+d.obesidade_G_2 || 0) + (+d.obesidade_G_3 || 0)
-      );
-      } else {
-      nutrCount = d3.sum(arrAll, d => +d[filtroNutr] || 0);
-      }
+      const nutrCount = G.somarColunaCustom(arrAll as unknown as G.DataRow[], col);
 
       const nutrPct = totalAll ? (nutrCount / totalAll) * 100 : 0;
 
       let pctFem = 0, pctMasc = 0;
-      if (filtroSexo === "Todos") {
+      if (selectedSexo === "Todos") {
       const arrFem = arrAll.filter(d => {
          const sexo = String(d.SEXO || "").trim().toLowerCase();
          return sexo === "fem" || sexo === "feminino";
@@ -369,12 +325,12 @@ export function initRegional(
       const pctValues = indicadores.map(ind => {
          const count = ind === "Total"
             ? totalAll
-            : d3.sum(arrAll, d => +d[ind]);
+            : G.somarColunaCustom(arrAll as unknown as G.DataRow[], selectedNutricional);
          return totalAll ? (count / totalAll) * 100 : 0;
       });
       const minVal = d3.min(pctValues) ?? 0;
       const maxVal = d3.max(pctValues) ?? 0;
-      const colorScaleCountry = G.getColorScale(filtroSexo, minVal, maxVal);
+      const colorScaleCountry = G.getColorScale(selectedSexo, minVal, maxVal);
 
       // 5) Projeção e gerador de path
       const projection = d3.geoMercator().fitSize([chartW, chartH], geoData);
@@ -384,7 +340,7 @@ export function initRegional(
       const showTooltipBrasil = (event: MouseEvent, d: any) => {
          const lines = [
             `<div class="tooltip-title">Brasil<span class="font-normal">: ${nutrPct.toFixed(1)}%</span></div>`,
-            ...(filtroSexo === "Todos" ? [
+            ...(selectedSexo === "Todos" ? [
             `<div class="tooltip-fem">Feminino<span class="font-normal">: ${pctFem.toFixed(1)}%</span></div>`,
             `<div class="tooltip-masc">Masculino<span class="font-normal">: ${pctMasc.toFixed(1)}%</span></div>`
             ] : [])
@@ -400,7 +356,7 @@ export function initRegional(
          .attr("class", "country-boundary")
          .attr("d", (d: any) => pathGen(d)!)  // pathGen sabe lidar com FeatureCollection
          .attr("fill", colorScaleCountry(nutrPct))  // pinta todo o país pela % nacional
-         .attr("stroke", G.getStrokeColor[filtroSexo])    // ou remova o stroke interno: .attr("stroke", "none")
+         .attr("stroke", G.getStrokeColor[selectedSexo])    // ou remova o stroke interno: .attr("stroke", "none")
          .attr("stroke-width", 1)
          .on("mouseover", (event, d) => {
             // mesmo tooltip que você já tinha para "estados"
@@ -455,99 +411,64 @@ export function initRegional(
    }
 
    function updateEstadosMap(geoData: FeatureCollection<GeometryObject, any>): void {
-      const features = geoData.features as Feature<GeometryObject, any>[];
-      // lê valores dos selects
-      const filtroAno = selectAno.value;
-      const filtroSexo = selectSexo.value;
-      const filtroNutricional = selectNutricional.value;
+      const features            = geoData.features as Feature<GeometryObject, any>[];
+      const selectedAno         = +selectAno.value;
+      const selectedSexo        = selectSexo.value;
+      const selectedNutricional = selectNutricional.value;
+      const col                 = G.mapNutricional(selectedNutricional);
 
       // filtra dados por ano e fase
-      const allStateData = allData.filter(d =>
-         +d.ANO === +filtroAno
-      );
+      const allStateData = allData.filter(d => +d.ANO === +selectedAno);
 
       const valoresMapa = new Map<string, number>();
       const stateAggregates = new Map<string, { total: number; fem?: number; masc?: number; nutrient?: number }>();
 
-      // agregação por UF
-      if (filtroNutricional === "Total") {
-         if (filtroSexo === "Todos") {
-         allStateData.forEach(d => {
-            const uf = d.UF;
-            const sumVal = (+d.baixo_peso) + (+d.eutrofico) + (+d.sobrepeso)
-               + (+d.obesidade_G_1) + (+d.obesidade_G_2) + (+d.obesidade_G_3);
-            valoresMapa.set(uf, (valoresMapa.get(uf) || 0) + sumVal);
-            if (!stateAggregates.has(uf)) stateAggregates.set(uf, { total: 0, fem: 0, masc: 0 });
-            const agg = stateAggregates.get(uf)!;
-            agg.total += sumVal;
-            if (d.SEXO === "Fem") agg.fem! += sumVal;
-            else if (d.SEXO === "Masc") agg.masc! += sumVal;
-         });
-         } else {
-         allStateData.filter(d => d.SEXO === filtroSexo).forEach(d => {
-            const uf = d.UF;
-            const sumVal = (+d.baixo_peso) + (+d.eutrofico) + (+d.sobrepeso)
-               + (+d.obesidade_G_1) + (+d.obesidade_G_2) + (+d.obesidade_G_3);
-            valoresMapa.set(uf, (valoresMapa.get(uf) || 0) + sumVal);
-            if (!stateAggregates.has(uf)) stateAggregates.set(uf, { total: 0 });
-            stateAggregates.get(uf)!.total += sumVal;
-         });
-         }
-      } else {
-         // lógica de porcentagem conforme sexo e indicador
-         if (filtroSexo === "Todos") {
-         const roll = d3.rollup(
+
+      if (selectedSexo === "Todos") {
+         const rollPct = d3.rollup(
             allStateData,
-            v => {
-               const totalSum = d3.sum(v, d => (+d.baixo_peso) + (+d.eutrofico) + (+d.sobrepeso)
-               + (+d.obesidade_G_1) + (+d.obesidade_G_2) + (+d.obesidade_G_3));
-               const nutrientSum = d3.sum(v, d => +d[filtroNutricional]);
-               return totalSum > 0 ? (nutrientSum/totalSum)*100 : 0;
+            (rows) => G.agregarNutri(rows as G.DataRow[], col).pct,
+            (d) => d.UF
+         );
+         rollPct.forEach((val, uf) => valoresMapa.set(uf, val));
+
+         const porUF = d3.group(allStateData, d => d.UF);
+         porUF.forEach((rows , uf) =>{
+            const denominadorUF = G.denominadorSoma(rows as G.DataRow[]);
+            const {num: numFem} = G.agregarNutri(rows as G.DataRow[], col, "Fem");
+            const {num: numMasc}= G.agregarNutri(rows as G.DataRow[], col, "Masc");
+
+            stateAggregates.set(uf, {total: denominadorUF, fem: numFem, masc: numMasc});
+      
+      });
+
+      } else {
+         const onlySex = allStateData.filter(d => d.SEXO === selectedSexo);
+
+         const rollPct = d3.rollup(
+            onlySex,
+            (rows) => G.agregarNutri(rows as G.DataRow[], col).pct,
+            (d) => d.UF
+         )
+         rollPct.forEach((val, uf)=> valoresMapa.set(uf,val));
+
+         const rollAgg = d3.rollup(
+            onlySex,
+            (rows) => {
+               const a = G.agregarNutri(rows as G.DataRow[], col);
+               return {total: a.den, nutrient: a.num};
             },
-            d => d.UF
-         );
-         roll.forEach((val, uf) => valoresMapa.set(uf, val));
-         allStateData.forEach(d => {
-            const uf = d.UF;
-            const nutrient = +d[filtroNutricional];
-            if (!stateAggregates.has(uf)) stateAggregates.set(uf, { total: 0, fem: 0, masc: 0 });
-            const agg = stateAggregates.get(uf)!;
-            agg.total += (+d.baixo_peso) + (+d.eutrofico) + (+d.sobrepeso)
-               + (+d.obesidade_G_1) + (+d.obesidade_G_2) + (+d.obesidade_G_3);
-            if (d.SEXO === "Fem") agg.fem! += nutrient;
-            else if (d.SEXO === "Masc") agg.masc! += nutrient;
-         });
-         } else {
-         const rollSex = d3.rollup(
-            allStateData.filter(d => d.SEXO === filtroSexo),
-            v => {
-               const totalSum = d3.sum(v, d => (+d.baixo_peso) + (+d.eutrofico) + (+d.sobrepeso)
-               + (+d.obesidade_G_1) + (+d.obesidade_G_2) + (+d.obesidade_G_3));
-               const nutrientSum = d3.sum(v, d => +d[filtroNutricional]);
-               return totalSum > 0 ? (nutrientSum/totalSum)*100 : 0;
-            },
-            d => d.UF
-         );
-         rollSex.forEach((val, uf) => valoresMapa.set(uf, val));
-         // builder para tooltip estadual
-         const tooltipRoll = d3.rollup(
-            allStateData.filter(d => d.SEXO === filtroSexo),
-            v => ({
-               total: d3.sum(v, d => (+d.baixo_peso) + (+d.eutrofico) + (+d.sobrepeso)
-               + (+d.obesidade_G_1) + (+d.obesidade_G_2) + (+d.obesidade_G_3)),
-               nutrient: d3.sum(v, d => +d[filtroNutricional])
-            }),
-            d => d.UF
-         );
-         tooltipRoll.forEach((val, uf) => stateAggregates.set(uf, val));
-         }
+            (d) => d.UF
+         )
+         rollAgg.forEach((val,uf) => stateAggregates.set(uf, val as any))
       }
+      
 
       // escalas de cor
-      const vals = Array.from(valoresMapa.values());
-      const minVal = d3.min(vals) ?? 0;
-      const maxVal = d3.max(vals) ?? 0;
-      const colorScale = G.getColorScale(filtroSexo, minVal, maxVal);
+      const vals        = Array.from(valoresMapa.values());
+      const minVal      = d3.min(vals) ?? 0;
+      const maxVal      = d3.max(vals) ?? 0;
+      const colorScale  = G.getColorScale(selectedSexo, minVal, maxVal);
 
       // injeta properties no geoData
       geoData.features.forEach((f: any) => {
@@ -555,9 +476,8 @@ export function initRegional(
       });
 
       // projeção personalizada para o estado
-      const projection = d3.geoMercator()
-         .fitSize([chartW, chartH], geoData);
-      const pathGen = d3.geoPath().projection(projection);
+      const projection = d3.geoMercator().fitSize([chartW, chartH], geoData);
+      const pathGen    = d3.geoPath().projection(projection);
 
       // cria/limpa svg
       let svgBrasil = d3.select(mapContainer).select<SVGSVGElement>("svg");
@@ -573,7 +493,7 @@ export function initRegional(
          .data(features)
          .join("path")
             .classed("map-path state", true)
-            .attr("stroke", G.getStrokeColor[filtroSexo])
+            .attr("stroke", G.getStrokeColor[selectedSexo])
             .attr("d", d => pathGen(d)!)
             .attr("fill", d => {
             const val = valoresMapa.get(d.id as string);
@@ -584,12 +504,12 @@ export function initRegional(
             const nome = G.ufLabel[id] || id;
             const agg = stateAggregates.get(id) || { total: 0, fem: 0, masc: 0};
             let content: string[] = [];
-            if (filtroSexo === "Todos") {
-               const total = agg.total!;
+            if (selectedSexo === "Todos") {
+               const total       = agg.total!;
                const nutrientSum = agg.fem! + agg.masc!;
-               const statePerc = total > 0 ? (nutrientSum/total)*100 : 0;
-               const percFem = nutrientSum > 0 ? (agg.fem!/nutrientSum)*100 : 0;
-               const percMasc = nutrientSum > 0 ? (agg.masc!/nutrientSum)*100 : 0;
+               const statePerc   = total > 0       ? (nutrientSum/total)*100 : 0;
+               const percFem     = nutrientSum > 0 ? (agg.fem!/nutrientSum)*100 : 0;
+               const percMasc    = nutrientSum > 0 ? (agg.masc!/nutrientSum)*100 : 0;
                content = [
                   `<div class="tooltip-title">${nome}:<span class="notbold"> ${statePerc.toFixed(1)}%</span></div>`,
                   `<div class="tooltip-fem">Feminino:<span class="notbold"> ${percFem.toFixed(1)}%</span></div>`,
@@ -616,6 +536,8 @@ export function initRegional(
             const id = d.id as string;
             if (selectModo.value === "federativa"){
                initCidadesMap(id);
+            } else if(selectModo.value === "macro"){
+               initMacroRegionMap(id)
             } else { 
                initHealthRegionMap(id);
             }
@@ -657,11 +579,14 @@ export function initRegional(
    currentMode = "cidades";
    currentUF = uf;
 
-   // ao mudar o modo (federativa ↔ saude)
+   // ao mudar o modo (federativa ↔ saude ↔ macro)
    selectModo.onchange = () => {
       if (selectModo.value === "saude") {
          initHealthRegionMap(currentUF);
-      } else {
+      } else if(selectModo.value === "macro" ){
+         initMacroRegionMap(currentUF);
+      }
+      else {
          initCidadesMap(currentUF);
       }
    };
@@ -687,15 +612,16 @@ export function initRegional(
    function updateCidadesMap(uf: string): void {
    
    // lê filtros
-   const selectedYear     = selectAno.value;
-   const selectedSexo     = selectSexo.value;
-   const selectedNutricao = selectNutricional.value;
+   const selectedAno         = selectAno.value;
+   const selectedSexo        = selectSexo.value;
+   const selectedNutricional = selectNutricional.value;
+   const col                 = G.mapNutricional(selectedNutricional);
 
    // carrega o GeoJSON correto
    const geojsonFile = G.stateGeojsonFiles[uf];
    d3.json<any>(geojsonFile).then(geo => {
       // filtra a base
-      let stateCSV = allData.filter(d => d.UF === uf && d.ANO === selectedYear);
+      let stateCSV = allData.filter(d => d.UF === uf && d.ANO === selectedAno);
       
       if (selectedSexo !== "Todos") {
          stateCSV = stateCSV.filter(d => d.SEXO === selectedSexo);
@@ -703,24 +629,18 @@ export function initRegional(
 
       // agrega: total ou %, por município
       let agg: Map<string, number>;
-      if (selectedNutricao === "Total") {
+      if (selectedNutricional === "Total") {
          agg = d3.rollup(
          stateCSV,
-         v => d3.sum(v, d =>
-            +d.baixo_peso + +d.eutrofico + +d.sobrepeso +
-            +d.obesidade_G_1 + +d.obesidade_G_2 + +d.obesidade_G_3
-         ),
+         v =>  G.denominadorSoma(v as G.DataRow[]),
          d => d.codigo_municipio
          );
       } else {
          agg = d3.rollup(
          stateCSV,
          v => {
-            const sumCat   = d3.sum(v, d => +d[selectedNutricao]);
-            const totalSum = d3.sum(v, d =>
-               +d.baixo_peso + +d.eutrofico + +d.sobrepeso +
-               +d.obesidade_G_1 + +d.obesidade_G_2 + +d.obesidade_G_3
-            );
+            const sumCat   = G.somarColunaCustom(v as G.DataRow[],col);
+            const totalSum = G.denominadorSoma(v as G.DataRow[]);
             return totalSum > 0 ? (sumCat / totalSum) * 100 : 0;
          },
          d => d.codigo_municipio
@@ -776,42 +696,34 @@ export function initRegional(
          })
          .on("mouseover", function(event, d:any) {
             // Pré-agrega dados para os tooltips dos municípios
-            const stateAllData = stateCSV.filter(d => d.ANO === selectedYear && d.UF === uf);
-            let tooltipLookup, totalSexState;
-            if (selectedNutricao === "Total") {
-               if (selectedSexo === "Todos") {
-                  tooltipLookup = d3.rollup(stateAllData, v => {
-                     return {
-                        total: d3.sum(v, d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3)),
-                        fem: d3.sum(v.filter(d => d.SEXO === "Fem"), d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3)),
-                        masc: d3.sum(v.filter(d => d.SEXO === "Masc"), d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3))
-                     };
-                  }, d => d.codigo_municipio);
-               } else {
-                  const filteredData = stateAllData.filter(d => d.SEXO === selectedSexo);
-                  tooltipLookup = d3.rollup(filteredData, v => d3.sum(v, d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3)), d => d.codigo_municipio);
-                  totalSexState = d3.sum(filteredData, d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3));
-               }
+            const stateAllData = stateCSV.filter(d => d.ANO === selectedAno && d.UF === uf);
+            let tooltipLookup: Map<string, any>;
+            let totalSexState;
+            
+            if (selectedSexo === "Todos") {
+               tooltipLookup = d3.rollup(
+                  stateAllData, 
+                  v => ({
+                     nutrient: G.somarColunaCustom(v as G.DataRow[], col),
+                     total:    G.denominadorSoma(v as G.DataRow[]),
+                     fem:      G.somarColunaCustom((v as G.DataRow[]).filter(d => d.SEXO === "Fem"),  col),
+                     masc:     G.somarColunaCustom((v as G.DataRow[]).filter(d => d.SEXO === "Masc"), col)
+                  
+                  }), 
+                  d => d.codigo_municipio
+               );
             } else {
-               if (selectedSexo === "Todos") {
-                  tooltipLookup = d3.rollup(stateAllData, v => {
-                     return {
-                        nutrient: d3.sum(v, d => +d[selectedNutricao]),
-                        total: d3.sum(v, d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3)),
-                        fem: d3.sum(v.filter(d => d.SEXO === "Fem"), d => +d[selectedNutricao]),
-                        masc: d3.sum(v.filter(d => d.SEXO === "Masc"), d => +d[selectedNutricao])
-                     };
-                  }, d => d.codigo_municipio);
-               } else {
-                  const filteredData = stateAllData.filter(d => d.SEXO === selectedSexo);
-                  tooltipLookup = d3.rollup(filteredData, v => {
-                     return {
-                        nutrient: d3.sum(v, d => +d[selectedNutricao]),
-                        total: d3.sum(v, d => (+d.baixo_peso)+(+d.eutrofico)+(+d.sobrepeso)+(+d.obesidade_G_1)+(+d.obesidade_G_2)+(+d.obesidade_G_3))
-                     };
-                  }, d => d.codigo_municipio);
-               }
+               const filteredData = stateAllData.filter(d => d.SEXO === selectedSexo);
+               tooltipLookup = d3.rollup(
+                  filteredData, 
+                  v => ({
+                     nutrient: G.somarColunaCustom(v as G.DataRow[], col),
+                     total:    G.denominadorSoma(v as G.DataRow[])
+                  }), 
+                  d => d.codigo_municipio
+               );
             }
+            
            let htmlContent = [];
            const muniCode = d.properties.id || d.properties.CODMUN || d.properties.cod_mun;
            if (selectedSexo === "Todos") {
@@ -874,11 +786,14 @@ export function initRegional(
    containerDivisao.classed("hidden", false);
    selectModo.value = "saude";
 
-   // ao mudar o modo (federativa ↔ saude)
+   // ao mudar o modo (federativa ↔ saude ↔ macro)
    selectModo.onchange = () => {
       if (selectModo.value === "saude") {
          initHealthRegionMap(currentUF);
-      } else {
+      } else if(selectModo.value === "macro" ){
+         initMacroRegionMap(currentUF);
+      }
+      else {
          initCidadesMap(currentUF);
       }
    };
@@ -902,10 +817,11 @@ export function initRegional(
   // -----------------------
   
   function updateHealthRegionMap(uf:string): void {
-    const selectedYear  = +selectAno.value;
-    const selectedSexo  = selectSexo.value;
-    const selectedNutri = selectNutricional.value;
-    const selectedFase = "";
+    const selectedAno         = +selectAno.value;
+    const selectedSexo        = selectSexo.value;
+    const selectedNutricional = selectNutricional.value;
+    const selectedFase        = "";
+    const col                 = G.mapNutricional(selectedNutricional);
         
     // 1) carrega o GeoJSON de regiões de saúde para este UF
     const geojsonFile = G.stateRGeojsonFiles[uf];
@@ -915,7 +831,7 @@ export function initRegional(
       //    Assumindo que você já carregou o CSV db_region.csv em global regionData
       let stateCSV = allData.filter(
          d =>  d.UF === uf 
-           && +d.ANO === +selectedYear 
+           && +d.ANO === +selectedAno 
       );
       // junta regionData para obter regional_id
       const merged = stateCSV.map(d => {
@@ -944,9 +860,9 @@ export function initRegional(
       agg = d3.rollup(
          baseAgg,
          v => {
-            const catSum   = d3.sum( v, d => +d[selectedNutri]          );
-            const totalSum = d3.sum( v, d => somaEstadosNutricionais(d) );
-            return totalSum > 0 ? (catSum/totalSum)*100 : 0;
+            const catSum         = G.somarColunaCustom(v as G.DataRow[], col);
+            const totalSum       = G.denominadorSoma(v as G.DataRow[]);
+            return totalSum > 0  ? (catSum/totalSum)*100 : 0;
          },
          d => d.regional_id
       );
@@ -960,21 +876,21 @@ export function initRegional(
       const colorScale = G.getColorScale(selectedSexo, minVal, maxVal);      
       
       geo.features.forEach(f => {
-        const key = String(f.properties.reg_id);
+        const key = String(f.properties.HREG_ID);
         f.properties.value = agg.get(key) || 0;
       });
 
       // --- AGREGAÇÃO para o tooltip, idêntica à do mapa de municípios ---
-      const regionAllData = merged.filter(d => +d.ANO === selectedYear);
+      const regionAllData = merged.filter(d => +d.ANO === selectedAno);
       const tooltipLookup = d3.rollup(
         regionAllData,
         v => ({
-          nutrient:  d3.sum(v, d => +d[selectedNutri]),
-          total:     d3.sum(v, d => somaEstadosNutricionais(d)),
-          nutriFem:  d3.sum(v.filter(d=> d.SEXO ==="Fem"),d=> +d[selectedNutri]),
-          nutriMasc: d3.sum(v.filter(d=> d.SEXO ==="Masc"),d=> +d[selectedNutri]),
-          fem:       d3.sum(v.filter(d => d.SEXO === "Fem"), d => somaEstadosNutricionais(d)),
-          masc:      d3.sum(v.filter(d => d.SEXO === "Masc"), d => somaEstadosNutricionais(d))
+          nutrient:  G.somarColunaCustom(v as G.DataRow[], col),
+          total:     G.denominadorSoma(v as G.DataRow[]),
+          nutriFem:  G.somarColunaCustom((v as G.DataRow[]).filter(d => d.SEXO === "Fem"),  col),
+          nutriMasc: G.somarColunaCustom((v as G.DataRow[]).filter(d => d.SEXO === "Masc"),  col),
+          fem:       G.denominadorSoma((v as G.DataRow[]).filter(d => d.SEXO === "Fem")),
+          masc:      G.denominadorSoma((v as G.DataRow[]).filter(d => d.SEXO === "Masc"))
         }),
         d => d.regional_id
       );
@@ -1014,7 +930,7 @@ export function initRegional(
            .attr("stroke-width", 1)
            .on("mouseover", function(event, d) {
                // 1) pega a agregação por região
-               const key         = String(d.properties.reg_id);
+               const key         = String(d.properties.HREG_ID);
                const aggOver     = tooltipLookup.get(key) || { nutrient:0, nutriFem:0, nutriMasc:0, total:0, fem:0, masc:0 };
 
                const percTFem     = aggOver.total > 0 ? aggOver.fem/aggOver.total*100 :0;
@@ -1027,14 +943,14 @@ export function initRegional(
                
                // 2) monta o html
                if (selectedSexo === 'Todos'){
-                  lines.push(`<strong>${d.properties.nome}</strong>: ${regPerc.toFixed(1)}%</br>`);
+                  lines.push(`<strong>${d.properties.HREG_NAME}</strong>: ${regPerc.toFixed(1)}%</br>`);
                   lines.push(`<span style="font-size:13px; color:#DC143C;"><strong>Feminino</strong>: ${percTFem.toFixed(1)}%</span></br>`);
                   lines.push(`<span style="font-size:13px; color:#4169E1;"><strong>Masculino</strong>: ${percTMasc.toFixed(1)}%</span>`);
                   }else{
                      lines.push(
                         selectedSexo === "Fem" 
-                        ? `<strong>${d.properties.nome}</strong>: ${percFem.toFixed(1)}%</br>` 
-                        : `<strong>${d.properties.nome}</strong>: ${percMasc.toFixed(1)}%</br>`
+                        ? `<strong>${d.properties.HREG_NAME}</strong>: ${percFem.toFixed(1)}%</br>` 
+                        : `<strong>${d.properties.HREG_NAME}</strong>: ${percMasc.toFixed(1)}%</br>`
                      );
                   };
                
@@ -1078,20 +994,213 @@ export function initRegional(
    (mapContainer as any).__resizeRegional = () => {
       reloadMap();
    }
-   // Clique direito global do mapa
-   /* d3.select(mapContainer)
-   .on("contextmenu", (event: MouseEvent) => {
-      event.preventDefault();
-      if (currentMode === "brasil" || currentMode === "estados") {
-         initBrasilMap();
-         d3.select(mapContainer).selectAll("*").remove();
-         d3.select(".legendRegional").selectAll("*").remove();
-      } else if (currentMode === "cidades" || currentMode === "healthRegion") {
-         initEstadosMap();
-         d3.select(mapContainer).selectAll("*").remove();
-         d3.select(".legendRegional").selectAll("*").remove();
+   // =======================
+  // VISÃO MACROREGIÃO SAÚDE (USANDO OS MESMOS CONTAINERS)
+  // =======================
+  function initMacroRegionMap(uf:string) {
+    currentMode = "macroRegion";
+    currentUF = uf;
+    LimpaMapa();
+
+   // mostra o container de divisões
+   containerDivisao.classed("hidden", false);
+   selectModo.value = "macro";
+
+   // ao mudar o modo (federativa ↔ saude ↔ macro)
+   selectModo.onchange = () => {
+      if (selectModo.value === "saude") {
+         initHealthRegionMap(currentUF);
+      } else if(selectModo.value === "macro" ){
+         initMacroRegionMap(currentUF);
       }
-   }); */
+      else {
+         initCidadesMap(currentUF);
+      }
+   };
+
+     
+  
+    d3.select("#mapaRegional")
+      .insert("h2", ":first-child")
+      .text(`${G.ufLabel[uf]} – Macrorregiões de Saúde`)
+      .classed("text-center font-bold", true);
+       
+    // re-binde dos filtros gerais
+    AtualizarMapa(uf);
+  
+    // desenha pela primeira vez
+    updateMacroRegionMap(uf);
+  }
+  
+  // -----------------------
+  // atualiza VISÃO MACORREGIÃO DE SAÚDE
+  // -----------------------
+  
+  function updateMacroRegionMap(uf:string): void {
+    const selectedAno         = +selectAno.value;
+    const selectedSexo        = selectSexo.value;
+    const selectedNutricional = selectNutricional.value;
+    const selectedFase        = "";
+    const col                 = G.mapNutricional(selectedNutricional);
+        
+    // 1) carrega o GeoJSON de regiões de saúde para este UF
+    const geojsonFile = G.stateMRGeojsonFiles[uf];
+
+    d3.json<MacroCollection>(geojsonFile).then(geo => {
+      // 2) filtra e agrega dados usando db_region (você deve ter feito o join db_final ↔ db_region em memória)
+      //    Assumindo que você já carregou o CSV db_region.csv em global regionData
+      let stateCSV = allData.filter(
+         d =>  d.UF === uf 
+           && +d.ANO === +selectedAno 
+      );
+      // junta regionData para obter macro_id
+      const merged = stateCSV.map(d => {
+        const reg = regionInfo.find(r => r.municipio_id_sdv === d.codigo_municipio);
+        return Object.assign({}, d, { macro_id: reg ? reg.macro_id : null });
+      }).filter(d => d.macro_id);
+      
+      let agg: Map<string,number>;
+      const baseAgg = selectedSexo === "Todos" ? merged : merged.filter(d=>d.SEXO === selectedSexo);
+
+      agg = d3.rollup(
+         baseAgg,
+         v => {
+            const catSum         = G.somarColunaCustom(v as G.DataRow[], col);
+            const totalSum       = G.denominadorSoma(v as G.DataRow[]);
+            return totalSum > 0  ? (catSum/totalSum)*100 : 0;
+         },
+         d => d.macro_id
+      );
+      
+  
+      // 4) mesmo código da cor, path e projeção da visão municipal,
+      //    mas usando geo.features (macrorregiões de saúde) e agg.get(feature.properties.regi_id)
+      const values = Array.from(agg.values() as Iterable<number>);
+      const minVal = d3.min(values) ?? 0;
+      const maxVal = d3.max(values) ?? 0;
+      const colorScale = G.getColorScale(selectedSexo, minVal, maxVal);      
+      
+      geo.features.forEach(f => {
+        const key = String(f.properties.MACRO_ID);
+        f.properties.value = agg.get(key) || 0;
+      });
+
+      // --- AGREGAÇÃO para o tooltip, idêntica à do mapa de municípios ---
+      const regionAllData = merged.filter(d => +d.ANO === selectedAno);
+      const tooltipLookup = d3.rollup(
+        regionAllData,
+        v => ({
+          nutrient:  G.somarColunaCustom(v as G.DataRow[], col),
+          total:     G.denominadorSoma(v as G.DataRow[]),
+          nutriFem:  G.somarColunaCustom((v as G.DataRow[]).filter(d => d.SEXO === "Fem"),  col),
+          nutriMasc: G.somarColunaCustom((v as G.DataRow[]).filter(d => d.SEXO === "Masc"),  col),
+          fem:       G.denominadorSoma((v as G.DataRow[]).filter(d => d.SEXO === "Fem")),
+          masc:      G.denominadorSoma((v as G.DataRow[]).filter(d => d.SEXO === "Masc"))
+        }),
+        d => d.macro_id
+      );
+  
+      let svg = d3.select("#mapaRegional svg");
+      if (svg.empty()) {
+      svg = d3.select("#mapaRegional").append("svg");
+      }
+
+      // calcula largura útil descontando a legenda
+      const legendElHR = mapContainer.parentElement
+      ? mapContainer.parentElement.querySelector(".legendRegional") as HTMLElement | null
+      : null;
+      const legendWHR = legendElHR ? legendElHR.getBoundingClientRect().width : 0;
+      const gapHR = 8;
+      const widthUsableHR = Math.max(200, chartW - legendWHR - gapHR);
+
+      // aplica dimensões
+      svg.attr("width", widthUsableHR).attr("height", chartH);
+
+      // usa a largura útil na projeção
+      const path = d3.geoPath().projection(
+      d3.geoMercator().fitSize([widthUsableHR, chartH], geo)
+      );
+
+      svg.selectAll("path")
+      .data(geo.features)
+      .join("path")
+      .attr("class", "macrorregiao-saude")
+      .attr("d", path)
+           .attr("fill", d => {
+             return d.properties.value === 0
+             ? "#ccc"
+             : colorScale(d.properties.value);
+           })
+           .attr("stroke", G.getStrokeColor[selectedSexo])
+           .attr("stroke-width", 1)
+           .on("mouseover", function(event, d) {
+               // 1) pega a agregação por região
+               const key         = String(d.properties.MACRO_ID);
+               const aggOver     = tooltipLookup.get(key) || { nutrient:0, nutriFem:0, nutriMasc:0, total:0, fem:0, masc:0 };
+
+               const percTFem     = aggOver.total > 0 ? aggOver.fem/aggOver.total*100 :0;
+               const percTMasc    = aggOver.total > 0 ? aggOver.masc/aggOver.total*100 :0;
+               const regPerc     = aggOver.total > 0 ? aggOver.nutrient/aggOver.total*100 :0;
+               const percFem     = aggOver.fem > 0 ? aggOver.nutriFem/aggOver.fem*100 : 0;
+               const percMasc     = aggOver.masc > 0 ? aggOver.nutriMasc/aggOver.masc*100 : 0;
+
+               const lines: string[] = [];
+               
+               // 2) monta o html
+               if (selectedSexo === 'Todos'){
+                  lines.push(`<strong>${d.properties.MACRO_NAME}</strong>: ${regPerc.toFixed(1)}%</br>`);
+                  lines.push(`<span style="font-size:13px; color:#DC143C;"><strong>Feminino</strong>: ${percTFem.toFixed(1)}%</span></br>`);
+                  lines.push(`<span style="font-size:13px; color:#4169E1;"><strong>Masculino</strong>: ${percTMasc.toFixed(1)}%</span>`);
+                  }else{
+                     lines.push(
+                        selectedSexo === "Fem" 
+                        ? `<strong>${d.properties.MACRO_NAME}</strong>: ${percFem.toFixed(1)}%</br>` 
+                        : `<strong>${d.properties.MACRO_NAME}</strong>: ${percMasc.toFixed(1)}%</br>`
+                     );
+                  };
+               
+               const htmlContent = `<div class="tooltip-content">${lines.join("")}</div>`;
+               // 3) exibe com as mesmas classes/transitions
+               tooltip
+                 .classed("hidden", false)
+                 .classed("opacity-0", false)
+                 .classed("opacity-100", true)
+                 .html(htmlContent)
+                 .style("left", (event.clientX + 5) + "px")
+                 .style("top",  (event.clientY - 28) + "px")
+                 .transition().duration(200).style("opacity","1");
+   
+               d3.select(this).attr("stroke-width", 2);
+           })
+           .on("mousemove", G.moveTooltip)
+           .on("mouseout", function() {
+           tooltip.classed("opacity-0", true)
+                  .classed("hidden",true);
+           d3.select(this).attr("stroke-width", 1);
+           })
+           .on("contextmenu", (event) => {            
+            event.preventDefault();
+            event.stopPropagation();
+            initEstadosMap();
+           });
+           
+      // 5) legenda: igual à visão municipal
+      G.legendasMapa(mapContainer,colorScale,minVal,maxVal);
+  
+        // Alerta
+     if(d3.select("#mapaRegional").selectAll(".alerta-mapa").empty()){
+        d3.select("#mapaRegional")
+           .append("div")
+              .attr("class","alerta-mapa alerta-mapa-base")
+              .text("⚠️Clique com o botão direito do mouse para retornar à visualização estadual");
+        }
+     });
+   }
+   (mapContainer as any).__resizeRegional = () => {
+      reloadMap();
+   }
+
+   
 }
       
 
