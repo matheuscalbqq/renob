@@ -3,11 +3,11 @@ import { ExternalLink, BarChart3, TrendingUp, TriangleAlert } from "lucide-react
 import { GiBrazil } from "react-icons/gi";
 const legend = [
   { imc: "< 18,5", label: "Baixo peso" },
-  { imc: "18,5 ≤ 24,9", label: "Eutrofia" },
-  { imc: "25,0 ≤ 29,9", label: "Sobrepeso" },
-  { imc: "30,0 ≤ 34,9", label: "Obesidade grau I" },
-  { imc: "35,0 ≤ 39,9", label: "Obesidade grau II" },
-  { imc: "40,0 >", label: "Obesidade grau III" },
+  { imc: "≥ 18,5 e < 25,0", label: "Eutrofia" },
+  { imc: "≥ 25,0 e < 30,0", label: "Sobrepeso" },
+  { imc: "≥ 30,0 e < 35,0", label: "Obesidade grau I" },
+  { imc: "≥ 35,0 e < 40,0", label: "Obesidade grau II" },
+  { imc: "≥ 40,0", label: "Obesidade grau III" },
 ];
 
 const visualize = [
@@ -35,337 +35,301 @@ const Metodologia = () => {
           <Card className="shadow-medium bg-muted/50">
             <CardContent className="p-6 md:p-4">
               <p className="text-lg text-muted-foreground md:text-justify">
-                Os dados vêm do SISVAN e das Regiões de Saúde de 2024, permitindo análises entre 2008 e 2024 sobre o estado nutricional de adultos. As visualizações — Mapeamento Nutricional, Demográfico e Análise Temporal — mostram como o Brasil evolui em diferentes recortes. A metodologia garante comparabilidade ao longo dos anos, transformando informações em insumos para decisões em saúde pública.
+                Compreender a evolução do estado nutricional da população brasileira para apoiar a tomada de
+                decisão em saúde pública: este é o foco desta plataforma. Abaixo, detalhamos a origem e o 
+                tratamento aplicado aos dados, garantindo que profissionais e gestores possam utilizar estes 
+                indicadores com segurança para o monitoramento do cenário nacional.
               </p>
             </CardContent>
           </Card>
         </section>
         
-        {/* Data */}
+        {/* SISVAN */}
         <section className="mb-8">
           <Card className="shadow-medium bg-gradient-accent mb-4">
             <CardContent className="p-2 md:p-2 text-left">
               <h2 className="text-3xl font-bold text-white ">
-                Nossos Dados
+                O Sistema de Vigilância Alimentar e Nutricional (SISVAN)
               </h2>
             </CardContent>
           </Card>
+          <div className="mr-10 ml-4">
           <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
-          Todas as análises e construções desenvolvidas aqui se baseiam nos dados nutricionais coletados e disponibilizados 
-          pelo SISVAN
-          <sup id="cite-sisvan">
-            <a href="#ref-sisvan" aria-label="Ir para referência 1">[1]</a>
-          </sup>, 
-          nas divisões de macrorregiões e regiões de saúde de 2024 criadas a partir dos
-          dados do DEMAS-SEIDIGI
-          <sup id="cite-macro">
-            <a href="#ref-macro" aria-label="Ir para referência 2">[2]</a>
-          </sup> e das malhas municipais disponibilizadas pelo IBGE
-          <sup id="cite-shape">
-            <a href="#ref-shape" aria-label="Ir para referência 3">[3]</a>
-          </sup>
-          <sup id="cite-ibge">
-            <a href="#ref-ibge" aria-label="Ir para referência 4">[4]</a>
-          </sup>.
-
-
+          O SISVAN é o sistema de informação do Ministério da Saúde responsável pelo monitoramento contínuo 
+          do estado nutricional e do consumo alimentar da população assistida pelo Sistema Único de Saúde 
+          (SUS)<a href="#ref-sisvan" className="hover:text-secondary/50" aria-label="Ir para referência 1">[1]</a>.
           </p>
-          <p className="text-lg leading-relaxed text-muted-foreground mb-6 md:text-justify">
-            Os percentuais de “prevalência” são calculados como <span className="font-semibold">(contagem do estado nutricional ÷ total no recorte) × 100</span>.
-            A mesma base alimenta três visões — Temporal, Mapeamento e Regional — variando o tipo de agregação, o denominador e a escala geográfica.
+          <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
+          Ele opera no âmbito da <span className="text-secondary/90">Atenção Primária à Saúde (APS)</span>, consolidando dados antropométricos coletados
+          durante os atendimentos de rotina. Mais do que um repositório, o SISVAN é uma ferramenta essencial 
+          para a gestão, fornecendo subsídios para o planejamento, acompanhamento e avaliação de políticas 
+          públicas de alimentação e nutrição<a href="#ref-aps" className="hover:text-secondary/50" aria-label="Ir para referência 2">[2]</a>.
           </p>
-          <div>
-                
-                <h3 className="text-2xl font-semibold mb-6 text-foreground">
-                  O que é o SISVAN?
-                </h3>
-                <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
-                  O Sistema de Vigilância Alimentar e Nutricional (SISVAN) é uma ferramenta fundamental 
-                  para o monitoramento do estado nutricional da população brasileira, fornecendo dados 
-                  essenciais para o desenvolvimento de políticas públicas de saúde.
-                </p>
-                <p className="text-lg leading-relaxed text-muted-foreground md:text-justify">
-                  Através de uma {''}<span className="font-semibold">coleta sistemática de dados antropométricos e de consumo alimentar</span>{''}, 
-                  o SISVAN permite identificar tendências, padrões regionais e grupos de risco, 
-                  orientando intervenções em saúde pública.
-                </p>
           </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:items-start mt-4">
+        </section>
+        <section className="mb-8">
+          <Card className="shadow-medium bg-gradient-accent mb-4">
+            <CardContent className="p-2 md:p-2 text-left">
+              <h2 className="text-3xl font-bold text-white ">
+                Origem e Características dos Dados
+              </h2>
+            </CardContent>
+          </Card>
+          <div className=" ml-4 mr-10 ">
+          <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
+          As informações aqui apresentadas são provenientes dos relatórios consolidados de acesso público do 
+          <span className="text-secondary/90"> SISVAN Web</span>, compreendendo dados temporais de 
+          <span className="text-secondary/90"> 2008 a 2024</span>
+          <a href="#ref-sisvan" className="hover:text-secondary/50" aria-label="Ir para referência 1">[1]</a>.
+          </p>
+
               
               <div>
                 
                 <h3 className="text-2xl font-semibold mb-4 text-foreground">
-                  Abrangência dos Dados
+                  Natureza da Amostra
                 </h3>
                 <p className="text-lg leading-relaxed text-muted-foreground mb-6 md:text-justify">
-                  Nosso sistema permite explorar cada estado nutricional da classificação antropométrica 
-                  para <span className="text-secondary font-semibold">adultos (20-59 anos)</span> a partir dos seguintes fatores:
+                  É fundamental compreender a distinção metodológica entre os dados apresentados e
+                  os inquéritos populacionais:
                 </p>
                  
-                <ul className="list-none space-y-2 text-lg text-muted-foreground text-justify">
+                <ul className="list-none space-y-2 text-lg text-muted-foreground ml-6 text-justify">
                   <li className="relative pl-5">
                     <span
                       className="absolute left-0 top-3 h-2 w-2 rounded-full bg-accent"
-                    />{''}<span className="text-accent font-semibold">Unidades geográficas:</span>{''} País, Estados, Cidades, Macrorregiões e Regiões de Saúde;
-                  </li>
-                  <li className="relative pl-5">
-                    <span
-                      className="absolute left-0 top-3 h-2 w-2 rounded-full bg-secondary"
-                    />{''}<span className="text-secondary font-semibold">Gênero:</span>{''} Feminino e Masculino;
+                    />{''}<span className="text-accent font-semibold">Inquéritos de Base Populacional (ex: Censo, POF, PNS):</span>{''} Utilizam 
+                    amostragem probabilística para representar a totalidade da população brasileira, independentemente do uso
+                     de serviços de saúde;
                   </li>
                   <li className="relative pl-5">
                     <span
                       className="absolute left-0 top-3 h-2 w-2 rounded-full bg-accent"
-                    />{''}<span className="text-accent font-semibold">Período:</span>{''} 2008 a 2024.
+                    />{''}<span className="text-accent font-semibold">Dados Administrativos (SISVAN):</span>{''} Refletem 
+                    o perfil nutricional dos <span className="text-secondary/90">indivíduos que buscaram atendimento na rede pública de saúde</span><a href="#ref-aps" className="hover:text-secondary/50" aria-label="Ir para referência 2">[2]</a>.
                   </li>
                 </ul>
                 
                 <br></br>
                 <p className="text-lg leading-relaxed text-muted-foreground md:text-justify">
-                  Essa estrutura facilita análises comparativas e permite {''}<span className="font-semibold">identificar tendências, vulnerabilidades regionais e perfis nutricionais específicos</span>{''} 
-                  , fundamentais para a formulação de políticas de saúde pública baseadas em evidências. 
-                  Exemplos de análise disponíveis:
+                  Portanto, os indicadores desta plataforma referem-se à <span className="text-secondary/90"> população usuária do 
+                  SUS</span> monitorada no período. Embora não possuam inferência universal para toda a demografia brasileira,
+                  representam o cenário da demanda nos serviços de saúde, constituindo uma evidência sólida para a gestão do sistema.
                 </p>
                 <br></br>
-                <ul className="list-none space-y-2 text-lg text-muted-foreground text-justify">
+              </div>
+
+              <div>
+                
+                <h3 className="text-2xl font-semibold mb-4 text-foreground">
+                  Níveis de Agregação Geográfica
+                </h3>
+                <p className="text-lg leading-relaxed text-muted-foreground mb-6 md:text-justify">
+                  Para permitir diagnósticos em diferentes escalas, 
+                  os dados foram estruturados nos seguintes níveis territoriais:
+                </p>
+                 
+                <ul className="list-none space-y-2 text-lg text-muted-foreground ml-6 text-justify">
+                  <li className="relative pl-5">
+                    <span
+                      className="absolute left-0 top-3 h-2 w-2 rounded-full bg-accent"
+                    />{''}<span className="text-accent font-semibold">Nacional:</span>{''} Brasil;
+                  </li>
                   <li className="relative pl-5">
                     <span
                       className="absolute left-0 top-3 h-2 w-2 rounded-full bg-secondary"
-                    />
-                    Comparação da prevalência de {''} 
-                    <span className="text-secondary font-semibold"> obesidade entre mulheres adultas </span>{''} 
-                     em diferentes estados (ex: Minas Gerais vs. São Paulo);
+                    />{''}<span className="text-secondary font-semibold">Estadual:</span>{''} Unidades da Federação (UF);
                   </li>
                   <li className="relative pl-5">
                     <span
                       className="absolute left-0 top-3 h-2 w-2 rounded-full bg-accent"
-                    />
-                    Avaliação da {''} 
-                    <span className="text-accent font-semibold">evolução da desnutrição da população geral </span>{''}
-                    em uma mesma região ao longo dos anos;
+                    />{''}<span className="text-accent font-semibold">Regional:</span>{''} Macrorregiões de Saúde e Regiões de Saúde (conforme divisão administrativa do SUS);
+                  </li>
+                  <li className="relative pl-5">
+                    <span
+                      className="absolute left-0 top-3 h-2 w-2 rounded-full bg-secondary"
+                    />{''}<span className="text-secondary font-semibold">Local:</span>{''} Municípios.
                   </li>
                 </ul>
-
-
-              </div>
-              
-              
-              <Card className="shadow-strong">
-                <CardContent className="p-8">
-                  <h4 className="text-xl font-semibold mb-6 text-primary">
-                    Classificação Antropométrica
-                  </h4>
-                  <p className="text-muted-foreground md:text-justify"> Utilizamos critérios padronizados com base no Índice de Massa Corporal (IMC), ajustados conforme a fase da vida. Abaixo, apresentamos os pontos de corte adotados e a fórmula do IMC:</p>
-                  <br></br>
-                  <div className="col-span-2 text-center text-muted-foreground">
-                    <math display="block">
-                      <mrow>
-                        <mi>IMC</mi>
-                        <mo>=</mo>
-                        <mfrac>
-                          <mrow>
-                            <mi>Peso (kg)</mi>
-                          </mrow>
-                          <mrow>
-                            <mi>Altura² (m²)</mi>
-                          </mrow>
-                        </mfrac>
-                      </mrow>
-                    </math>
-                    {/* em JSX o <br> precisa ser self-closed */}
-                    <br />
-                  </div>
-                  <div className="overflow-x-auto">
-                    <p className="font-bold md:text-center"> Adultos (20-59 anos)</p>
-                    <table className="w-full text-sm text-left">
-                      <thead className="bg-muted-foreground/5">
-                        <tr>
-                          <th className="px-4 py-2 text-center">IMC (kg/m²)</th>
-                          <th className="px-4 py-2 text-center">Estado Nutricional</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {legend.map(({ imc, label }) => (
-                          <tr key={label}>
-                            <td className="px-4 py-2 text-muted-foreground text-center">{imc}</td>
-                            <td className="px-4 py-2 text-muted-foreground text-center">{label}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                </CardContent>
-              </Card>
-              
-            </div>
-            <div>
                 
-                <h3 className="text-2xl font-semibold mb-4 text-foreground mt-8">
-                  Por que isso importa?
-                </h3>
-                <p className="text-lg leading-relaxed text-muted-foreground mb-6 md:text-justify">
-                  Os dados apresentados aqui são uma ferramenta estratégica para o 
-                  <span className="text-secondary font-semibold"> monitoramento contínuo </span> da situação 
-                  nutricional no território nacional, <span className="text-accent font-semibold">avaliação de impacto</span>{' '}
-                  de políticas públicas e <span className="text-secondary font-semibold">planejamento de ações locais</span>{''}, como campanhas de prevenção à obesidade.
+                <br></br>
+                <p className="text-lg leading-relaxed text-muted-foreground md:text-justify">
+                  Portanto, os indicadores desta plataforma referem-se à <span className="text-secondary/90"> população usuária do 
+                  SUS</span> monitorada no período. Embora não possuam inferência universal para toda a demografia brasileira,
+                  representam o cenário da demanda nos serviços de saúde, constituindo uma evidência sólida para a gestão do sistema.
                 </p>
-                <p className="text-xl text-muted-foreground max-w-1xl mx-auto italic text-center">Transformando dados em ação</p>
-                <p className="text-xl text-muted-foreground max-w-1xl mx-auto italic text-center">
-                  Use nosso mapeamento como base técnica para decisões mais eficazes em saúde pública
-                </p>
+                <br></br>
+              </div>
               </div>
         </section>
-
-        {/* Visualization */}
-        <section className="mb-8" id="como-calculamos">
+        <section className="mb-8">
           <Card className="shadow-medium bg-gradient-accent mb-4">
             <CardContent className="p-2 md:p-2 text-left">
-              <h2 className="text-3xl font-bold text-white">Nossas Visualizações</h2>
+              <h2 className="text-3xl font-bold text-white ">
+                Harmonização Territorial
+              </h2>
+            </CardContent>
+          </Card>
+          <div className=" ml-4 mr-10 ">
+          <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
+          Para garantir a consistência dos dados temporais, 
+          aplicou-se uma metodologia de compatibilização geográfica.
+          </p>
+          <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
+          Utilizou-se como base fixa a malha de<span className="text-secondary/90"> Regiões e Macrorregiões de Saúde vigente em 2024/2025</span> (fontes:
+          DEMAS-SEIDIGI e IBGE<a href="#ref-macro" className="hover:text-secondary/50" aria-label="Ir para referência 3">[3]</a><a href="#ref-ibge" className="hover:text-secondary/50" aria-label="Ir para referência 4">[4]</a>). 
+          Os dados dos anos anteriores foram projetados sobre esta configuração atual. 
+          Isso assegura que as variações observadas ao longo do tempo reflitam mudanças reais nos indicadores de 
+          saúde daquele território, sem a interferência de alterações administrativas nas divisas regionais 
+          ocorridas na última década.
+          </p>
+          </div>
+
+          </section>
+        <section className="mb-8">
+          <Card className="shadow-medium bg-gradient-accent mb-4">
+            <CardContent className="p-2 md:p-2 text-left">
+              <h2 className="text-3xl font-bold text-white ">
+                Classificação Antropométrica e Indicadores
+              </h2>
+            </CardContent>
+          </Card>
+          <div className=" ml-4 mr-10 ">
+          <p className="text-lg leading-relaxed text-muted-foreground mb-2 md:text-justify">
+          O estado nutricional para adultos (20 a 59 anos) segue os pontos de corte de Índice de Massa Corporal (IMC)
+          preconizados pela Organização Mundial da Saúde (OMS) e adotados pelo Ministério da Saúde 
+          <a href="#ref-aps" className="hover:text-secondary/50" aria-label="Ir para referência 2">[2]</a>:
+          </p>
+
+          <Card className="shadow-strong max-w-fit bg-muted-foreground/5 place-self-center">
+            <CardContent className="p-2">
+              <div className="place-items-center">  
+                <table className="min-w-4xl text-sm text-left">
+                  <thead className="bg-muted-foreground/30">
+                    <tr className="text-center text-base">
+                      <th className="px-4 py-2">Classificação</th>
+                      <th className="px-4 py-2">Intervalo de IMC (kg/m²)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {legend.map(({ imc, label }) => (
+                      <tr key={label}>                  
+                        <td className="px-4 py-2 text-muted-foreground text-left">{label}</td>
+                        <td className="px-4 py-2 text-muted-foreground text-center">{imc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
 
+            <div>             
+                <h3 className="text-2xl font-semibold mb-4 text-foreground mt-8">
+                  Agrupamentos para Visualização
+                </h3>
+                <p className="text-lg leading-relaxed text-muted-foreground mb-6 md:text-justify">
+                  Para facilitar a leitura epidemiológica e a identificação de riscos nas visualizações, 
+                  foram utilizados também dois indicadores agregados:
+                </p>
+                <ul className="list-none space-y-2 text-lg text-muted-foreground ml-6 text-justify">
+                  <li className="relative pl-5">
+                    <span
+                      className="absolute left-0 top-3 h-2 w-2 rounded-full bg-secondary"
+                    />{''}<span className="text-secondary font-semibold">Excesso de Peso:</span>{''} Agrega 
+                    todos os indivíduos com IMC ≥ 25,0 kg/m² (soma de <span className="italic">Sobrepeso</span> + <span className="italic">Obesidade Graus I, II</span> e <span className="italic">III</span>);
+                  </li>
+                  <li className="relative pl-5">
+                    <span
+                      className="absolute left-0 top-3 h-2 w-2 rounded-full bg-accent"
+                    />{''}<span className="text-accent font-semibold">Obesidade (Geral):</span>{''} Agrega 
+                    todos os indivíduos com IMC ≥ 30,0 kg/m² (soma de <span className="italic">Obesidade Graus I, II</span> e <span className="italic">III</span>);
+                  </li>
+                </ul>
+              </div>
+          </div>
+        </section>
+        <section className="mb-8">
+          <Card className="shadow-medium bg-gradient-accent mb-4">
+            <CardContent className="p-2 md:p-2 text-left">
+              <h2 className="text-3xl font-bold text-white ">
+                Cálculo de Indicadores
+              </h2>
+            </CardContent>
+          </Card>
+          <div className=" ml-4 mr-10 ">
+
           {/* Comum */}
           <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-6">
-            O fluxo começa pela escolha do <span className="font-semibold">recorte</span>, que define o universo do cálculo:
-            UF → (Município ou <span className="font-semibold">Macrorregião de Saúde</span> ou Região de Saúde) → Ano → Gênero.
-            Em qualquer módulo, a opção <span className="font-semibold">“Todos”</span> é a soma de Feminino + Masculino.
-            Percentuais são arredondados na interface, mas os cálculos preservam precisão para evitar distorções por arredondamento acumulado.
-            Cada visualização fixa uma ou duas variáveis do recorte como “constantes” e compara as demais dentro desse mesmo universo.
-            Foram criados os <span className="font-semibold">agrupamentos “Obesidade” e "Excesso de peso"</span>, sendo o agregado de todos os três graus de obesidade e
-            o agregado de sobrepeso com os três graus de obesidade, respectivamente. Ambos disponíveis em todas três visões. 
+            Para transformar os dados em informações comparáveis, utilizamos a <span className="text-secondary/90">Prevalência</span> (frequência relativa). 
+            Diferente do número absoluto, a prevalência permite comparar municípios e regiões de tamanhos 
+            populacionais diferentes [6] 
           </p>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:items-start mt-4">
 
             {/* Mapeamento */}
             <div>
-              <h3 className="text-2xl font-semibold mb-4 text-foreground">Mapeamento Nutricional</h3>
-              <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
-                A pergunta aqui é “<span className="text-accent font-semibold"><em>como se reparte o todo entre os estados nutricionais marcados</em>?</span>”.
-                Para cada selecionado, partimos do recorte e calculamos a soma das parcelas dos estados marcados, gerando um
-                <em> Total</em><sub>group</sub>. Cada barra representa a fração de um estado nutricional sobre esse
-                <em> Total</em><sub>group</sub> — uma distribuição <em>interna</em> condicionada ao conjunto escolhido.
-                A visualização mostra barras agrupadas (Masculino, Feminino, Todos) e uma barra empilhada (Feminino sobre Masculino) para evidenciar a composição por gênero em <i>Todos</i>.
+              <h3 className="text-2xl font-semibold mb-4 text-foreground">A Fórmula da Prevalência</h3>
+              <p className="text-lg leading-relaxed text-muted-foreground md:text-justify">
+                O percentual exibido nos gráficos e mapas representa a proporção de indivíduos em uma determinada 
+                condição em relação ao total de pessoas avaliadas naquele grupo específico:
               </p>
-
-              {/* Callout 1 */}
-              <div className="rounded-xl border border-accent bg-accent/20 p-4 mb-2">
-                <div className="text-lg text-yellow-800 md:text-justify ">
-                  <p>
-                  <TriangleAlert className="inline-block h-6 w-6 align-text-top" aria-hidden /> <span className="text-xl">Denominador variável</span>
-                  </p>
-                  <p> 
-                    A distribuição é <em>interna</em> aos estados nutricionais marcados, ou seja, marcar/desmarcar categorias altera o denominador e, portanto, todas as porcentagens. Evite comparar diretamente com prevalências da Análise Temporal ou do Mapeamento Demográfico.
-                  </p>
-                </div>
+              <br />
+              <div className="col-span-2 text-center text-muted-foreground">
+                <math display="block">
+                  <mrow>
+                    <mi>Prevalência (%)</mi>
+                    <mo>=</mo>
+                    <mfrac>
+                      <mrow>
+                        <mi>Nº de individuos na classificação</mi>
+                      </mrow>
+                      <mrow>
+                        <mi>Total de indivíduos avaliados (no ano, sexo e local selecionados)</mi>
+                      </mrow>
+                    </mfrac>
+                    <mo>&times; 100</mo>
+                  </mrow>
+                </math>
+                {/* em JSX o <br> precisa ser self-closed */}
+                <br />
               </div>
+              
             </div>
 
             {/* Regional / Demográfico */}
             <div>
-              <h3 className="text-2xl font-semibold mb-4 text-foreground">Mapeamento Demográfico</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-foreground">Representação dos Dados</h3>
+              <h4 className="text-xl font-semibold mb-4 text-secondary/80">Mapeamento Demográfico</h4>
               <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
-                A unidade básica é o município, associado à região do recorte vigente na visualização, seja Unidade Federativa,
-                Região de Saúde ou <span className="font-semibold">Macrorregião de Saúde</span>. Para cada região,
-                somamos tanto o numerador do estado nutricional quanto o seu total, e calculamos:
+                Apresenta a distribuição espacial das prevalências.
               </p>
+              <ul className="list-none space-y-2 text-lg text-muted-foreground ml-6 text-justify">
+                  <li className="relative pl-5">
+                    <span
+                      className="absolute left-0 top-3 h-2 w-2 rounded-full bg-accent"
+                    />{''}<span className="text-accent font-semibold">Nota Técnica: </span>{''}                   
+                  Municípios representados na cor cinza indicam ausência de dados ou número insuficiente de registros no 
+                  sistema para o ano selecionado, não devendo ser interpretados como prevalência zero. A cartografia 
+                  utiliza como base os arquivos shapefile do projeto Geodata BR
+                  <a href="#ref-geodata" className="hover:text-secondary/50" aria-label="Ir para referência 2">[5]</a>.
+                </li>
+              </ul>
 
-              <div className="col-span-2 text-center text-muted-foreground mt-6 mb-6">
-                <math display="block">
-                  <mrow>
-                    <mi>prevalência regional (%)</mi>
-                    <mo>=</mo>
-                    <mfrac>
-                      <msub><mi>Total</mi><mn>nutri</mn></msub>
-                      <mrow><mi>Total</mi></mrow>
-                    </mfrac>
-                    <mo>×</mo>
-                    <mn>100 %.</mn>
-                  </mrow>
-                </math>
-                <br />
-              </div>
-
+              <h4 className="text-xl font-semibold mt-6 mb-4 text-secondary/80">Mapeamento Demográfico</h4>
               <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
-                Usamos escala de cores <span className="font-semibold">quantizada</span> com faixas e legenda textual;
-                regiões sem valores (Total = 0) aparecem em cinza.
-              </p>
-
-              {/* Callout 2 */}
-              <div className="rounded-xl border border-blue-300 bg-blue-50 p-4 mt-4 mb-4">
-                <div className="text-lg text-blue-900 md:text-justify">
-                  <p><TriangleAlert className="inline-block h-6 w-6 align-text-top" aria-hidden /> <span className="text-xl">MAUP/escala geográfica</span></p> 
-                  <p>Prevalências por Macrorregião ou Região de Saúde agregam municípios.
-                  Evite inferir comportamento municipal ou individual a partir do mapa (“falácia ecológica”).</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Callout 3 */}
-          <div className="rounded-xl border border-secondary bg-secondary/20 p-4 mb">
-            <p className="text-lg text-red-800 md:text-justify">
-              <TriangleAlert className="inline-block h-6 w-6 align-text-top" aria-hidden /> <span className="text-xl">Malha de Regiões e Macrorregiões fixadas em 2025 </span></p>
-            <p className="text-lg text-red-800 md:text-justify">
-              As análises espaciais utilizam a configuração vigente em 2025 como referência
-              <span className="font-semibold"> fixa</span> para todos os anos exibidos.
-              Nos anos em que o SUS tenha alterado a composição regional, os resultados
-              <span className="font-semibold"> não</span> representam a malha administrativa daquele ano,
-              mas a projeção dos dados na malha 2025. Assim, variações ao longo do tempo refletem mudanças
-              nos estados nutricionais, <span className="font-semibold">não</span> no desenho regional.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:items-start mt-4">
-
-            {/* Temporal */}
-            <div>
-              <h3 className="text-2xl font-semibold mb-4 text-foreground">Análises Temporais</h3>
-              <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-2">
-                Seleciona-se um estado nutricional e calcula-se sua <span className="font-semibold">prevalência por ano</span> no recorte.
-                Para cada ano, somamos o numerador do estado nutricional e o total; então tomamos a razão (× 100) para o valor exibido.
-                O eixo X usa anos ordenados e o eixo Y é percentual, com teto ajustado ao máximo observado (com margem).
-                Mostramos linhas por gênero (quando aplicável) e marcadores com rótulos do valor anual.
+                Exibe a evolução dos indicadores ao longo dos anos (2008-2024). 
+                Esta visualização permite observar o comportamento histórico dos dados, 
+                facilitando a identificação de tendências de aumento ou estabilização do estado nutricional 
+                na região selecionada.
               </p>
             </div>
 
-            {/* Tabela “o que cada visualização fixa/compare” */}
-            <div>
-              <Card className="shadow-strong">
-                <CardContent className="p-8">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-muted-foreground/5">
-                      <tr>
-                        <th className="px-4 py-2 text-center">Visualização</th>
-                        <th className="px-20 py-2 text-center">Recorte</th>
-                        <th className="px-4 py-2 text-center">Compare</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {visualize.map(({ symbol, viz, show, compare }) => (
-                        <tr key={viz}>
-                          <td className="flex px-4 py-2 text-muted-foreground text-start items-center">{symbol} {viz}</td>
-                          <td className="px-4 py-2 text-muted-foreground text-center">{show}</td>
-                          <td className="px-4 py-2 text-muted-foreground text-center">{compare}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </CardContent>
-              </Card>
-            </div>
+            
           </div>
-          <div className="rounded-xl border border-accent bg-accent/20 p-4 mt-4">
-            <p className="text-lg text-yellow-800 md:text-justify">
-              <TriangleAlert className="inline-block h-6 w-6 align-text-center" aria-hidden /> <span className="text-xl">Atenção para como ler valores por gênero!</span><br />
-              • Quando Gênero = <span className="text-primary italic"> Todos</span>, os valores mostrados para Feminino e Masculino representam a
-              <span className="font-semibold"> parcela interna</span> de cada gênero <em>dentro do total</em> “Todos” naquele ano (não são as prevalências em seus próprios denominadores).<br />
-              • Quando Gênero = <span className="text-secondary italic">Feminino</span> ou Gênero = <span className="text-accent italic">Masculino</span>, os valores são
-              <span className="font-semibold"> calculados a partir do total daquele gênero</span> no ano/recorte — portanto, podem diferir dos exibidos em “Todos”.
-            </p>
-          </div>
+
+          
+
+          
         </section>
 
 
@@ -380,35 +344,49 @@ const Metodologia = () => {
               </h2>
             </CardContent>
           </Card>
-           <ol className="list-decimal pl-5 text-lg leading-relaxed text-muted-foreground mb-6 md:text-justify">
-            <li id="ref-sisvan" className="scroll-mt-24">
-              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://sisaps.saude.gov.br/sisvan/relatoriopublico/index">
-             Relatórios de Acesso Público. Site Oficial do Sistema de Vigilância Alimentar e Nutricional (SISVAN).
-          <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
-              <a href="#cite-sisvan" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
+           <ul className="list-none pl-5 text-lg leading-relaxed text-muted-foreground mb-6 mr-10 md:text-justify">
+
+            <li id="ref-sisvan" className="scroll-mt-24 mb-4">
+              
+            [1] Brasil. Ministério da Saúde. 
+            Secretaria de Atenção Primária à Saúde. 
+            <span className="text-secondary/90"> Sistema de Vigilância Alimentar e Nutricional - SISVAN Web. </span>
+             Relatórios de Acesso Público. 
+            Disponível em:<a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="http://sisaps.saude.gov.br/sisvan/"><span className="underline">http://sisaps.saude.gov.br/sisvan</span>.
+
+           <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
             </li>
 
-            <li id="ref-macro" className="scroll-mt-24">
-              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://infoms.saude.gov.br/extensions/SEIDIGI_DEMAS_MACRORREGIOES/SEIDIGI_DEMAS_MACRORREGIOES.html">
-             Ministério da Saúde - Macrorregiões e Regiões de Saúde. Desenvolvido pelo DEMAS-SEIDIGI.
-          <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
-              <a href="#cite-macro" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
+            <li id="ref-aps" className="scroll-mt-24 mb-4">
+             [2] Brasil. Ministério da Saúde. 
+             Secretaria de Atenção à Saúde. 
+             Departamento de Atenção Básica. 
+             <span className="text-secondary/90"> Orientações para a coleta e análise de dados antropométricos em serviços de saúde: 
+             Norma Técnica do Sistema de Vigilância Alimentar e Nutricional – SISVAN. </span>
+             Brasília: Ministério da Saúde, 2011.
             </li>
 
-            <li id="ref-shape" className="scroll-mt-24">
-              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://github.com/tbrugz/geodata-br">
-             Projeto Geodata BR - Brasil. Criado por Telmo Brugnara - github/tbrugz.
-          <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
-              <a href="#cite-shape" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
+            <li id="ref-macro" className="scroll-mt-24 mb-4">
+              [3] Brasil. Ministério da Saúde. 
+              Departamento de Monitoramento e Avaliação do SUS (DEMAS-SEIDIGI).  
+              <span className="text-secondary/90"> Divisão Territorial de Saúde: Macrorregiões e Regiões de Saúde.
+            </span>
             </li>
 
-            <li id="ref-ibge" className="scroll-mt-24">
-              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" target="_blank" href="https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html?=&t=downloads">
-             Malha Municipal - Instituto Brasileiro de Geografia e Estatística (IBGE).
-          <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
-              <a href="#cite-ibge" className="ml-2 text-xs underline hover:no-underline hover:text-sm hover:text-secondary/80">↩ voltar</a>
+            <li id="ref-ibge" className="scroll-mt-24 mb-4">
+              [4] Instituto Brasileiro de Geografia e Estatística (IBGE).   
+              <span className="text-secondary/90"> Malha Municipal Digital.</span> Rio de Janeiro: IBGE.
             </li>
-          </ol>
+
+            <li id="ref-geodata" className="scroll-mt-24 mb-4">
+              [5] BRUGNARA, Telmo.    
+              <span className="text-secondary/90"> Geodata BR - Brasil.</span> Porto Alegre: Github, 2020.
+              Disponível em:
+              <a className="ml-2 text-muted-foreground hover:underline hover:text-secondary/50" 
+              target="_blank" href="https://github.com/tbrugz/geodata-br"><span className="underline">https://github.com/tbrugz/geodata-br</span>.
+              <ExternalLink className="inline-block h-3 w-3 align-text-bottom" aria-hidden /></a>
+            </li>
+          </ul>
         </section>
       </div>
     </div>

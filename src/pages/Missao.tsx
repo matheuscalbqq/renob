@@ -51,7 +51,7 @@ const Missao = () => {
                   <Eye className="h-8 w-8 text-secondary/80" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-secondary/80">Transparência</h3>
-                <p className="text-secondary/60">
+                <p className="text-secondary/60 text-sm">
                   Apresentamos dados de forma clara e acessível, promovendo transparência 
                   na comunicação científica.
                 </p>
@@ -64,7 +64,7 @@ const Missao = () => {
                   <UsersRound className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-foreground">Impacto Social</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground  text-sm">
                   Focamos em gerar conhecimento que contribua efetivamente para 
                   melhorar a saúde nutricional da população.
                 </p>
@@ -77,9 +77,9 @@ const Missao = () => {
                   <Lightbulb className="h-8 w-8 text-secondary/80" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-secondary/80">Inovação</h3>
-                <p className="text-secondary/60">
-                  Utilizamos tecnologias modernas de visualização para tornar 
-                  dados complexos compreensíveis e actionáveis.
+                <p className="text-secondary/60 text-sm">
+                  Utilizamos interfaces intuitivas que simplificam a leitura de grandes volumes de dados, 
+                  convertendo-os em informações aplicáveis ao planejamento em saúde
                 </p>
               </CardContent>
             </Card>
@@ -90,7 +90,7 @@ const Missao = () => {
                   <Shield className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-foreground">Rigor Científico</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground  text-sm">
                   Baseamos nossas análises em metodologias científicas sólidas 
                   e dados oficiais validados.
                 </p>
@@ -113,19 +113,19 @@ const Missao = () => {
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-secondary mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-secondary mt-2 flex-shrink-0"></div>
                     <span className="text-muted-foreground">
                       Facilitar o acesso e compreensão dos dados do SISVAN
                     </span>
                   </li>
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-primary mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                     <span className="text-muted-foreground">
                       Promover a tomada de decisão baseada em evidências
                     </span>
                   </li>
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-accent mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-accent mt-2 flex-shrink-0"></div>
                     <span className="text-muted-foreground">
                       Contribuir para políticas públicas de nutrição mais efetivas
                     </span>
@@ -141,21 +141,15 @@ const Missao = () => {
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-secondary mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-secondary mt-2 flex-shrink-0"></div>
                     <span className="text-muted-foreground">
                       Mapear o estado nutricional por região e estado
                     </span>
                   </li>
                   <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-primary mt-2"></div>
+                    <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                     <span className="text-muted-foreground">
-                      Analisar tendências temporais dos indicadores nutricionais
-                    </span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="h-2 w-2 rounded-full bg-accent mt-2"></div>
-                    <span className="text-muted-foreground">
-                      Identificar padrões e correlações nos dados
+                      Estruturar bases de dados de saúde em representações gráficas dinâmicas, facilitando a interpretação de cenários e a fundamentação de análises técnicas
                     </span>
                   </li>
                 </ul>

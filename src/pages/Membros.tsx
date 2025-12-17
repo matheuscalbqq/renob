@@ -52,12 +52,11 @@ const membros = [
     especialidade: "Nutrição e Saúde",
     avatar: "https://i.postimg.cc/ncHcFtgj/Daniela.png",
     descricao: [
-      "Doutora em Nutrição pela UFV",
-      "Desenvolvimento e Tecnologia de Alimentos",
-      "Doenças Crônicas não Transmissíveis",
-      "Inflamação",
-      "Nutrição Bioquímica",
-      "Nutrição Clínica"
+      "Consultora em Real-World Evidence (RWE) e Análise de Dados em Saúde",
+      "Doutora em Ciência da Nutrição pela UFV",
+      "Pesquisadora Pós-Doc no projeto RENOB-MG: Excelência na Atenção Primária à Saúde",
+      "Expertise na condução de ensaios clínicos, revisão sistemática e meta-análise",
+      "Produção técnico-científica e análise de dados secundários para qualificação de gestores no manejo da obesidade e DCNTs"
     ],
     contatos: {
       email:    "dani@dani.com.br",
@@ -108,7 +107,7 @@ const membros = [
 const Membros = () => {
   // helper para não duplicar o JSX do card
   const renderCard = (membro: typeof membros[number]) => (
-    <Card key={membro.id} className="w-full max-w-sm shadow-medium hover:shadow-strong transition-all duration-300 group flex flex-col h-full">
+    <Card key={membro.id} className="w-full max-w-md shadow-medium hover:shadow-strong transition-all duration-300 group flex flex-col h-full">
       <CardContent className="p-6 flex flex-col h-full">
         {/* Avatar and Basic Info */}
         <div className="text-center mb-6">
@@ -119,7 +118,7 @@ const Membros = () => {
             </AvatarFallback>
           </Avatar>
           
-          <h3 className="text-xl font-bold mb-2 text-foreground w-60 flex-center ml-12">
+          <h3 className="text-xl font-bold mb-2 text-foreground text-center max-w-64 mx-auto">
             {membro.nome}
           </h3>
           

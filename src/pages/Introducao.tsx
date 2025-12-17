@@ -61,7 +61,7 @@ const Introducao = () => {
                 <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <VenusAndMars className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold text-primary mb-2">Gêneros</h3>
+                <h3 className="text-2xl font-bold text-primary mb-2">Sexo</h3>
                 <p className="text-muted-foreground">Feminino e Masculino</p>
               </CardContent>
             </Card>
@@ -71,7 +71,7 @@ const Introducao = () => {
                 <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center">
                   <Calendar1 className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="text-2xl font-bold text-accent mb-2">10+ Anos de Dados</h3>
+                <h3 className="text-2xl font-bold text-accent mb-2">Análise Temporal</h3>
                 <p className="text-accent/70">Análises de 2008 a 2024</p>
               </CardContent>
             </Card>

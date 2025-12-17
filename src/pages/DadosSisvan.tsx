@@ -7,8 +7,11 @@ import { initRegional }     from "@/lib/d3/regional";
 import { initTemporal }     from "@/lib/d3/analise_temporal";
 import { useRef, useEffect, useState } from "react";
 import { select } from "d3-selection";
+import DismissibleAlert from '@/components/DismissibleAlert'
 import { preloadCidadesFriendly, debounce, REGIONAL_RESIZE_PROP, TEMPORAL_RESIZE_PROP } from "@/lib/d3/global";
 import * as G from "@/lib/d3/global";
+
+
 
 
 export default function DadosSisvan() {
@@ -65,6 +68,10 @@ export default function DadosSisvan() {
   // Estados para os filtros de Mapeamento
   const [data, setData]             = useState<G.DataRow[]>([]);
   const [regions, setRegions]       = useState<G.RegionDataRow[]>([]);
+
+  
+const [tab, setTab] = useState<"mapeamento" | "regional" | "temporal">("mapeamento");
+const [alertKeyRegional, setAlertKeyRegional] = useState(0);
 
 
   useEffect(()=>{
@@ -262,7 +269,17 @@ export default function DadosSisvan() {
         </div>
 
         {/* Data Visualization Tabs */}
-        <Tabs defaultValue="mapeamento" className="w-full">
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            const next = v as "mapeamento" | "regional" | "temporal";
+            setTab(next);
+
+            // Recria o alerta SOMENTE quando entrar na aba regional
+            if (next === "regional") setAlertKeyRegional((k) => k + 1);
+          }}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="mapeamento" className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
@@ -318,9 +335,9 @@ export default function DadosSisvan() {
                         <option value="">Selecione o ano</option>
                       </select>
 
-                      <label htmlFor="selectSexo" className="block font-semibold mt-2 text-base">Gênero</label>
+                      <label htmlFor="selectSexo" className="block font-semibold mt-2 text-base">Sexo</label>
                       <select ref={selectSexo} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Selecione o gênero</option>
+                        <option value="">Selecione o sexo</option>
                       </select>
                     </div>
 
@@ -402,27 +419,6 @@ export default function DadosSisvan() {
 
                   </div>
                 </div>
-
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-primary/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-primary mb-2">Diferença na quantidade de entrevistados</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Há muito mais adultos femininos que masculinos presentes nos dados, com mais de 50 vezes mais nos anos iniciais e até 3 vezes nos anos mais recentes
-                    </p>
-                  </div>
-                  <div className="bg-secondary/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-secondary mb-2">Proporções semelhantes</h4>
-                    <p className="text-sm text-secondary/80">
-                      Apesar da grande diferença na quantidade de entrevistados, ambos os gêneros possuem proporções similares dos indicativos
-                    </p>
-                  </div>
-                  <div className="bg-accent/10 p-4 rounded-lg">
-                    <h4 className="font-semibold text-accent mb-2">Mudança de moda</h4>
-                    <p className="text-sm text-accent/70">
-                      Entre 2018 e 2020 há uma mudança no valor mais frenquente de Eutrófico para Sobrepeso 
-                    </p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -431,7 +427,7 @@ export default function DadosSisvan() {
           <TabsContent forceMount value="regional" className="data-[state=inactive]:hidden data-[state=active]:block">
             <Card className="shadow-medium">
               <CardContent className="p-8">
-                <div className="mb-6">
+                <div className="mb-2 ">
                   <h2 ref={titleReg} className="text-2xl font-bold mb-3 text-foreground">
                     Mapeamento Regional
                   </h2>
@@ -439,8 +435,12 @@ export default function DadosSisvan() {
                     Mapa demográfico de cada estado nutricional no Brasil, com visualização de suas diversas regiões e divisões. 
                     Nele é possível notar padrões e características específicas de cada região.
                   </p>
-                </div>
-                
+                  <DismissibleAlert key={alertKeyRegional} className="max-w-4xl place-self-center">
+                    <p className="text-sm leading-snug text-red-800 md:text-justify self-center">
+                      As visualizações das Macrorregiões e Regiões de Saúde são acessadas pelo filtro "Divisão" na visualização de municípios.
+                    </p>
+                  </DismissibleAlert>
+                </div>                
                 {/* Placeholder for D3 Chart */}
                 <div className="bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/30 p-2 w-full flex gap-6">
                   <div className="w-1/5 flex  flex-col gap-6">
@@ -451,9 +451,9 @@ export default function DadosSisvan() {
                         <option value="">Ano</option>
                       </select>
 
-                      <label htmlFor="filtro-sexo" className="block font-semibold mt-2 text-base">Gênero</label>
+                      <label htmlFor="filtro-sexo" className="block font-semibold mt-2 text-base">Sexo</label>
                       <select id="filtro-sexo" ref={selectSexoReg} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Gênero</option>
+                        <option value="">Sexo</option>
                       </select>
                       
                       <label htmlFor="filtroNutricional" className="block font-semibold mt-2 text-base">Estado Nutricional</label>
@@ -500,30 +500,6 @@ export default function DadosSisvan() {
                   </div>
 
                 </div>
-
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-5 gap-4">
-                  <div className="bg-gradient-accent p-4 rounded-lg text-center">
-                    <h4 className="font-bold text-primary mb-1">Norte</h4>
-                    <p className="text-xs text-background">Maiores prevalências de Sobrepeso</p>
-                  </div>
-                  <div className="bg-gradient-accent p-4 rounded-lg text-center">
-                    <h4 className="font-bold text-primary mb-1">Nordeste</h4>
-                    <p className="text-xs text-background">Maiores prevalências de Baixo Peso</p>
-                  </div>
-                  <div className="bg-gradient-accent p-4 rounded-lg text-center">
-                    <h4 className="font-bold text-primary mb-1">Centro-Oeste</h4>
-                    <p className="text-xs text-background">Prevalência mediana na maioria dos indicadores</p>
-                  </div>
-                  <div className="bg-gradient-accent p-4 rounded-lg text-center">
-                    <h4 className="font-bold text-primary mb-1">Sudeste</h4>
-                    <p className="text-xs text-background">Prevalência mediana em todos os indicadores</p>
-                  </div>
-                  <div className="bg-gradient-accent p-4 rounded-lg text-center">
-                    <h4 className="font-bold text-primary mb-1">Sul</h4>
-                    <p className="text-xs text-background">Maiores prevalências de Obesidade</p>
-                  </div>
-                  
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -564,9 +540,9 @@ export default function DadosSisvan() {
                       <option value="">Selecione a Divisão</option>
                       </select>
 
-                      <label htmlFor="filtroSexoTemp" className="block font-semibold mt-2 text-base">Gênero</label>
+                      <label htmlFor="filtroSexoTemp" className="block font-semibold mt-2 text-base">Sexo</label>
                       <select id="filtroSexoTemp" ref={selectSexoTemp} className="mt-1 border border-gray-300 rounded p-1 w-full">
-                        <option value="">Selecione o Gênero</option>
+                        <option value="">Selecione o sexo</option>
                       </select>
 
                       <label htmlFor="filtroNutriTemp" className="block font-semibold mt-2 text-base">Estado Nutricional</label>

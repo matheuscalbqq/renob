@@ -538,7 +538,7 @@ const Materiais = () => {
                 dados customizados para sua pesquisa.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="mailto:helenhermana@ufv.br">
+                <a href="mailto:renob@ufv.br">
                 <Button variant="secondary" size="lg" className="px-8 w-40">
                   Entrar em Contato
                 </Button>
