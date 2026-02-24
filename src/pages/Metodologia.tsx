@@ -263,7 +263,7 @@ const Metodologia = () => {
           <p className="text-lg leading-relaxed text-muted-foreground md:text-justify mb-6">
             Para transformar os dados em informações comparáveis, utilizamos a <span className="text-secondary/90">Prevalência</span> (frequência relativa). 
             Diferente do número absoluto, a prevalência permite comparar municípios e regiões de tamanhos 
-            populacionais diferentes [6] 
+            populacionais diferentes. 
           </p>
 
             {/* Mapeamento */}
